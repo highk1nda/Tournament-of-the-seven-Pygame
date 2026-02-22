@@ -26,7 +26,7 @@ FPS = 60
 
 # Floor settings
 FLOOR_Y = 510
-FLOOR_HEIGHT = 200 #Thikness
+FLOOR_HEIGHT = SCREEN_HEIGHT - FLOOR_Y #Thikness
 
 # Define colors
 GREEN = (26, 66, 28)
@@ -38,8 +38,8 @@ CHARACTER_OFFSET = [40, 37]
 CHARACTER_DATA = [CHARACTER_SIZE, CHARACTER_SCALE, CHARACTER_OFFSET]  # 0 - size, 1 - scale, 2 - offset
 
 # Player sizes
-PLAYER_WIDTH = 150
-PLAYER_HEIGHT = 270
+PLAYER_WIDTH = 140
+PLAYER_HEIGHT = 140
 
 # Load spritesheets
 knight = pygame.image.load(
@@ -53,8 +53,8 @@ WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
 
 knight_y = FLOOR_Y
 # create 2 instances of player 
-knight_test = Fighter(160, knight_y, CHARACTER_DATA, knight, KNIGHT_ANIMATION_STEPS)
-were_test = Fighter(700, knight_y, CHARACTER_DATA, werebear, WEREBEAR_ANIMATION_STEPS)
+knight_test = Fighter(160, FLOOR_Y - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, CHARACTER_DATA, knight, KNIGHT_ANIMATION_STEPS)
+were_test = Fighter(700, FLOOR_Y - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, CHARACTER_DATA, werebear, WEREBEAR_ANIMATION_STEPS)
 
 
 # knight2 = pygame.image.load(
@@ -80,8 +80,6 @@ were_test = Fighter(700, knight_y, CHARACTER_DATA, werebear, WEREBEAR_ANIMATION_
 #     "attack3": pygame.K_SLASH
 # }
 
-PLAYER_1 = 0
-PLAYER_2 = 1
 # set bgm and sound effects
 background_music = pygame.mixer.Sound("assets/sfx/Royalty Free Epic Celtic Fantasy Music - Highland Song.mp3")
 background_music.set_volume(0.2)
@@ -90,6 +88,10 @@ background_music.play()
 forest_sfx = pygame.mixer.Sound("assets/sfx/forest-ambience-296528.mp3")
 forest_sfx.set_volume(0.1)
 forest_sfx.play()
+
+# set numbers to represent players
+PLAYER_1 = 0
+PLAYER_2 = 1
 
 # Game loop
 running = True
@@ -110,8 +112,8 @@ while running:
 
     # GAME LOGIC
     # Update knight movement and state
-    knight_test.move(SCREEN_WIDTH, 610, PLAYER_1) #width, Y position of the player
-    were_test.move(SCREEN_WIDTH, 610, PLAYER_2)
+    knight_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_1) #width, Y position of the player
+    were_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_2)
 
 
     # Update knight

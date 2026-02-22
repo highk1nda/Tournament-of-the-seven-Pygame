@@ -4,7 +4,7 @@ from src.modules.sfx.sound_loader import load_fighter_sounds
 
 
 class Fighter():
-    def __init__(self, x, y, data, sprite_sheet, animation_steps):
+    def __init__(self, x, y, player_width, player_height, data, sprite_sheet, animation_steps):
         self.size = data[0]
         self.image_scale = data[1]
         self.offset = data[2]
@@ -19,15 +19,16 @@ class Fighter():
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pygame.time.get_ticks()
-        self.rect = pygame.Rect(x, y, 140, 140)
+        self.rect = pygame.Rect(x, y, player_width, player_height)
+        self.vel_x = 0
         self.vel_y = 0
         self.running = False
         self.jumping = False
         self.attacking = False
         self.attack_type = 0
-        self.health = 100
-        self.hit = False
+        self.stun = False
         self.death = False
+        self.health = 100
         self.sounds = load_fighter_sounds()
 
         self.walk_sound = self.sounds["walk"]
@@ -40,12 +41,16 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER):
-        SPEED = 6
+    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER):
+        SPEED = 8
         GRAVITY = 2
+        if self.jumping:
+            FRICTION = 0.93 # air friction
+        else:
+            FRICTION = 0.7 # ground friction
         dx = 0
         dy = 0
-        FLOOR_HEIGHT = 100
+
         self.running = False
         self.flip = False
 
@@ -55,40 +60,26 @@ class Fighter():
         # EDIT FOR EACH PLAYER
         # SPLIT IN TWO CLASS INSTANCES
         #
+        # PLAYER 1
         # MOVEMENT BINDS WASD
         if PLAYER == 0:
             if key[pygame.K_d]:  # RIGHT
-                dx += SPEED
+                self.vel_x = SPEED
                 self.running = True
-            if key[pygame.K_a]:  # LEFT
-                dx -= SPEED
+            elif key[pygame.K_a]:  # LEFT
+                self.vel_x = -SPEED
                 self.running = True
-
-        # jumping
-        if PLAYER == 0:
-            if key[pygame.K_w]:  # UP
-                self.vel_y -= SPEED
-        if PLAYER == 1:
-            if key[pygame.K_SPACE]:  # UP
-                self.vel_y -= SPEED
-
-        if key[pygame.K_i]:  # FLIP TEST
-            if self.flip == True:
-                self.flip = False
-        # MOVEMENT BINDS ARROWS
-        if PLAYER == 1:
-            if key[pygame.K_RIGHT]:  # RIGHT
-                dx += SPEED
-                self.running = True
-            if key[pygame.K_LEFT]:  # LEFT
-                dx -= SPEED
-                self.running = True
+            else:
+                self.vel_x *= FRICTION  # apply friction
+                if abs(self.vel_x) < 0.2:
+                    self.vel_x = 0      # avoid infinite issue
+            
             # jumping
-            if key[pygame.K_UP]:  # UP
-                self.vel_y -= SPEED
+            if key[pygame.K_w] and not self.jumping:  # UP
+                self.vel_y = -30
+                self.jumping = True
 
-        # Attack binds
-        if PLAYER == 0:
+            # attacting
             if not self.attacking:
                 if key[pygame.K_r]:
                     self.attacking = True
@@ -102,25 +93,43 @@ class Fighter():
                     self.attacking = True
                     self.attack_type = 3
                     self.attack_sound_played = False
-
-        # Attack binds
+        
+        # PLAYER 2
+        # MOVEMENT BINDS ARROWS
         if PLAYER == 1:
+            self.flip = True
+            
+            if key[pygame.K_RIGHT]:  # RIGHT
+                self.vel_x = SPEED
+                self.running = True
+            elif key[pygame.K_LEFT]:  # LEFT
+                self.vel_x = -SPEED
+                self.running = True
+            else:
+                self.vel_x *= FRICTION  # apply friction
+                if abs(self.vel_x) < 0.2:
+                    self.vel_x = 0      # avoid infinite issue
+
+            # jumping
+            if key[pygame.K_UP] and not self.jumping:  # UP
+                self.vel_y = -30
+                self.jumping = True
+
+            # attacking
             if not self.attacking:
-                if key[pygame.K_RCTRL]:
+                if key[pygame.K_PERIOD]:
                     self.attacking = True
                     self.attack_type = 1
                     self.attack_sound_played = False
-                elif key[pygame.K_PERIOD]:
+                elif key[pygame.K_SLASH]:
                     self.attacking = True
                     self.attack_type = 2
                     self.attack_sound_played = False
-                elif key[pygame.K_SLASH]:
+                elif key[pygame.K_RSHIFT]:
                     self.attacking = True
                     self.attack_type = 3
                     self.attack_sound_played = False
 
-        if PLAYER == 1:
-            self.flip = True
 
         # SFX
         # walking sound
@@ -144,22 +153,23 @@ class Fighter():
                 self.orc_attack_sound.play()
             self.attack_sound_played = True
 
-        # gravity
+        # apply gravity
         self.vel_y += GRAVITY
-        dy += self.vel_y
+
+        dx = self.vel_x
+        dy = self.vel_y
 
         # is player on screen
         if self.rect.left + dx < 0:
-            dx -= self.rect.left
+            dx = -self.rect.left
+            self.vel_x = 0
         if self.rect.right + dx > SCREEN_WIDTH:
             dx = SCREEN_WIDTH - self.rect.right
+            self.vel_x = 0
         if self.rect.bottom + dy > SCREEN_HEIGHT - FLOOR_HEIGHT:
             self.vel_y = 0
             dy = SCREEN_HEIGHT - FLOOR_HEIGHT - self.rect.bottom
-        if self.rect.top + dy > SCREEN_HEIGHT:
-            self.vel_y = 0
-        if self.rect.top + dy < 0:
-            self.vel_y = 0
+            self.jumping = False
 
         # update position
         self.rect.x += dx
@@ -182,6 +192,8 @@ class Fighter():
             # update the current animation
             self.frame_index = 0
             self.update_time = pygame.time.get_ticks()
+
+
 # Legacy code, don't mind
 #     # Player 1 crouch (S)
 #     if keys[pygame.K_s]:
