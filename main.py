@@ -30,6 +30,8 @@ FLOOR_HEIGHT = SCREEN_HEIGHT - FLOOR_Y #Thikness
 
 # Define colors
 GREEN = (26, 66, 28)
+RED = (255, 0, 0)
+WHITE = (255, 255, 255)
 
 # define knight variables - frame size
 CHARACTER_SIZE = 100
@@ -80,6 +82,20 @@ were_test = Fighter(700, FLOOR_Y - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, T
 #     "attack3": pygame.K_SLASH
 # }
 
+# function for drawing fighter health bars
+def draw_health_bar(health, x, y, right_side):
+    ratio = health / 100
+    max_width = 400
+    current_width = max_width * ratio
+    
+    pygame.draw.rect(display_surface, WHITE, (x - 2, y - 2, 404, 34), 2)
+
+    # make health bars axially symmetric
+    if not right_side:
+        pygame.draw.rect(display_surface, RED, (x, y, current_width, 30))
+    else:
+        pygame.draw.rect(display_surface, RED, (x + max_width - current_width, y, current_width, 30))
+
 # set bgm and sound effects
 background_music = pygame.mixer.Sound("assets/sfx/Royalty Free Epic Celtic Fantasy Music - Highland Song.mp3")
 background_music.set_volume(0.2)
@@ -107,6 +123,9 @@ while running:
     # RENDERING
     # Draw background
     display_surface.blit(background, (0, 0))
+    # Draw health bars
+    draw_health_bar(knight_test.health, 20, 20, False)
+    draw_health_bar(were_test.health, 580, 20, True)
     # Draw floor
     pygame.draw.rect(display_surface, GREEN, (0, FLOOR_Y, SCREEN_WIDTH, FLOOR_HEIGHT))
 
