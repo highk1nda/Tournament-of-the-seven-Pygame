@@ -15,11 +15,11 @@ class Fighter():
             self.image_scale,
             animation_steps
         )  # Load in the sheet straight away. List of lists of animations
-        self.action = 0  # 0 - IDLE 1 - Walk
+        self.action = 0  # 0 - IDLE, 1 - Walk
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pygame.time.get_ticks()
-        self.rect = pygame.Rect(x, y, 200, 200)
+        self.rect = pygame.Rect(x, y, 140, 140)
         self.vel_y = 0
         self.running = False
         self.jumping = False
@@ -171,7 +171,7 @@ class Fighter():
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
-        # pygame.draw.rect(surface, (222, 110, 0), self.rect)
+        pygame.draw.rect(surface, (222, 110, 0), self.rect)
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
 
