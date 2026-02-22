@@ -15,7 +15,7 @@ class Fighter():
             self.image_scale,
             animation_steps
         )  # Load in the sheet straight away. List of lists of animations
-        self.action = 0  # 0 - IDLE, 1 - Walk
+        self.action = 0  # 0: idle, 1: run, 2: attack1, 3: attack2, 4: attack3, -2: hit stun, -1: death
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pygame.time.get_ticks()
