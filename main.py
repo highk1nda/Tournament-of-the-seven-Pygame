@@ -112,8 +112,8 @@ while running:
 
     # GAME LOGIC
     # Update knight movement and state
-    knight_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_1, were_test) #width, Y position of the player
-    were_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_2, knight_test)
+    knight_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_1, were_test, display_surface) #width, Y position of the player
+    were_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_2, knight_test, display_surface)
 
 
     # Update knight

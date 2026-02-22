@@ -41,7 +41,7 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER, TARGET):
+    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER, TARGET, SURFACE):
         SPEED = 8
         GRAVITY = 2
         if self.jumping:
@@ -81,18 +81,17 @@ class Fighter():
 
             # attacting
             if not self.attacking:
-                if key[pygame.K_r]:
-                    self.attacking = True
-                    self.attack_type = 1
-                    self.attack_sound_played = False
-                elif key[pygame.K_f]:
-                    self.attacking = True
-                    self.attack_type = 2
-                    self.attack_sound_played = False
-                elif key[pygame.K_v]:
-                    self.attacking = True
-                    self.attack_type = 3
-                    self.attack_sound_played = False
+                if key[pygame.K_r] or key[pygame.K_f] or key[pygame.K_v]:
+                    self.attack(SURFACE, TARGET)
+                    if key[pygame.K_r]:
+                        self.attack_type = 1
+                        self.attack_sound_played = False
+                    elif key[pygame.K_f]:
+                        self.attack_type = 2
+                        self.attack_sound_played = False
+                    elif key[pygame.K_v]:
+                        self.attack_type = 3
+                        self.attack_sound_played = False
         
         # PLAYER 2
         # MOVEMENT BINDS ARROWS
@@ -117,18 +116,17 @@ class Fighter():
 
             # attacking
             if not self.attacking:
-                if key[pygame.K_PERIOD]:
-                    self.attacking = True
-                    self.attack_type = 1
-                    self.attack_sound_played = False
-                elif key[pygame.K_SLASH]:
-                    self.attacking = True
-                    self.attack_type = 2
-                    self.attack_sound_played = False
-                elif key[pygame.K_RSHIFT]:
-                    self.attacking = True
-                    self.attack_type = 3
-                    self.attack_sound_played = False
+                if key[pygame.K_PERIOD] or key[pygame.K_SLASH] or key[pygame.K_RSHIFT]:
+                    self.attack(SURFACE, TARGET)
+                    if key[pygame.K_PERIOD]:
+                        self.attack_type = 1
+                        self.attack_sound_played = False
+                    elif key[pygame.K_SLASH]:
+                        self.attack_type = 2
+                        self.attack_sound_played = False
+                    elif key[pygame.K_RSHIFT]:
+                        self.attack_type = 3
+                        self.attack_sound_played = False
 
 
         # SFX
@@ -180,6 +178,18 @@ class Fighter():
         # update position
         self.rect.x += dx
         self.rect.y += dy
+
+    def attack(self, surface, TARGET):
+        self.attacking = True
+        # create attacking hitbox 
+        attacking_rect = pygame.Rect(self.rect.centerx - (1.5 * self.rect.width * self.flip), self.rect.y, 1.5 * self.rect.width, self.rect.height)
+
+        # collision detect
+        if attacking_rect.colliderect(TARGET.rect):
+            TARGET.health -= 10
+            TARGET.stun = True
+        
+        pygame.draw.rect(surface, (0, 255, 0), attacking_rect)
 
     # animation loop
     def update(self):
