@@ -29,7 +29,11 @@ def update_fighter_animation(fighter):
 
     # 0: idle, 1: run, 2: attack1, 3: attack2, 4: attack3, -2: hit stun, -1: death
     # Determine what action is happening
-    if fighter.stun:
+    if fighter.health <= 0:
+        fighter.health = 0
+        fighter.death = True
+        new_action = -1
+    elif fighter.stun:
         new_action = -2
     elif fighter.attacking:
         if fighter.attack_type == 1:
@@ -59,11 +63,14 @@ def update_fighter_animation(fighter):
         fighter.frame_index += 1
         fighter.update_time = pygame.time.get_ticks()
 
-    # loop frames and reset actions
+    # check if animation finished, loop frames and reset actions
     if fighter.frame_index >= len(fighter.animation_list[fighter.action]):
-        fighter.frame_index = 0
-        if fighter.attacking:
-            fighter.attacking = False
-            fighter.attack_sound_played = False
-        if fighter.stun:
-            fighter.stun = False
+        if fighter.death:
+            fighter.frame_index = len(fighter.animation_list[-1]) - 1
+        else:
+            fighter.frame_index = 0
+            if fighter.attacking:
+                fighter.attacking = False
+                fighter.attack_sound_played = False
+            if fighter.stun:
+                fighter.stun = False

@@ -56,77 +56,83 @@ class Fighter():
 
         # Key presses
         key = pygame.key.get_pressed()
+
+        # reset speed if stun or dead
+        if self.stun or self.death:
+            self.vel_x = 0
+
         #
         # EDIT FOR EACH PLAYER
         # SPLIT IN TWO CLASS INSTANCES
         #
-        # PLAYER 1
-        # MOVEMENT BINDS WASD
-        if PLAYER == 0:
-            if key[pygame.K_d]:  # RIGHT
-                self.vel_x = SPEED
-                self.running = True
-            elif key[pygame.K_a]:  # LEFT
-                self.vel_x = -SPEED
-                self.running = True
-            else:
-                self.vel_x *= FRICTION  # apply friction
-                if abs(self.vel_x) < 0.2:
-                    self.vel_x = 0      # avoid infinite issue
+       
+        if self.death == False:
+
+            # PLAYER 1
+            # MOVEMENT BINDS WASD
+            if PLAYER == 0:
+                if key[pygame.K_d]:  # RIGHT
+                    self.vel_x = SPEED
+                    self.running = True
+                elif key[pygame.K_a]:  # LEFT
+                    self.vel_x = -SPEED
+                    self.running = True
+                else:
+                    self.vel_x *= FRICTION  # apply friction
+                    if abs(self.vel_x) < 0.2:
+                        self.vel_x = 0      # avoid infinite issue
+                
+                # jumping
+                if key[pygame.K_w] and not self.jumping:  # UP
+                    self.vel_y = -30
+                    self.jumping = True
+
+                # attacting
+                if not self.attacking:
+                    if key[pygame.K_r] or key[pygame.K_f] or key[pygame.K_v]:
+                        self.attack(SURFACE, TARGET)
+                        if key[pygame.K_r]:
+                            self.attack_type = 1
+                            self.attack_sound_played = False
+                        elif key[pygame.K_f]:
+                            self.attack_type = 2
+                            self.attack_sound_played = False
+                        elif key[pygame.K_v]:
+                            self.attack_type = 3
+                            self.attack_sound_played = False
             
-            # jumping
-            if key[pygame.K_w] and not self.jumping:  # UP
-                self.vel_y = -30
-                self.jumping = True
+            # PLAYER 2
+            # MOVEMENT BINDS ARROWS
+            if PLAYER == 1:
+                if key[pygame.K_RIGHT]:  # RIGHT
+                    self.vel_x = SPEED
+                    self.running = True
+                elif key[pygame.K_LEFT]:  # LEFT
+                    self.vel_x = -SPEED
+                    self.running = True
+                else:
+                    self.vel_x *= FRICTION  # apply friction
+                    if abs(self.vel_x) < 0.2:
+                        self.vel_x = 0      # avoid infinite issue
 
-            # attacting
-            if not self.attacking:
-                if key[pygame.K_r] or key[pygame.K_f] or key[pygame.K_v]:
-                    self.attack(SURFACE, TARGET)
-                    if key[pygame.K_r]:
-                        self.attack_type = 1
-                        self.attack_sound_played = False
-                    elif key[pygame.K_f]:
-                        self.attack_type = 2
-                        self.attack_sound_played = False
-                    elif key[pygame.K_v]:
-                        self.attack_type = 3
-                        self.attack_sound_played = False
-        
-        # PLAYER 2
-        # MOVEMENT BINDS ARROWS
-        if PLAYER == 1:
-            self.flip = True
-            
-            if key[pygame.K_RIGHT]:  # RIGHT
-                self.vel_x = SPEED
-                self.running = True
-            elif key[pygame.K_LEFT]:  # LEFT
-                self.vel_x = -SPEED
-                self.running = True
-            else:
-                self.vel_x *= FRICTION  # apply friction
-                if abs(self.vel_x) < 0.2:
-                    self.vel_x = 0      # avoid infinite issue
+                # jumping
+                if key[pygame.K_UP] and not self.jumping:  # UP
+                    self.vel_y = -30
+                    self.jumping = True
 
-            # jumping
-            if key[pygame.K_UP] and not self.jumping:  # UP
-                self.vel_y = -30
-                self.jumping = True
-
-            # attacking
-            if not self.attacking:
-                if key[pygame.K_PERIOD] or key[pygame.K_SLASH] or key[pygame.K_RSHIFT]:
-                    self.attack(SURFACE, TARGET)
-                    if key[pygame.K_PERIOD]:
-                        self.attack_type = 1
-                        self.attack_sound_played = False
-                    elif key[pygame.K_SLASH]:
-                        self.attack_type = 2
-                        self.attack_sound_played = False
-                    elif key[pygame.K_RSHIFT]:
-                        self.attack_type = 3
-                        self.attack_sound_played = False
+                # attacking
+                if not self.attacking:
+                    if key[pygame.K_PERIOD] or key[pygame.K_SLASH] or key[pygame.K_RSHIFT]:
+                        self.attack(SURFACE, TARGET)
+                        if key[pygame.K_PERIOD]:
+                            self.attack_type = 1
+                            self.attack_sound_played = False
+                        elif key[pygame.K_SLASH]:
+                            self.attack_type = 2
+                            self.attack_sound_played = False
+                        elif key[pygame.K_RSHIFT]:
+                            self.attack_type = 3
+                            self.attack_sound_played = False
 
 
         # SFX
@@ -170,10 +176,11 @@ class Fighter():
             self.jumping = False
 
         # ensure players face each other
-        if TARGET.rect.centerx > self.rect.centerx:
-            self.flip = False
-        else:
-            self.flip = True
+        if not self.death:
+            if TARGET.rect.centerx > self.rect.centerx:
+                self.flip = False
+            else:
+                self.flip = True
 
         # update position
         self.rect.x += dx
@@ -182,7 +189,20 @@ class Fighter():
     def attack(self, surface, TARGET):
         self.attacking = True
         # create attacking hitbox 
-        attacking_rect = pygame.Rect(self.rect.centerx - (1.5 * self.rect.width * self.flip), self.rect.y, 1.5 * self.rect.width, self.rect.height)
+        attack_width = int(1.5 * self.rect.width)
+        if self.flip:   
+            # facing left
+            attacking_rect = pygame.Rect(self.rect.left - attack_width, 
+                                     self.rect.y, 
+                                     attack_width, 
+                                     self.rect.height)
+        else:     
+            # facing right
+            attacking_rect = pygame.Rect(self.rect.right, 
+                                     self.rect.y, 
+                                     attack_width, 
+                                     self.rect.height)
+
 
         # collision detect
         if attacking_rect.colliderect(TARGET.rect):
