@@ -53,8 +53,8 @@ WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
 
 knight_y = FLOOR_Y
 # create 2 instances of player 
-knight_test = Fighter(160, FLOOR_Y - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, CHARACTER_DATA, knight, KNIGHT_ANIMATION_STEPS)
-were_test = Fighter(700, FLOOR_Y - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, CHARACTER_DATA, werebear, WEREBEAR_ANIMATION_STEPS)
+knight_test = Fighter(160, FLOOR_Y - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, False, CHARACTER_DATA, knight, KNIGHT_ANIMATION_STEPS)
+were_test = Fighter(700, FLOOR_Y - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, True, CHARACTER_DATA, werebear, WEREBEAR_ANIMATION_STEPS)
 
 
 # knight2 = pygame.image.load(
@@ -112,8 +112,8 @@ while running:
 
     # GAME LOGIC
     # Update knight movement and state
-    knight_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_1) #width, Y position of the player
-    were_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_2)
+    knight_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_1, were_test) #width, Y position of the player
+    were_test.move(SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER_2, knight_test)
 
 
     # Update knight

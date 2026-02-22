@@ -4,11 +4,11 @@ from src.modules.sfx.sound_loader import load_fighter_sounds
 
 
 class Fighter():
-    def __init__(self, x, y, player_width, player_height, data, sprite_sheet, animation_steps):
+    def __init__(self, x, y, player_width, player_height, flip, data, sprite_sheet, animation_steps):
         self.size = data[0]
         self.image_scale = data[1]
         self.offset = data[2]
-        self.flip = False
+        self.flip = flip
         self.animation_list = load_animation_frames(
             sprite_sheet,
             self.size,
@@ -41,7 +41,7 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER):
+    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER, TARGET):
         SPEED = 8
         GRAVITY = 2
         if self.jumping:
@@ -52,7 +52,7 @@ class Fighter():
         dy = 0
 
         self.running = False
-        self.flip = False
+        self.attack_type = 0
 
         # Key presses
         key = pygame.key.get_pressed()
@@ -159,7 +159,7 @@ class Fighter():
         dx = self.vel_x
         dy = self.vel_y
 
-        # is player on screen
+        # check if player is in screen
         if self.rect.left + dx < 0:
             dx = -self.rect.left
             self.vel_x = 0
@@ -170,6 +170,12 @@ class Fighter():
             self.vel_y = 0
             dy = SCREEN_HEIGHT - FLOOR_HEIGHT - self.rect.bottom
             self.jumping = False
+
+        # ensure players face each other
+        if TARGET.rect.centerx > self.rect.centerx:
+            self.flip = False
+        else:
+            self.flip = True
 
         # update position
         self.rect.x += dx
