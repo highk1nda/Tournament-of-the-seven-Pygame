@@ -23,9 +23,9 @@ def load_fighter_sounds():
         )
     }
 
-    sounds["walk"].set_volume(0.2)
+    sounds["walk"].set_volume(0.3)
     sounds["attack1"].set_volume(0.4)
-    sounds["attack2"].set_volume(0.2)
-    sounds["attack3"].set_volume(0.15)
+    sounds["attack2"].set_volume(0.4)
+    sounds["attack3"].set_volume(0.4)
 
     return sounds
