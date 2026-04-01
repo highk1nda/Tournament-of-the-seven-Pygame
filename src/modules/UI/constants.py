@@ -23,8 +23,42 @@ PLAYER_HEIGHT            = 140
 KNIGHT_ANIMATION_STEPS   = [6, 8, 7, 10, 11, 4, 4, 4]
 WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
 
-PLAYER_1 = 0
-PLAYER_2 = 1
+PLAYER_1_INIT_X = 160
+PLAYER_2_INIT_X = 700
+
+PLAYER_SPEED = 8
+JUMPING_SPEED = -30
+GRAVITY = 2
+GROUND_FRICTION = 0.7
+AIR_FRICTION = 0.93
+
+P1_CONTROLS = {
+    "left": pygame.K_a,
+    "right": pygame.K_d,
+    "up": pygame.K_w,
+    "attack1": pygame.K_r,
+    "attack2": pygame.K_f,
+    "attack3": pygame.K_v
+}
+
+P2_CONTROLS = {
+    "left": pygame.K_LEFT,
+    "right": pygame.K_RIGHT,
+    "up": pygame.K_UP,
+    "attack1": pygame.K_PERIOD,
+    "attack2": pygame.K_SLASH,
+    "attack3": pygame.K_RSHIFT
+}
+
+ACTIONS = {
+    "IDLE": 0,
+    "WALK": 1,
+    "ATTACK1": 2,
+    "ATTACK2": 3,
+    "ATTACK3": 4,
+    "HIT": -2,
+    "DEATH": -1
+}
 
 menumusic: str = "assets/sfx/menmusica.mp3"
 forestsound: str = "assets/sfx/forest-ambience-296528.mp3"

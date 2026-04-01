@@ -1,5 +1,6 @@
 import pygame
 
+from src.modules.UI import constants as con
 
 def load_animation_frames(sprite_sheet, size, scale, animation_steps):
     animation_list = []
@@ -27,27 +28,26 @@ def load_animation_frames(sprite_sheet, size, scale, animation_steps):
 def update_fighter_animation(fighter):
     animation_cooldown = 110  # 110 ms between frames
 
-    # 0: idle, 1: run, 2: attack1, 3: attack2, 4: attack3, -2: hit stun, -1: death
     # Determine what action is happening
     if fighter.health <= 0:
         fighter.health = 0
         fighter.death = True
-        new_action = -1
+        new_action = con.ACTIONS["DEATH"]
     elif fighter.stun:
-        new_action = -2
+        new_action = con.ACTIONS["HIT"]
     elif fighter.attacking:
         if fighter.attack_type == 1:
-            new_action = 2 #attack type 1
+            new_action = con.ACTIONS["ATTACK1"]
         elif fighter.attack_type == 2:
-            new_action = 3 #attack type 2
+            new_action = con.ACTIONS["ATTACK2"]
         elif fighter.attack_type == 3:
-            new_action = 4 #attack type 3
+            new_action = con.ACTIONS["ATTACK3"]
         else:
             new_action = fighter.action
     elif fighter.running:
-        new_action = 1  # walk
+        new_action = con.ACTIONS["WALK"]
     else:
-        new_action = 0  # idle
+        new_action = con.ACTIONS["IDLE"]
 
     # update action if changed
     if new_action != fighter.action:

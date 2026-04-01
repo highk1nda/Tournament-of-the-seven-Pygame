@@ -1,10 +1,11 @@
 import pygame
+
 from src.modules.fighter.render import load_animation_frames, update_fighter_animation
 from src.modules.sfx.sound_loader import load_fighter_sounds
-
+from src.modules.UI import constants as con
 
 class Fighter():
-    def __init__(self, x, y, player_width, player_height, flip, data, sprite_sheet, animation_steps):
+    def __init__(self, x, y, player_width, player_height, flip, data, sprite_sheet, animation_steps, controls):
         self.size = data[0]
         self.image_scale = data[1]
         self.offset = data[2]
@@ -29,8 +30,9 @@ class Fighter():
         self.stun = False
         self.death = False
         self.health = 100
-        self.sounds = load_fighter_sounds()
+        self.controls = controls
 
+        self.sounds = load_fighter_sounds()
         self.walk_sound = self.sounds["walk"]
         self.sword_attack1_sound = self.sounds["attack1"]
         self.sword_attack2_sound = self.sounds["attack2"]
@@ -41,13 +43,13 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER, TARGET, SURFACE):
-        SPEED = 8
-        GRAVITY = 2
+    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET, SURFACE):
+        SPEED = con.PLAYER_SPEED
+        GRAVITY = con.GRAVITY
         if self.jumping:
-            FRICTION = 0.93 # air friction
+            FRICTION = con.AIR_FRICTION
         else:
-            FRICTION = 0.7 # ground friction
+            FRICTION = con.GROUND_FRICTION
         dx = 0
         dy = 0
 
@@ -61,79 +63,36 @@ class Fighter():
         if self.stun or self.death:
             self.vel_x = 0
 
-        #
-        # EDIT FOR EACH PLAYER
-        # SPLIT IN TWO CLASS INSTANCES
-        #
-       
         if self.death == False:
-
-            # PLAYER 1
-            # MOVEMENT BINDS WASD
-            if PLAYER == 0:
-                if key[pygame.K_d]:  # RIGHT
-                    self.vel_x = SPEED
-                    self.running = True
-                elif key[pygame.K_a]:  # LEFT
-                    self.vel_x = -SPEED
-                    self.running = True
-                else:
-                    self.vel_x *= FRICTION  # apply friction
-                    if abs(self.vel_x) < 0.2:
-                        self.vel_x = 0      # avoid infinite issue
-                
-                # jumping
-                if key[pygame.K_w] and not self.jumping:  # UP
-                    self.vel_y = -30
-                    self.jumping = True
-
-                # attacting
-                if not self.attacking:
-                    if key[pygame.K_r] or key[pygame.K_f] or key[pygame.K_v]:
-                        self.attack(SURFACE, TARGET)
-                        if key[pygame.K_r]:
-                            self.attack_type = 1
-                            self.attack_sound_played = False
-                        elif key[pygame.K_f]:
-                            self.attack_type = 2
-                            self.attack_sound_played = False
-                        elif key[pygame.K_v]:
-                            self.attack_type = 3
-                            self.attack_sound_played = False
+            if key[self.controls["right"]]:  # RIGHT
+                self.vel_x = SPEED
+                self.running = True
+            elif key[self.controls["left"]]:  # LEFT
+                self.vel_x = -SPEED
+                self.running = True
+            else:
+                self.vel_x *= FRICTION  # apply friction
+                if abs(self.vel_x) < 0.2:
+                    self.vel_x = 0      # avoid infinite issue
             
-            # PLAYER 2
-            # MOVEMENT BINDS ARROWS
-            if PLAYER == 1:
-                if key[pygame.K_RIGHT]:  # RIGHT
-                    self.vel_x = SPEED
-                    self.running = True
-                elif key[pygame.K_LEFT]:  # LEFT
-                    self.vel_x = -SPEED
-                    self.running = True
-                else:
-                    self.vel_x *= FRICTION  # apply friction
-                    if abs(self.vel_x) < 0.2:
-                        self.vel_x = 0      # avoid infinite issue
+            # jumping
+            if key[self.controls["up"]] and not self.jumping:  # UP
+                self.vel_y = con.JUMPING_SPEED
+                self.jumping = True
 
-                # jumping
-                if key[pygame.K_UP] and not self.jumping:  # UP
-                    self.vel_y = -30
-                    self.jumping = True
-
-                # attacking
-                if not self.attacking:
-                    if key[pygame.K_PERIOD] or key[pygame.K_SLASH] or key[pygame.K_RSHIFT]:
-                        self.attack(SURFACE, TARGET)
-                        if key[pygame.K_PERIOD]:
-                            self.attack_type = 1
-                            self.attack_sound_played = False
-                        elif key[pygame.K_SLASH]:
-                            self.attack_type = 2
-                            self.attack_sound_played = False
-                        elif key[pygame.K_RSHIFT]:
-                            self.attack_type = 3
-                            self.attack_sound_played = False
-
+            # attacting
+            if not self.attacking:
+                if key[self.controls["attack1"]] or key[self.controls["attack2"]] or key[self.controls["attack3"]]:
+                    self.attack(SURFACE, TARGET)
+                    if key[self.controls["attack1"]]:
+                        self.attack_type = 1
+                        self.attack_sound_played = False
+                    elif key[self.controls["attack2"]]:
+                        self.attack_type = 2
+                        self.attack_sound_played = False
+                    elif key[self.controls["attack3"]]:
+                        self.attack_type = 3
+                        self.attack_sound_played = False
 
         # SFX
         # walking sound
@@ -220,15 +179,6 @@ class Fighter():
         pygame.draw.rect(surface, (222, 110, 0), self.rect)
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
-
-    def update_action(self, new_action):
-        # check if the new action is different to the previous one
-        if new_action != self.action:
-            self.action = new_action
-            # update the current animation
-            self.frame_index = 0
-            self.update_time = pygame.time.get_ticks()
-
 
 # Legacy code, don't mind
 #     # Player 1 crouch (S)

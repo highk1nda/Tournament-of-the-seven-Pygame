@@ -15,12 +15,12 @@ class FightScreen():
         self.werebear = None
 
     def loadfighters(self):
-        self.knight = Fighter(160, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, con.knight_sheet, con.KNIGHT_ANIMATION_STEPS)
-        self.werebear = Fighter(700, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True, con.CHARACTER_DATA, con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)
+        self.knight = Fighter(con.PLAYER_1_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, con.knight_sheet, con.KNIGHT_ANIMATION_STEPS, con.P1_CONTROLS)
+        self.werebear = Fighter(con.PLAYER_2_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True, con.CHARACTER_DATA, con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS, con.P2_CONTROLS)
 
     def update(self):
-        self.knight.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, con.PLAYER_1, self.werebear, self.screen)
-        self.werebear.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, con.PLAYER_2, self.knight, self.screen)
+        self.knight.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.werebear, self.screen)
+        self.werebear.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.knight, self.screen)
         self.knight.update()
         self.werebear.update()
 
