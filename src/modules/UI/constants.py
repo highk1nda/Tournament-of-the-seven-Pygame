@@ -22,15 +22,24 @@ PLAYER_WIDTH             = 140
 PLAYER_HEIGHT            = 140
 KNIGHT_ANIMATION_STEPS   = [6, 8, 7, 10, 11, 4, 4, 4]
 WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
+WIND_SIZE = 512
+WIND_SCALE = 0.5
+WIND_FRAMES = 16
+WIND_SCALE_SIZE = WIND_SCALE * WIND_SIZE
 
 PLAYER_1_INIT_X = 160
 PLAYER_2_INIT_X = 700
 
 PLAYER_SPEED = 8
 JUMPING_SPEED = -30
-GRAVITY = 2
+
+DASHING_SPEED = 80
+DASHING_BRAKE = 0.5
+DASHING_COOLDOWN = 0   # ms -- 1000ms = 1s
+
 GROUND_FRICTION = 0.7
 AIR_FRICTION = 0.93
+GRAVITY = 2
 
 P1_CONTROLS = {
     "left": pygame.K_a,
@@ -38,16 +47,18 @@ P1_CONTROLS = {
     "up": pygame.K_w,
     "attack1": pygame.K_r,
     "attack2": pygame.K_f,
-    "attack3": pygame.K_v
+    "attack3": pygame.K_v,
+    "dash": pygame.K_LSHIFT
 }
 
 P2_CONTROLS = {
     "left": pygame.K_LEFT,
     "right": pygame.K_RIGHT,
     "up": pygame.K_UP,
-    "attack1": pygame.K_PERIOD,
-    "attack2": pygame.K_SLASH,
-    "attack3": pygame.K_RSHIFT
+    "attack1": pygame.K_COMMA,
+    "attack2": pygame.K_PERIOD,
+    "attack3": pygame.K_SLASH,
+    "dash": pygame.K_RSHIFT
 }
 
 ACTIONS = {
@@ -65,6 +76,7 @@ forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
 menuscreenimage: str = "assets/forest.jpg"
 fightscreenimage: str = "assets/forest.jpg"
 
+wind = "assets/wind.png"
 Knight = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters" "/Characters(100x100)/Knight/Knight/Knight.png"
 Werebear = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters" "/Characters(100x100)/Werebear/Werebear/Werebear.png"
 
@@ -76,5 +88,7 @@ background = pygame.transform.scale(pygame.image.load(menuscreenimage).convert()
 knight_sheet = pygame.image.load(Knight).convert_alpha()
 
 werebear_sheet = pygame.image.load(Werebear).convert_alpha()
+
+wind_sheet = pygame.image.load(wind).convert_alpha()
 
 background_music = pygame.mixer.Sound(menumusic)

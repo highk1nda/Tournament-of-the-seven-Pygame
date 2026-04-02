@@ -1,6 +1,6 @@
 import pygame
 
-from src.modules.fighter.render import load_animation_frames, update_fighter_animation
+from src.modules.fighter.render import load_animation_frames, update_fighter_animation, update_wind_animation
 from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.UI import constants as con
 
@@ -32,6 +32,18 @@ class Fighter():
         self.health = 100
         self.controls = controls
 
+        self.dashing = False
+        self.dashing_direction = 0
+        self.wind_animation_list = load_animation_frames(
+            con.wind_sheet,
+            con.WIND_SIZE,
+            con.WIND_SCALE,
+            [con.WIND_FRAMES]
+        )[0]
+        self.wind_frame_index = 0
+        self.wind_update_time = 0
+        self.last_dash_time = 0
+
         self.sounds = load_fighter_sounds()
         self.walk_sound = self.sounds["walk"]
         self.sword_attack1_sound = self.sounds["attack1"]
@@ -62,18 +74,44 @@ class Fighter():
         # reset speed if stun or dead
         if self.stun or self.death:
             self.vel_x = 0
+            self.dashing = False
 
+        current_time = pygame.time.get_ticks()
+
+        # read input
         if self.death == False:
-            if key[self.controls["right"]]:  # RIGHT
-                self.vel_x = SPEED
-                self.running = True
-            elif key[self.controls["left"]]:  # LEFT
-                self.vel_x = -SPEED
-                self.running = True
-            else:
-                self.vel_x *= FRICTION  # apply friction
-                if abs(self.vel_x) < 0.2:
-                    self.vel_x = 0      # avoid infinite issue
+
+            if key[self.controls["dash"]] and not self.dashing:
+                can_dash = (current_time - self.last_dash_time) > con.DASHING_COOLDOWN
+
+                if can_dash:
+                    if key[self.controls["right"]]:
+                        self.dashing = True
+                        self.dashing_direction = 1
+                        self.wind_update_time = current_time
+                        self.last_dash_time = current_time
+                    elif key[self.controls["left"]]:
+                        self.dashing = True
+                        self.dashing_direction = -1
+                        self.wind_update_time = current_time
+                        self.last_dash_time = current_time
+
+                if self.dashing:
+                    self.vel_x = con.DASHING_SPEED * self.dashing_direction * 2
+            else: 
+                if self.dashing:
+                    self.vel_x *= con.DASHING_BRAKE
+                    
+                if key[self.controls["right"]]:  # RIGHT
+                    self.vel_x = SPEED
+                    self.running = True
+                elif key[self.controls["left"]]:  # LEFT
+                    self.vel_x = -SPEED
+                    self.running = True
+                else:
+                    self.vel_x *= FRICTION  # apply friction
+                    if abs(self.vel_x) < 0.2:
+                        self.vel_x = 0      # avoid infinite issue
             
             # jumping
             if key[self.controls["up"]] and not self.jumping:  # UP
@@ -175,8 +213,11 @@ class Fighter():
         update_fighter_animation(self)  # Update fighter animation & attack states
 
     def draw(self, surface):
+        if self.dashing:
+            update_wind_animation(self, surface)
+
         img = pygame.transform.flip(self.image, self.flip, False)
-        pygame.draw.rect(surface, (222, 110, 0), self.rect)
+        #pygame.draw.rect(surface, (222, 110, 0), self.rect)
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
 

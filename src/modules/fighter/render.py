@@ -44,6 +44,8 @@ def update_fighter_animation(fighter):
             new_action = con.ACTIONS["ATTACK3"]
         else:
             new_action = fighter.action
+    elif fighter.dashing:
+        new_action = con.ACTIONS["WALK"]
     elif fighter.running:
         new_action = con.ACTIONS["WALK"]
     else:
@@ -74,3 +76,33 @@ def update_fighter_animation(fighter):
                 fighter.attack_sound_played = False
             if fighter.stun:
                 fighter.stun = False
+
+def update_wind_animation(fighter, surface):
+    
+    animation_cooldown = 5
+    time = pygame.time.get_ticks()
+    flip = False
+
+    if fighter.dashing_direction == 1:  
+        wind_x_offset = -(con.PLAYER_WIDTH // 2 + con.WIND_SCALE_SIZE)   # dash right
+    else:
+        flip = True                               
+        wind_x_offset = con.PLAYER_WIDTH // 2   # dash left
+
+    wind_x = fighter.rect.centerx + wind_x_offset
+    wind_y = fighter.rect.centery - (con.WIND_SCALE_SIZE // 2)
+
+    frame = fighter.wind_animation_list[fighter.wind_frame_index]
+    frame = pygame.transform.flip(frame, flip, False)
+    surface.blit(frame, (wind_x, wind_y))
+
+ 
+
+    if time - fighter.wind_update_time > animation_cooldown:
+        fighter.wind_frame_index += 1
+        fighter.wind_update_time = time
+
+    if fighter.wind_frame_index >= len(fighter.wind_animation_list):
+        fighter.wind_frame_index = 0
+        fighter.dashing = False
+    
