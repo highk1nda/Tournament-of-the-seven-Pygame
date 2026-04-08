@@ -73,6 +73,7 @@ def update_fighter_animation(fighter):
             fighter.frame_index = 0
             if fighter.attacking:
                 fighter.attacking = False
+                fighter.attack_type = 0
                 fighter.attack_sound_played = False
             if fighter.stun:
                 fighter.stun = False

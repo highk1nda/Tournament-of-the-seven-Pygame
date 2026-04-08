@@ -25,12 +25,26 @@ PLAYER_HEIGHT            = 140
 KNIGHT_ANIMATION_STEPS   = [6, 8, 7, 10, 11, 4, 4, 4]
 WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
 
+ATTACK_ACTIVE_FRAMES = {
+    0: None,
+    1: [(3, 5)],        # (Start, End) index of animation
+    2: [(3, 5), (7, 9)],
+    3: [(7, 9)]
+}                       # for knight, test
+
+ATTACK_WIDTH_SCALE = {      # attacking hitbox width scale
+    0: None,
+    1: 0.6,
+    2: 1,
+    3: 1.5
+}                       # for knight, test
+
 ANIMATION_COOLDOWNS = {
     0: 110,        # 110 ms between frames
     1: 110,
     2: 65,
-    3: 65,
-    4: 65,
+    3: 75,
+    4: 85,
     -2: 100,
     -1: 100
 }

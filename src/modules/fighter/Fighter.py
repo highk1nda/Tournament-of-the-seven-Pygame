@@ -25,8 +25,11 @@ class Fighter():
         self.vel_y = 0
         self.running = False
         self.jumping = False
+
         self.attacking = False
         self.attack_type = 0
+        self.hitbox_set = set()     # avoid duplicate collision detection
+
         self.stun = False
         self.death = False
         self.health = 100
@@ -61,7 +64,7 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET, SURFACE):
+    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET):
         SPEED = con.PLAYER_SPEED
         GRAVITY = con.GRAVITY
         if self.jumping:
@@ -72,7 +75,6 @@ class Fighter():
         dy = 0
 
         self.running = False
-        self.attack_type = 0
 
         # Key presses
         key = pygame.key.get_pressed()
@@ -149,7 +151,8 @@ class Fighter():
             # attacting
             if not self.attacking:
                 if key[self.controls["attack1"]] or key[self.controls["attack2"]] or key[self.controls["attack3"]]:
-                    self.attack(SURFACE, TARGET)
+                    self.attacking = True
+                    self.hitbox_set.clear()
                     if key[self.controls["attack1"]]:
                         self.attack_type = 1
                         self.attack_sound_played = False
@@ -159,7 +162,9 @@ class Fighter():
                     elif key[self.controls["attack3"]]:
                         self.attack_type = 3
                         self.attack_sound_played = False
-
+            
+            if self.attacking:
+                self.attack(TARGET)
         # SFX
         # walking sound
         if self.running:
@@ -211,30 +216,43 @@ class Fighter():
         self.rect.x += dx
         self.rect.y += dy
 
-    def attack(self, surface, TARGET):
-        self.attacking = True
-        # create attacking hitbox 
-        attack_width = int(1.5 * self.rect.width)
-        if self.flip:   
-            # facing left
-            attacking_rect = pygame.Rect(self.rect.left - attack_width, 
-                                     self.rect.y, 
-                                     attack_width, 
-                                     self.rect.height)
-        else:     
-            # facing right
-            attacking_rect = pygame.Rect(self.rect.right, 
-                                     self.rect.y, 
-                                     attack_width, 
-                                     self.rect.height)
+    def attack(self, TARGET):
+        active_frame_list = con.ATTACK_ACTIVE_FRAMES[self.attack_type]
+        if active_frame_list == None:
+            return
 
-
-        # collision detect
-        if attacking_rect.colliderect(TARGET.rect):
-            TARGET.health -= 10
-            TARGET.stun = True
+        current_attack_index = -1
+        attack_width_scale = con.ATTACK_WIDTH_SCALE[self.attack_type]
+        for i, (start_frame, end_frame) in enumerate(active_frame_list):
+            if start_frame <= self.frame_index <= end_frame:
+                current_attack_index = i
+                break
         
-        pygame.draw.rect(surface, con.LIGHT_GREEN, attacking_rect)
+        if current_attack_index == -1:
+            return
+       
+        if current_attack_index not in self.hitbox_set:
+        # create attacking hitbox 
+            attack_width = int(attack_width_scale * self.rect.width)
+            if self.flip:   
+                # facing left
+                attacking_rect = pygame.Rect(self.rect.left - attack_width, 
+                                        self.rect.y, 
+                                        attack_width, 
+                                        self.rect.height)
+            else:     
+                # facing right
+                attacking_rect = pygame.Rect(self.rect.right, 
+                                        self.rect.y, 
+                                        attack_width, 
+                                        self.rect.height)
+            # collision detect
+            if attacking_rect.colliderect(TARGET.rect):
+                TARGET.health -= 10
+                TARGET.stun = True
+                if not TARGET.death:
+                    TARGET.frame_index = 0
+                self.hitbox_set.add(current_attack_index)
 
     # animation loop
     def update(self):
