@@ -25,6 +25,16 @@ PLAYER_HEIGHT            = 140
 KNIGHT_ANIMATION_STEPS   = [6, 8, 7, 10, 11, 4, 4, 4]
 WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
 
+ANIMATION_COOLDOWNS = {
+    0: 110,        # 110 ms between frames
+    1: 110,
+    2: 65,
+    3: 65,
+    4: 65,
+    -2: 100,
+    -1: 100
+}
+
 WIND_SIZE = 512
 WIND_SCALE = 0.5
 WIND_FRAMES = 16

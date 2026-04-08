@@ -26,7 +26,7 @@ def load_animation_frames(sprite_sheet, size, scale, animation_steps):
 
 # Update fighter animation & attack states
 def update_fighter_animation(fighter):
-    animation_cooldown = 110  # 110 ms between frames
+    animation_cooldown = con.ANIMATION_COOLDOWNS[fighter.action]
 
     # Determine what action is happening
     if fighter.health <= 0:
