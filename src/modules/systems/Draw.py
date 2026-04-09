@@ -69,10 +69,11 @@ def draw_dashing_cooldown_bar(display_surface, fighter, right_side):
                                                                       progress_width,
                                                                       con.DASHING_BAR_HEIGHT))
 
-def draw_screen(display_surface, background, floor_y, floor_height, screen_width, fighter1, fighter2):
+def draw_screen(display_surface, background, floor_y, floor_height, screen_width, fighter1, fighter2, offset=(0, 0)):
     # RENDERING
     # Draw background
-    display_surface.blit(background, (0, 0))
+    x, y = offset
+    display_surface.blit(background, (x, y))
 
     # Draw health bars
     draw_health_bar(display_surface, fighter1.health, con.HEALTH_BAR_LEFT_X, con.HEALTH_BAR_Y, False)
@@ -83,4 +84,4 @@ def draw_screen(display_surface, background, floor_y, floor_height, screen_width
     draw_dashing_cooldown_bar(display_surface, fighter2, True)
 
     # Draw floor
-    pygame.draw.rect(display_surface, con.GREEN, (0, floor_y, screen_width, floor_height))
+    pygame.draw.rect(display_surface, con.GREEN, (x, floor_y + y, screen_width, floor_height))

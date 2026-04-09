@@ -1,4 +1,5 @@
 import pygame
+import random
 from pygame.locals import *
 
 from src.modules.fighter.Fighter import Fighter 
@@ -14,6 +15,10 @@ class FightScreen():
         self.knight = None
         self.werebear = None
 
+        # screen shake
+        self.shake_end_time = 0
+        self.screen_shake_offset = (0, 0)
+
     def loadfighters(self):
         self.knight = Fighter(con.PLAYER_1_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, con.knight_sheet, con.KNIGHT_ANIMATION_STEPS, con.P1_CONTROLS)
         self.werebear = Fighter(con.PLAYER_2_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True, con.CHARACTER_DATA, con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS, con.P2_CONTROLS)
@@ -24,12 +29,29 @@ class FightScreen():
         self.knight.update()
         self.werebear.update()
 
+        # check if any damage maded
+        current_time = pygame.time.get_ticks()
+        for fighter in (self.knight, self.werebear):
+            if fighter.screen_shake:
+                self.shake_end_time = current_time + con.SCREEN_SHAKE_DURATION
+                fighter.screen_shake = False
+        
+        if current_time < self.shake_end_time:
+            remain_time = self.shake_end_time - current_time
+            ratio = remain_time / con.SCREEN_SHAKE_DURATION
+            shake_intensity = int(ratio * con.SCREEN_SHAKE_INTENSITY)
+            self.screen_shake_offset = (random.randint(-shake_intensity, shake_intensity),
+                                        random.randint(-shake_intensity, shake_intensity))
+        else:
+            self.screen_shake_offset = (0, 0)
+
         if self.knight.death or self.werebear.death:
             return "menu"
         return None
     
     def draw(self):
-        draw_screen(self.screen, con.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.knight, self.werebear)
+        x, y = self.screen_shake_offset
+        draw_screen(self.screen, con.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.knight, self.werebear, offset=(x, y))
         self.knight.draw(self.screen)
         self.werebear.draw(self.screen)
 

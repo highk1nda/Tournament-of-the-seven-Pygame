@@ -7,6 +7,9 @@ pygame.mixer.init()
 SCREEN_WIDTH  = 1000
 SCREEN_HEIGHT = 600
 
+SCREEN_SHAKE_DURATION = 300 # ms
+SCREEN_SHAKE_INTENSITY = 3  # maximum offset
+
 FPS = 60
 
 RED = (255, 0 , 0)
@@ -38,6 +41,8 @@ ATTACK_WIDTH_SCALE = {      # attacking hitbox width scale
     2: 1,
     3: 1.5
 }                       # for knight, test
+
+KNOCKBACK_DISTANCE = 35
 
 ANIMATION_COOLDOWNS = {
     0: 110,        # 110 ms between frames
