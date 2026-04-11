@@ -130,6 +130,10 @@ class Fighter():
 
                 if self.dashing:
                     self.vel_x = con.DASHING_SPEED * self.dashing_direction * 2
+                else:
+                    self.vel_x *= FRICTION  # apply friction
+                    if abs(self.vel_x) < 0.2:
+                        self.vel_x = 0      # avoid infinite issue
             else: 
                 if self.dashing:
                     self.vel_x *= con.DASHING_BRAKE
@@ -249,7 +253,7 @@ class Fighter():
                                         attack_width, 
                                         self.rect.height)
             # collision detect
-            if attacking_rect.colliderect(TARGET.rect):
+            if attacking_rect.colliderect(TARGET.rect) and not TARGET.dashing:
                 TARGET.health -= 10
                 TARGET.stun = True
                 if not TARGET.death:
