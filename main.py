@@ -4,6 +4,7 @@ import pygame
 from src.modules.Screens.MainMenu import MainMenuScreen as mainmenu
 from src.modules.Screens.FightScreen import FightScreen as fightscr
 from src.modules.Screens.Help import Help as helpscr
+from src.modules.Screens.SelectCharScreen import SelectCharScreen as charselect
 from src.modules.UI import constants as con
 pygame.init()
 pygame.display.set_caption("Liberty") #VIVA LA LIBERTAS
@@ -36,6 +37,9 @@ while state != "quit":
 
     elif state == "play":
         con.background_music.stop()
+        state = charselect(con.display_surface, con.clock).run()
+
+    elif state == "fight":
         state = run_fight()
 
     elif state == "help":

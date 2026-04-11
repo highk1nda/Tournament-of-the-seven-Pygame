@@ -42,28 +42,28 @@ class DebugPopup:
         self._reload(self.fs.knight, con.knight_sheet, con.KNIGHT_ANIMATION_STEPS)
     def p1_select_werebear(self):
         self._reload(self.fs.knight, con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)
-    def p1_select_wizard(self):    
-        pass
+    def p1_select_wizard(self):
+        self._reload(self.fs.knight, con.wizard_sheet, con.WIZARD_ANIMATION_STEPS)
     def p1_select_minotaur(self):  
         pass
     def p1_select_archer(self):    
         pass
-    def p1_select_ktemplar(self):  
-        pass
+    def p1_select_ktemplar(self):
+        self._reload(self.fs.knight, con.knight_templar_sheet, con.KNIGHT_TEMPLAR_ANIMATION_STEPS)
 
   
     def p2_select_knight(self):
         self._reload(self.fs.werebear, con.knight_sheet, con.KNIGHT_ANIMATION_STEPS)
     def p2_select_werebear(self):
         self._reload(self.fs.werebear, con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)
-    def p2_select_wizard(self):    
-        pass
+    def p2_select_wizard(self):
+        self._reload(self.fs.werebear, con.wizard_sheet, con.WIZARD_ANIMATION_STEPS)
     def p2_select_minotaur(self):  
         pass
     def p2_select_archer(self):    
         pass
-    def p2_select_ktemplar(self):  
-        pass
+    def p2_select_ktemplar(self):
+        self._reload(self.fs.werebear, con.knight_templar_sheet, con.KNIGHT_TEMPLAR_ANIMATION_STEPS)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:

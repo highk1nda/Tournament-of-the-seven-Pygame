@@ -22,8 +22,10 @@ FLOOR_HEIGHT = SCREEN_HEIGHT - FLOOR_Y
 CHARACTER_DATA           = [100, 7, [40, 37]]  # 0 - size, 1 - scale, 2 - offset
 PLAYER_WIDTH             = 140
 PLAYER_HEIGHT            = 140
-KNIGHT_ANIMATION_STEPS   = [6, 8, 7, 10, 11, 4, 4, 4]
-WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
+KNIGHT_ANIMATION_STEPS         = [6, 8, 7, 10, 11, 4, 4, 4]
+WEREBEAR_ANIMATION_STEPS       = [6, 8, 9, 13, 9, 4, 4]
+KNIGHT_TEMPLAR_ANIMATION_STEPS = [6, 8, 8, 7, 8, 11, 4, 4, 4]
+WIZARD_ANIMATION_STEPS         = [6, 8, 15, 6, 10, 12, 6, 7, 4, 4]
 
 WIND_SIZE = 512
 WIND_SCALE = 0.5
@@ -102,17 +104,20 @@ menuscreenimage: str = "assets/forest.jpg"
 fightscreenimage: str = "assets/forest.jpg"
 
 wind = "assets/wind.png"
-Knight = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters" "/Characters(100x100)/Knight/Knight/Knight.png"
-Werebear = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters" "/Characters(100x100)/Werebear/Werebear/Werebear.png"
+Knight       = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight.png"
+Werebear     = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear.png"
+KnightTemplar = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar.png"
+Wizard       = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard.png"
 
 display_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
 background = pygame.transform.scale(pygame.image.load(menuscreenimage).convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-knight_sheet = pygame.image.load(Knight).convert_alpha()
-
-werebear_sheet = pygame.image.load(Werebear).convert_alpha()
+knight_sheet        = pygame.image.load(Knight).convert_alpha()
+werebear_sheet      = pygame.image.load(Werebear).convert_alpha()
+knight_templar_sheet = pygame.image.load(KnightTemplar).convert_alpha()
+wizard_sheet        = pygame.image.load(Wizard).convert_alpha()
 
 wind_sheet = pygame.image.load(wind).convert_alpha()
 
