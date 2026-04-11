@@ -1,10 +1,11 @@
 import pygame
 from pygame.locals import *
 
-from src.modules.fighter.Fighter import Fighter 
+from src.modules.fighter.Fighter import Fighter
 from src.modules.UI import constants as con
 from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.systems.Draw import draw_screen
+from tests.test import DebugPopup
 
 # the fight screen class
 class FightScreen():
@@ -37,6 +38,7 @@ class FightScreen():
         self.loadfighters()
         forest_sfx = pygame.mixer.Sound(con.forestsound)
         forest_sfx.play(-1)
+        debug = DebugPopup(self)
 
         #loop for fightscreen
         while True:
@@ -49,8 +51,10 @@ class FightScreen():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     forest_sfx.stop()
                     return "menu"
+                debug.handle_event(event)
 
             self.update()
             self.draw()
+            debug.draw(self.screen)
             pygame.display.update()
             

@@ -98,6 +98,7 @@ class Fighter():
 
                 if self.dashing:
                     self.vel_x = con.DASHING_SPEED * self.dashing_direction * 2
+                    self.sounds["dash"].play()
             else: 
                 if self.dashing:
                     self.vel_x *= con.DASHING_BRAKE
@@ -205,6 +206,7 @@ class Fighter():
         if attacking_rect.colliderect(TARGET.rect):
             TARGET.health -= 10
             TARGET.stun = True
+            TARGET.sounds["hit"].play()
         
         pygame.draw.rect(surface, (0, 255, 0), attacking_rect)
 
