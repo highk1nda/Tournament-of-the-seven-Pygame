@@ -42,7 +42,13 @@ class Fighter():
         )[0]
         self.wind_frame_index = 0
         self.wind_update_time = 0
-        self.last_dash_time = 0
+        
+
+        self.dashing_charge = con.DASHING_CHARGE
+        self.dashing_count = 0
+        self.dashing_in_cooldown = False
+        self.shift_was_pressed = False
+        self.dashing_cooldown_start_time = 0
 
         self.sounds = load_fighter_sounds()
         self.walk_sound = self.sounds["walk"]
@@ -78,23 +84,45 @@ class Fighter():
 
         current_time = pygame.time.get_ticks()
 
+        # check dashing cooldown
+        if self.dashing_in_cooldown:
+            if current_time - self.dashing_cooldown_start_time > con.DASHING_COOLDOWN:
+                self.dashing_in_cooldown = False
+                self.dashing_charge = con.DASHING_CHARGE
+                self.dashing_count = 0
+
         # read input
         if self.death == False:
 
-            if key[self.controls["dash"]] and not self.dashing:
-                can_dash = (current_time - self.last_dash_time) > con.DASHING_COOLDOWN
+            shift_pressed = key[self.controls["dash"]]
 
-                if can_dash:
+            # start dashing cooldown if dashed and released shift
+            if self.shift_was_pressed and not shift_pressed:
+                if self.dashing_count > 0 and not self.dashing_in_cooldown:
+                    self.dashing_in_cooldown = True
+                    self.dashing_cooldown_start_time = current_time
+                else:
+                    self.dashing_count = 0      # reset
+
+            self.shift_was_pressed = shift_pressed
+
+            if shift_pressed and not self.dashing and not self.dashing_in_cooldown:
+                if self.dashing_charge > 0:
                     if key[self.controls["right"]]:
                         self.dashing = True
                         self.dashing_direction = 1
                         self.wind_update_time = current_time
-                        self.last_dash_time = current_time
+                        self.dashing_charge -= 1
+                        self.dashing_count += 1
                     elif key[self.controls["left"]]:
                         self.dashing = True
                         self.dashing_direction = -1
-                        self.wind_update_time = current_time
-                        self.last_dash_time = current_time
+                        self.dashing_charge -= 1
+                        self.dashing_count += 1
+
+                    if self.dashing_charge == 0:
+                        self.dashing_in_cooldown = True
+                        self.dashing_cooldown_start_time = current_time
 
                 if self.dashing:
                     self.vel_x = con.DASHING_SPEED * self.dashing_direction * 2
@@ -208,7 +236,7 @@ class Fighter():
             TARGET.stun = True
             TARGET.sounds["hit"].play()
         
-        pygame.draw.rect(surface, (0, 255, 0), attacking_rect)
+        pygame.draw.rect(surface, con.LIGHT_GREEN, attacking_rect)
 
     # animation loop
     def update(self):
@@ -219,7 +247,7 @@ class Fighter():
             update_wind_animation(self, surface)
 
         img = pygame.transform.flip(self.image, self.flip, False)
-        #pygame.draw.rect(surface, (222, 110, 0), self.rect)
+        pygame.draw.rect(surface, con.ORANGE, self.rect)
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
 
