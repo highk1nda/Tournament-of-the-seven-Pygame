@@ -1,5 +1,6 @@
 draw_on_display.py
 .venv/*
+venv/*
 Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/.DS_Store
 Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/.DS_Store
 .gitignore

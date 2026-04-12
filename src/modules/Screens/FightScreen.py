@@ -2,10 +2,11 @@ import pygame
 import random
 from pygame.locals import *
 
-from src.modules.fighter.Fighter import Fighter 
+from src.modules.fighter.Fighter import Fighter
 from src.modules.UI import constants as con
 from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.systems.Draw import draw_screen
+from tests.test import DebugPopup
 
 # the fight screen class
 class FightScreen():
@@ -20,8 +21,10 @@ class FightScreen():
         self.screen_shake_offset = (0, 0)
 
     def loadfighters(self):
-        self.knight = Fighter(con.PLAYER_1_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, con.knight_sheet, con.KNIGHT_ANIMATION_STEPS, con.P1_CONTROLS)
-        self.werebear = Fighter(con.PLAYER_2_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True, con.CHARACTER_DATA, con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS, con.P2_CONTROLS)
+        p1 = getattr(con, "p1_selected", (con.knight_sheet,   con.KNIGHT_ANIMATION_STEPS)) # default to knight if not set
+        p2 = getattr(con, "p2_selected", (con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)) # default to werebear if not set
+        self.knight   = Fighter(con.PLAYER_1_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, p1[0], p1[1], con.P1_CONTROLS)
+        self.werebear = Fighter(con.PLAYER_2_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True,  con.CHARACTER_DATA, p2[0], p2[1], con.P2_CONTROLS)
 
     def update(self):
         self.knight.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.werebear)
@@ -59,6 +62,7 @@ class FightScreen():
         self.loadfighters()
         forest_sfx = pygame.mixer.Sound(con.forestsound)
         forest_sfx.play(-1)
+        debug = DebugPopup(self)
 
         #loop for fightscreen
         while True:
@@ -71,8 +75,10 @@ class FightScreen():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     forest_sfx.stop()
                     return "menu"
+                debug.handle_event(event)
 
             self.update()
             self.draw()
+            debug.draw(self.screen)
             pygame.display.update()
             

@@ -130,6 +130,7 @@ class Fighter():
 
                 if self.dashing:
                     self.vel_x = con.DASHING_SPEED * self.dashing_direction * 2
+                    self.sounds["dash"].play()
                 else:
                     self.vel_x *= FRICTION  # apply friction
                     if abs(self.vel_x) < 0.2:
@@ -256,6 +257,7 @@ class Fighter():
             if attacking_rect.colliderect(TARGET.rect) and not TARGET.dashing:
                 TARGET.health -= 10
                 TARGET.stun = True
+                TARGET.sounds["hit"].play()
                 if not TARGET.death:
                     TARGET.frame_index = 0
                     self.screen_shake = True

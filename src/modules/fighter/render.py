@@ -31,6 +31,8 @@ def update_fighter_animation(fighter):
     # Determine what action is happening
     if fighter.health <= 0:
         fighter.health = 0
+        if not fighter.death:
+            fighter.sounds["death"].play()
         fighter.death = True
         new_action = con.ACTIONS["DEATH"]
     elif fighter.stun:
