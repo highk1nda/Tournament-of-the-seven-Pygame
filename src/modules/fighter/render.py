@@ -24,7 +24,21 @@ def load_animation_frames(sprite_sheet, size, scale, animation_steps):
     return animation_list
 
 
-# Update fighter animation & attack states
+
+def crop_and_scale_frames(frames, target_height):
+    #Used in preview!!!
+    bounds = frames[0].get_bounding_rect()
+    for frame in frames[1:]:
+        bounds = bounds.union(frame.get_bounding_rect())
+    #Used in preview!!!
+    # crop each frame to box, then scale everything to the height needed (with aspect ratio kept and other dimensions)
+    cropped = [frame.subsurface(bounds).copy() for frame in frames]
+    scale = target_height / bounds.height
+    w = int(bounds.width  * scale)
+    h = int(bounds.height * scale)
+    return [pygame.transform.scale(frame, (w, h)) for frame in cropped]
+
+# Update fighter animation n attack states
 def update_fighter_animation(fighter):
     animation_cooldown = con.ANIMATION_COOLDOWNS[fighter.action]
 
