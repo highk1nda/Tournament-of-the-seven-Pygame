@@ -17,8 +17,8 @@ CHAR_DATA = [
     (con.knight_sheet,          con.KNIGHT_ANIMATION_STEPS),
     (con.werebear_sheet,        con.WEREBEAR_ANIMATION_STEPS),
     (con.wizard_sheet,          con.WIZARD_ANIMATION_STEPS),
-    None,
-    None,
+    None, # minotaur
+    None, # archer
     (con.knight_templar_sheet,  con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
 ]
 

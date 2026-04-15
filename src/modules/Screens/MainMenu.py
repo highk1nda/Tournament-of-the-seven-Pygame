@@ -12,7 +12,8 @@ class MainMenuScreen:
         self.font = pygame.font.SysFont(None, 40)
         
         self.background = con.background
-        self.background_music = con.background_music.play(-1)
+        if con.background_music.get_num_channels() == 0:
+            con.background_music.play(-1)
 
         # create the buttons, with play being in the center of the screen TODO add story, multiplayer, and singleplayer, buttons
         self.button_play = Button((con.SCREEN_WIDTH/2) - 100, con.SCREEN_HEIGHT/2, 200, 40, 'Play', self.font)

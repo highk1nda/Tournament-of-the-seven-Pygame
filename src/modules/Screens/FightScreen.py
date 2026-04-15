@@ -61,8 +61,16 @@ class FightScreen():
     def run(self):
         self.loadfighters()
         forest_sfx = pygame.mixer.Sound(con.forestsound)
+
+        con.background_music.stop()
         forest_sfx.play(-1)
+        con.fight_music.play(-1)
+
         debug = DebugPopup(self)
+
+        def stop_fight_sounds():
+            forest_sfx.stop()
+            con.fight_music.stop()
 
         #loop for fightscreen
         while True:
@@ -70,10 +78,10 @@ class FightScreen():
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    forest_sfx.stop()
+                    stop_fight_sounds()
                     return "quit"
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    forest_sfx.stop()
+                    stop_fight_sounds()
                     return "menu"
                 debug.handle_event(event)
 
