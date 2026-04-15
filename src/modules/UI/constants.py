@@ -157,6 +157,7 @@ ACTIONS = {
 }
 
 menumusic: str = "assets/sfx/menmusica.mp3"
+fightmusic: str = "assets/sfx/fightmusica.mp3"
 forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
 menuscreenimage: str = "assets/forest.jpg"
 fightscreenimage: str = "assets/forest.jpg"
@@ -180,3 +181,4 @@ wizard_sheet        = pygame.image.load(Wizard).convert_alpha()
 wind_sheet = pygame.image.load(wind).convert_alpha()
 
 background_music = pygame.mixer.Sound(menumusic)
+fight_music      = pygame.mixer.Sound(fightmusic)

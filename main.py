@@ -36,7 +36,6 @@ while state != "quit":
         state = run_menu()
 
     elif state == "play":
-        con.background_music.stop()
         state = charselect(con.display_surface, con.clock).run()
 
     elif state == "fight":
