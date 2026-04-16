@@ -40,8 +40,8 @@ class SelectCharScreen:
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock  = clock
-        self.font   = pygame.font.SysFont(None, 30)
-        self.big    = pygame.font.SysFont(None, 44)
+        self.font   = con.FONT_SMALL
+        self.big    = con.FONT_BIG
 
         self.p1_btns   = _grid_rects(top_y=130)
         self.p2_btns   = _grid_rects(top_y=360)

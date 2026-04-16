@@ -9,7 +9,7 @@ class MainMenuScreen:
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock = clock
-        self.font = pygame.font.SysFont(None, 40)
+        self.font = con.FONT_NORMAL
         
         self.background = con.background
         self.background_music = con.background_music.play(-1)

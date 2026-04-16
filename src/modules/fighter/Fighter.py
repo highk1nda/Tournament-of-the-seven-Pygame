@@ -32,6 +32,7 @@ class Fighter():
 
         self.stun = False
         self.death = False
+        self.death_animation_done = False
         self.health = 100
         self.controls = controls
 

@@ -1,5 +1,6 @@
 import pygame
 
+pygame.font.init()
 pygame.mixer.init()
 
 
@@ -12,12 +13,18 @@ SCREEN_SHAKE_INTENSITY = 3  # maximum offset
 
 FPS = 60
 
-RED = (255, 0 , 0)
+BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+RED = (255, 0 , 0)
 GREEN = (26, 66, 28)
 LIGHT_GREEN = (0, 255, 0)
 ORANGE = (222, 110, 0)
 BLUE = (80, 180, 255)
+
+FONT_NORMAL = pygame.font.SysFont(None, 40)
+FONT_BIG = pygame.font.SysFont(None, 44)
+FONT_SMALL = pygame.font.SysFont(None, 30)
+FONT_VERY_BIG = pygame.font.SysFont(None, 70)
 
 FLOOR_Y      = 510
 FLOOR_HEIGHT = SCREEN_HEIGHT - FLOOR_Y
@@ -96,6 +103,13 @@ DASHING_CHARGE = 2     # Dashing charge system:
 GROUND_FRICTION = 0.7
 AIR_FRICTION = 0.93
 GRAVITY = 2
+
+MAX_WINS = 2
+ROUND_TEXT_DURATION = 1700  # ms
+ROUND_TEXT_Y = 80
+DEATH_DURATION = 1000  # ms
+FADE_OUT_DURATION = 500  # ms
+MAX_ALPHA = 255  # full black
 
 P1_CONTROLS = {
     "left": pygame.K_a,
