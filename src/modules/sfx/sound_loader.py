@@ -21,7 +21,11 @@ def load_fighter_sounds():
         ),
         "orc_attack": pygame.mixer.Sound(
             "assets/sfx/sword_sfx/character-falling-on-ground-250069.mp3"
-        )
+        ),
+        "jump": pygame.mixer.Sound("assets/sfx/jump.mp3"),
+        "dash": pygame.mixer.Sound("assets/sfx/woosh.mp3"),
+        "death": pygame.mixer.Sound("assets/sfx/death.mp3"),
+        "hit": pygame.mixer.Sound("assets/sfx/hit.mp3")
     }
 
     sounds["walk"].set_volume(con.volume)
@@ -30,3 +34,31 @@ def load_fighter_sounds():
     sounds["attack3"].set_volume(con.volume)
 
     return sounds
+"""
+                                             ,--,  ,.-.
+               ,                   \,       '-,-`,'-.' | ._
+              /|           \    ,   |\         }  )/  / `-,',
+              [ ,          |\  /|   | |        /  \|  |/`  ,`
+              | |       ,.`  `,` `, | |  _,...(   (      .',
+              \  \  __ ,-` `  ,  , `/ |,'      Y     (   /_L\
+               \  \_\,``,   ` , ,  /  |         )         _,/
+                \  '  `  ,_ _`_,-,<._.<        /         /
+                 ', `>.,`  `  `   ,., |_      |         /
+                   \/`  `,   `   ,`  | /__,.-`    _,   `\
+               -,-..\  _  \  `  /  ,  / `._) _,-\`       \
+                \_,,.) /\    ` /  / ) (-,, ``    ,        |
+               ,` )  | \_\       '-`  |  `(               \
+              /  /```(   , --, ,' \   |`<`    ,            |
+             /  /_,--`\   <\  V /> ,` )<_/)  | \      _____)
+       ,-, ,`   `   (_,\ \    |   /) / __/  /   `----`
+      (-, \           ) \ ('_.-._)/ /,`    /
+      | /  `          `/ \\ V   V, /`     /
+   ,--\(        ,     <_/`\\     ||      /
+  (   ,``-     \/|         \-A.A-`|     /
+ ,>,_ )_,..(    )\          -,,_-`  _--`
+(_ \|`   _,/_  /  \_            ,--`
+ \( `   <.,../`     `-.._   _,-`
+    `                 \_      `--`
+                         `---`
+                                              -hmm...
+"""

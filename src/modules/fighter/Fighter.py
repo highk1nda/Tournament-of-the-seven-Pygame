@@ -1,11 +1,11 @@
 import pygame
-from src.modules.fighter.render import load_animation_frames, update_fighter_animation
+
+from src.modules.fighter.render import load_animation_frames, update_fighter_animation, update_wind_animation
 from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.UI import constants as con
 
-
 class Fighter():
-    def __init__(self, x, y, player_width, player_height, flip, data, sprite_sheet, animation_steps):
+    def __init__(self, x, y, player_width, player_height, flip, data, sprite_sheet, animation_steps, controls):
         self.size = data[0]
         self.image_scale = data[1]
         self.offset = data[2]
@@ -25,13 +25,37 @@ class Fighter():
         self.vel_y = 0
         self.running = False
         self.jumping = False
+
         self.attacking = False
         self.attack_type = 0
+        self.hitbox_set = set()     # avoid duplicate collision detection
+
         self.stun = False
         self.death = False
         self.health = 100
-        self.sounds = load_fighter_sounds()
+        self.controls = controls
 
+        self.dashing = False
+        self.dashing_direction = 0
+        self.wind_animation_list = load_animation_frames(
+            con.wind_sheet,
+            con.WIND_SIZE,
+            con.WIND_SCALE,
+            [con.WIND_FRAMES]
+        )[0]
+        self.wind_frame_index = 0
+        self.wind_update_time = 0
+        
+
+        self.dashing_charge = con.DASHING_CHARGE
+        self.dashing_count = 0
+        self.dashing_in_cooldown = False
+        self.shift_was_pressed = False
+        self.dashing_cooldown_start_time = 0
+
+        self.screen_shake = False
+
+        self.sounds = load_fighter_sounds()
         self.walk_sound = self.sounds["walk"]
         self.sword_attack1_sound = self.sounds["attack1"]
         self.sword_attack2_sound = self.sounds["attack2"]
@@ -42,18 +66,17 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, PLAYER, TARGET, SURFACE):
-        SPEED = 8
-        GRAVITY = 2
+    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET):
+        SPEED = con.PLAYER_SPEED
+        GRAVITY = con.GRAVITY
         if self.jumping:
-            FRICTION = 0.93 # air friction
+            FRICTION = con.AIR_FRICTION
         else:
-            FRICTION = 0.7 # ground friction
+            FRICTION = con.GROUND_FRICTION
         dx = 0
         dy = 0
 
         self.running = False
-        self.attack_type = 0
 
         # Key presses
         key = pygame.key.get_pressed()
@@ -61,81 +84,94 @@ class Fighter():
         # reset speed if stun or dead
         if self.stun or self.death:
             self.vel_x = 0
+            self.dashing = False
 
-        #
-        # EDIT FOR EACH PLAYER
-        # SPLIT IN TWO CLASS INSTANCES
-        #
-       
+        current_time = pygame.time.get_ticks()
+
+        # check dashing cooldown
+        if self.dashing_in_cooldown:
+            if current_time - self.dashing_cooldown_start_time > con.DASHING_COOLDOWN:
+                self.dashing_in_cooldown = False
+                self.dashing_charge = con.DASHING_CHARGE
+                self.dashing_count = 0
+
+        # read input
         if self.death == False:
 
-            # PLAYER 1
-            # MOVEMENT BINDS WASD
-            if PLAYER == 0:
-                if key[pygame.K_d]:  # RIGHT
+            shift_pressed = key[self.controls["dash"]]
+
+            # start dashing cooldown if dashed and released shift
+            if self.shift_was_pressed and not shift_pressed:
+                if self.dashing_count > 0 and not self.dashing_in_cooldown:
+                    self.dashing_in_cooldown = True
+                    self.dashing_cooldown_start_time = current_time
+                else:
+                    self.dashing_count = 0      # reset
+
+            self.shift_was_pressed = shift_pressed
+
+            if shift_pressed and not self.dashing and not self.dashing_in_cooldown:
+                if self.dashing_charge > 0:
+                    if key[self.controls["right"]]:
+                        self.dashing = True
+                        self.dashing_direction = 1
+                        self.wind_update_time = current_time
+                        self.dashing_charge -= 1
+                        self.dashing_count += 1
+                    elif key[self.controls["left"]]:
+                        self.dashing = True
+                        self.dashing_direction = -1
+                        self.dashing_charge -= 1
+                        self.dashing_count += 1
+
+                    if self.dashing_charge == 0:
+                        self.dashing_in_cooldown = True
+                        self.dashing_cooldown_start_time = current_time
+
+                if self.dashing:
+                    self.vel_x = con.DASHING_SPEED * self.dashing_direction * 2
+                    self.sounds["dash"].play()
+                else:
+                    self.vel_x *= FRICTION  # apply friction
+                    if abs(self.vel_x) < 0.2:
+                        self.vel_x = 0      # avoid infinite issue
+            else: 
+                if self.dashing:
+                    self.vel_x *= con.DASHING_BRAKE
+                    
+                if key[self.controls["right"]]:  # RIGHT
                     self.vel_x = SPEED
                     self.running = True
-                elif key[pygame.K_a]:  # LEFT
+                elif key[self.controls["left"]]:  # LEFT
                     self.vel_x = -SPEED
                     self.running = True
                 else:
                     self.vel_x *= FRICTION  # apply friction
                     if abs(self.vel_x) < 0.2:
                         self.vel_x = 0      # avoid infinite issue
-                
-                # jumping
-                if key[pygame.K_w] and not self.jumping:  # UP
-                    self.vel_y = -30
-                    self.jumping = True
-
-                # attacting
-                if not self.attacking:
-                    if key[pygame.K_r] or key[pygame.K_f] or key[pygame.K_v]:
-                        self.attack(SURFACE, TARGET)
-                        if key[pygame.K_r]:
-                            self.attack_type = 1
-                            self.attack_sound_played = False
-                        elif key[pygame.K_f]:
-                            self.attack_type = 2
-                            self.attack_sound_played = False
-                        elif key[pygame.K_v]:
-                            self.attack_type = 3
-                            self.attack_sound_played = False
             
-            # PLAYER 2
-            # MOVEMENT BINDS ARROWS
-            if PLAYER == 1:
-                if key[pygame.K_RIGHT]:  # RIGHT
-                    self.vel_x = SPEED
-                    self.running = True
-                elif key[pygame.K_LEFT]:  # LEFT
-                    self.vel_x = -SPEED
-                    self.running = True
-                else:
-                    self.vel_x *= FRICTION  # apply friction
-                    if abs(self.vel_x) < 0.2:
-                        self.vel_x = 0      # avoid infinite issue
+            # jumping
+            if key[self.controls["up"]] and not self.jumping:  # UP
+                self.vel_y = con.JUMPING_SPEED
+                self.jumping = True
 
-                # jumping
-                if key[pygame.K_UP] and not self.jumping:  # UP
-                    self.vel_y = -30
-                    self.jumping = True
-
-                # attacking
-                if not self.attacking:
-                    if key[pygame.K_PERIOD] or key[pygame.K_SLASH] or key[pygame.K_RSHIFT]:
-                        self.attack(SURFACE, TARGET)
-                        if key[pygame.K_PERIOD]:
-                            self.attack_type = 1
-                            self.attack_sound_played = False
-                        elif key[pygame.K_SLASH]:
-                            self.attack_type = 2
-                            self.attack_sound_played = False
-                        elif key[pygame.K_RSHIFT]:
-                            self.attack_type = 3
-                            self.attack_sound_played = False
-
-
+            # attacting
+            if not self.attacking:
+                if key[self.controls["attack1"]] or key[self.controls["attack2"]] or key[self.controls["attack3"]]:
+                    self.attacking = True
+                    self.hitbox_set.clear()
+                    if key[self.controls["attack1"]]:
+                        self.attack_type = 1
+                        self.attack_sound_played = False
+                    elif key[self.controls["attack2"]]:
+                        self.attack_type = 2
+                        self.attack_sound_played = False
+                    elif key[self.controls["attack3"]]:
+                        self.attack_type = 3
+                        self.attack_sound_played = False
+            
+            if self.attacking:
+                self.attack(TARGET)
         # SFX
         # walking sound
         if self.running:
@@ -187,49 +223,63 @@ class Fighter():
         self.rect.x += dx
         self.rect.y += dy
 
-    def attack(self, surface, TARGET):
-        self.attacking = True
-        # create attacking hitbox 
-        attack_width = int(1.5 * self.rect.width)
-        if self.flip:   
-            # facing left
-            attacking_rect = pygame.Rect(self.rect.left - attack_width, 
-                                     self.rect.y, 
-                                     attack_width, 
-                                     self.rect.height)
-        else:     
-            # facing right
-            attacking_rect = pygame.Rect(self.rect.right, 
-                                     self.rect.y, 
-                                     attack_width, 
-                                     self.rect.height)
+    def attack(self, TARGET):
+        active_frame_list = con.ATTACK_ACTIVE_FRAMES[self.attack_type]
+        if active_frame_list == None:
+            return
 
-
-        # collision detect
-        if attacking_rect.colliderect(TARGET.rect):
-            TARGET.health -= 10
-            TARGET.stun = True
+        current_attack_index = -1
+        attack_width_scale = con.ATTACK_WIDTH_SCALE[self.attack_type]
+        for i, (start_frame, end_frame) in enumerate(active_frame_list):
+            if start_frame <= self.frame_index <= end_frame:
+                current_attack_index = i
+                break
         
-        pygame.draw.rect(surface, con.GREEN, attacking_rect)
+        if current_attack_index == -1:
+            return
+       
+        if current_attack_index not in self.hitbox_set:
+        # create attacking hitbox 
+            attack_width = int(attack_width_scale * self.rect.width)
+            if self.flip:   
+                # facing left
+                attacking_rect = pygame.Rect(self.rect.left - attack_width, 
+                                        self.rect.y, 
+                                        attack_width, 
+                                        self.rect.height)
+            else:     
+                # facing right
+                attacking_rect = pygame.Rect(self.rect.right, 
+                                        self.rect.y, 
+                                        attack_width, 
+                                        self.rect.height)
+            # collision detect
+            if attacking_rect.colliderect(TARGET.rect) and not TARGET.dashing:
+                TARGET.health -= 10
+                TARGET.stun = True
+                TARGET.sounds["hit"].play()
+                if not TARGET.death:
+                    TARGET.frame_index = 0
+                    self.screen_shake = True
+                    # knockback by the attack
+                    if TARGET.flip:
+                        TARGET.rect.x += con.KNOCKBACK_DISTANCE
+                    else: 
+                        TARGET.rect.x -= con.KNOCKBACK_DISTANCE
+                self.hitbox_set.add(current_attack_index)
 
     # animation loop
     def update(self):
         update_fighter_animation(self)  # Update fighter animation & attack states
 
     def draw(self, surface):
+        if self.dashing:
+            update_wind_animation(self, surface)
+
         img = pygame.transform.flip(self.image, self.flip, False)
-        pygame.draw.rect(surface, con.ORANGE, self.rect)
+        #pygame.draw.rect(surface, con.ORANGE, self.rect)
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
-
-    def update_action(self, new_action):
-        # check if the new action is different to the previous one
-        if new_action != self.action:
-            self.action = new_action
-            # update the current animation
-            self.frame_index = 0
-            self.update_time = pygame.time.get_ticks()
-
 
 # Legacy code, don't mind
 #     # Player 1 crouch (S)

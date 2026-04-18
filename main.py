@@ -4,6 +4,9 @@ import pygame
 from src.modules.Screens.MainMenu import MainMenuScreen as mainmenu
 from src.modules.Screens.FightScreen import FightScreen as fightscr
 from src.modules.Screens.Help import Help as helpscr
+from src.modules.Screens.SelectCharScreen import SelectCharScreen as charselect
+from src.modules.Screens.BoonScreen import BoonScreen as boonscr
+from src.modules.Screens.MapScreen import MapScreen as mapscr
 from src.modules.Screens.Options import Options as opt
 from src.modules.UI import constants as con
 
@@ -15,7 +18,7 @@ pygame.display.set_caption("Liberty") #VIVA LA LIBERTAS
 # three functions that run all screens that can be called from main menu.
 def run_menu():
     menu = mainmenu(con.display_surface, con.clock)
-    return menu.run()  
+    return menu.run()
 
 def run_story():
     return "menu"
@@ -26,7 +29,7 @@ def run_singleplayer():
 def run_fight():
     fight = fightscr(con.display_surface, con.clock)
     return fight.run()
-    
+
 def run_help():
     help = helpscr(con.display_surface, con.clock)
     return help.run()
@@ -51,12 +54,22 @@ while state != "quit":
         con.background_music.stop()
         state = run_singleplayer()
 
-    elif state == "Multiplayer":
+    elif state == "Fight":
         con.background_music.stop()
-        state = run_fight()  
+        state = run_fight() 
 
-    elif state == "Help":
-        state = run_help()  
+    elif state == "Multiplayer":
+        sub_state = charselect(con.display_surface, con.clock).run()
+        if sub_state == "boon":
+            sub_state = boonscr(con.display_surface, con.clock).run()
+        if sub_state == "map":
+            sub_state = mapscr(con.display_surface, con.clock).run()
+        if sub_state == "boon":
+            sub_state = "play"
+        state = sub_state
+
+    elif state == "help":
+        state = run_help()
 
     elif state == "Options":
         state = run_options()

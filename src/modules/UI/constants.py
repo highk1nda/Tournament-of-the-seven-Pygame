@@ -19,6 +19,9 @@ clock = pygame.time.Clock()
 volume = 1
 brightness = 100
 
+SCREEN_SHAKE_DURATION = 300 # ms
+SCREEN_SHAKE_INTENSITY = 3  # maximum offset
+
 FPS = 60
 
 RED = (255, 0 , 0)
@@ -27,15 +30,60 @@ GREEN = (26, 66, 28)
 YELLOW = (212, 175, 55)
 BLACK = (0, 0, 0)
 GREY = (100, 100, 100)
-CYAN = (0, 255, 00)
+CYAN = (0, 255, 0)
 ORANGE = (222, 110, 0)
-
+LIGHT_GREEN = (0, 255, 0)
+BLUE = (80, 180, 255)
 buttonwidth = SCREEN_WIDTH / 5
 buttonheight = SCREEN_HEIGHT / 15
 buttonspacing = SCREEN_HEIGHT / 10
 
 button_y = (center_y) - (buttonspacing * 2)
 button_x = (center_x) - (buttonwidth / 2)
+# Character select screen colours
+SELECT_BG_COLOR        = (30, 30, 30)
+SELECT_P1_BTN_COLOR    = (160, 45, 45)
+SELECT_P2_BTN_COLOR    = (45, 70, 160)
+SELECT_FIGHT_BTN_COLOR = (60, 140, 60)
+SELECT_P1_LABEL_COLOR  = (210, 65, 65)
+SELECT_P2_LABEL_COLOR  = (65, 100, 210)
+BUTTON_DISABLED_COLOR  = (70, 70, 70)
+
+# Select Char Screen layout and sizes
+SELECT_LOAD_SCALE   = 4
+SELECT_PREVIEW_SIZE = 260
+
+SELECT_BTN_W       = 120
+SELECT_BTN_H       = 42
+SELECT_BTN_GAP     = 10
+SELECT_GRID_WIDTH  = 3 * SELECT_BTN_W + 2 * SELECT_BTN_GAP
+
+SELECT_P1_CX       = SCREEN_WIDTH // 4
+SELECT_P2_CX       = SCREEN_WIDTH * 3 // 4
+
+_sel_block_top     = (SCREEN_HEIGHT - 517) // 2
+SELECT_LABEL_Y     = _sel_block_top
+SELECT_PREVIEW_Y   = _sel_block_top + 46
+SELECT_BTN_ROW1_Y  = SELECT_PREVIEW_Y + SELECT_PREVIEW_SIZE + 14
+SELECT_BTN_ROW2_Y  = SELECT_BTN_ROW1_Y + SELECT_BTN_H + SELECT_BTN_GAP
+SELECT_FIGHT_Y     = SELECT_BTN_ROW2_Y + SELECT_BTN_H + 18
+SELECT_FIGHT_BTN_X = SCREEN_WIDTH // 2 - 100
+
+BOON_BTN_W   = 200
+BOON_BTN_H   = 40
+BOON_BTN_GAP = 8
+
+# Map screen layout
+MAP_PREVIEW_W  = 700
+MAP_PREVIEW_H  = 340
+MAP_PREVIEW_X  = (SCREEN_WIDTH - MAP_PREVIEW_W) // 2
+MAP_PREVIEW_Y  = 80
+MAP_NAV_BTN_W  = 130
+MAP_NAV_BTN_H  = 45
+MAP_NAV_Y      = MAP_PREVIEW_Y + MAP_PREVIEW_H + 30
+MAP_FIGHT_BTN_W = 160
+MAP_FIGHT_BTN_H = 45
+MAP_CX          = SCREEN_WIDTH // 2
 
 FLOOR_Y      = SCREEN_HEIGHT / 1.1
 FLOOR_HEIGHT = SCREEN_HEIGHT - FLOOR_Y
@@ -47,11 +95,107 @@ char_offset = [int(SCREEN_WIDTH / 48), int(SCREEN_HEIGHT / 27.8)]
 CHARACTER_DATA           = [char_size, char_scale, char_offset]  
 PLAYER_WIDTH             = int(SCREEN_WIDTH / 7.14)
 PLAYER_HEIGHT            = int(SCREEN_HEIGHT / 4.28)
-KNIGHT_ANIMATION_STEPS   = [6, 8, 7, 10, 11, 4, 4, 4]
-WEREBEAR_ANIMATION_STEPS = [6, 8, 9, 13, 9, 4, 4]
+KNIGHT_ANIMATION_STEPS         = [6, 8, 7, 10, 11, 4, 4, 4]
+WEREBEAR_ANIMATION_STEPS       = [6, 8, 9, 13, 9, 4, 4]
+KNIGHT_TEMPLAR_ANIMATION_STEPS = [6, 8, 8, 7, 8, 11, 4, 4, 4]
+WIZARD_ANIMATION_STEPS         = [6, 8, 15, 6, 10, 12, 6, 7, 4, 4]
 
-PLAYER_1 = 0
-PLAYER_2 = 1
+PLAYER_1_X = int(SCREEN_WIDTH * 0.15)
+PLAYER_2_X = int(SCREEN_WIDTH * 0.7)
+
+ATTACK_ACTIVE_FRAMES = {
+    0: None,
+    1: [(3, 5)],        # (Start, End) index of animation
+    2: [(3, 5), (7, 9)],
+    3: [(7, 9)]
+}                       # for knight, test
+
+ATTACK_WIDTH_SCALE = {      # attacking hitbox width scale
+    0: None,
+    1: 0.6,
+    2: 1,
+    3: 1.5
+}                       # for knight, test
+
+KNOCKBACK_DISTANCE = 35
+
+ANIMATION_COOLDOWNS = {
+    0: 110,        # 110 ms between frames
+    1: 110,
+    2: 65,
+    3: 75,
+    4: 85,
+    -2: 100,
+    -1: 100
+}
+
+WIND_SIZE = 512
+WIND_SCALE = 0.5
+WIND_FRAMES = 16
+WIND_SCALE_SIZE = WIND_SCALE * WIND_SIZE
+
+HEALTH_BAR_WIDTH = 400
+HEALTH_BAR_HEIGHT = 30
+HEALTH_BAR_LEFT_X = 20
+HEALTH_BAR_RIGHT_X = SCREEN_WIDTH - HEALTH_BAR_LEFT_X - HEALTH_BAR_WIDTH
+HEALTH_BAR_Y = 20
+
+HEALTH_BAR_BORDER_THICKNESS = 2
+
+DASHING_BAR_WIDTH = HEALTH_BAR_WIDTH + (HEALTH_BAR_BORDER_THICKNESS * 2)
+DASHING_BAR_HEIGHT = 5
+DASHING_BAR_HEALTH_BAR_DISTANCE = 4
+DASHING_BAR_LEFT_X = HEALTH_BAR_LEFT_X - HEALTH_BAR_BORDER_THICKNESS
+DASHING_BAR_RIGHT_X = HEALTH_BAR_RIGHT_X - HEALTH_BAR_BORDER_THICKNESS
+DASHING_BAR_Y = HEALTH_BAR_Y + HEALTH_BAR_HEIGHT + HEALTH_BAR_BORDER_THICKNESS + DASHING_BAR_HEALTH_BAR_DISTANCE
+CHARGES_DISTANCE_IN_HALF = 4
+DASHING_BAR_COLOR = LIGHT_GREEN
+
+PLAYER_SPEED = 8
+JUMPING_SPEED = -30
+
+DASHING_SPEED = 80
+DASHING_BRAKE = 0.5
+DASHING_COOLDOWN = 2000   # ms -- 1000ms = 1s
+DASHING_CHARGE = 2     # Dashing charge system:
+                       # Player has 2 dash charges in every Shift press window
+                       # Cooldown is triggered when:
+                       #    1) 2 dash charges are both used, or
+                       #    2) Shift is released after dash (at least 1 dash)
+
+GROUND_FRICTION = 0.7
+AIR_FRICTION = 0.93
+GRAVITY = 2
+
+P1_CONTROLS = {
+    "left": pygame.K_a,
+    "right": pygame.K_d,
+    "up": pygame.K_w,
+    "attack1": pygame.K_r,
+    "attack2": pygame.K_f,
+    "attack3": pygame.K_v,
+    "dash": pygame.K_LSHIFT
+}
+
+P2_CONTROLS = {
+    "left": pygame.K_LEFT,
+    "right": pygame.K_RIGHT,
+    "up": pygame.K_UP,
+    "attack1": pygame.K_COMMA,
+    "attack2": pygame.K_PERIOD,
+    "attack3": pygame.K_SLASH,
+    "dash": pygame.K_RSHIFT
+}
+
+ACTIONS = {
+    "IDLE": 0,
+    "WALK": 1,
+    "ATTACK1": 2,
+    "ATTACK2": 3,
+    "ATTACK3": 4,
+    "HIT": -2,
+    "DEATH": -1
+}
 
 PLAYER_1_X = int(SCREEN_WIDTH * 0.15)
 PLAYER_2_X = int(SCREEN_WIDTH * 0.7)
@@ -64,18 +208,45 @@ healthbar_y = int(SCREEN_WIDTH * 0.02)
 healtbar_xx = int(SCREEN_WIDTH * 0.58)
 
 menumusic: str = "assets/sfx/menmusica.mp3"
+fightmusic: str = "assets/sfx/fightmusica.mp3"
 forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
-menuscreenimage: str = "assets/forest.jpg"
-fightscreenimage: str = "assets/forest.jpg"
+menuscreenimage: str = "assets/forest.jpg" # DEAFULTIMAGE, not changable from game
+fightscreenimage: str = "assets/forest.jpg" # DEAFULTIMAGE, changable in MapScreen.py
 
-Knight = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters" "/Characters(100x100)/Knight/Knight/Knight.png"
-Werebear = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters" "/Characters(100x100)/Werebear/Werebear/Werebear.png"
+wind = "assets/wind.png"
+Knight       = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight.png"
+Werebear     = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear.png"
+KnightTemplar = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar.png"
+Wizard       = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard.png"
 
 background = pygame.transform.scale(pygame.image.load(menuscreenimage).convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-knight_sheet = pygame.image.load(Knight).convert_alpha()
+fight_backgrounds = {
+    "map1": background,
+    "map2": pygame.transform.scale(pygame.image.load("assets/fields.png").convert(), (SCREEN_WIDTH, SCREEN_HEIGHT)),
+}
 
-werebear_sheet = pygame.image.load(Werebear).convert_alpha()
+knight_sheet        = pygame.image.load(Knight).convert_alpha()
+werebear_sheet      = pygame.image.load(Werebear).convert_alpha()
+knight_templar_sheet = pygame.image.load(KnightTemplar).convert_alpha()
+wizard_sheet        = pygame.image.load(Wizard).convert_alpha()
+
+wind_sheet = pygame.image.load(wind).convert_alpha()
 
 background_music = pygame.mixer.Sound(menumusic)
-forest_sfx = pygame.mixer.Sound(forestsound)
+fight_music      = pygame.mixer.Sound(fightmusic)
+select_sound     = pygame.mixer.Sound("assets/sfx/select2.mp3")
+ui_error_sound   = pygame.mixer.Sound("assets/sfx/floraphonic-arcade-ui-4.mp3")
+exit_sound       = pygame.mixer.Sound("assets/sfx/musicholder-woosh-260275.mp3")
+exit_sound.set_volume(15.0)
+
+# Store selected character indices (in SelectCharScreen)
+p1_char_idx = 0
+p2_char_idx = 1
+
+# Store selected boons (in Boon Screen)
+p1_boon = None
+p2_boon = None
+
+# Store selected map (dynamicly changable btw, its set in MapScreen)
+selected_map = "map1"

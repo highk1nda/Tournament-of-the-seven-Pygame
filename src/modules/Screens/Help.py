@@ -54,7 +54,7 @@ class Help():
                 if event.type == pygame.QUIT:
                     return "quit"
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        return "menu"
+                    con.exit_sound.play()
+                    return "menu"
             self.draw()
             res.render_to_surface()
