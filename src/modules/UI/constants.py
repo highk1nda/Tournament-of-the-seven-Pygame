@@ -48,6 +48,22 @@ SELECT_BTN_ROW2_Y  = SELECT_BTN_ROW1_Y + SELECT_BTN_H + SELECT_BTN_GAP
 SELECT_FIGHT_Y     = SELECT_BTN_ROW2_Y + SELECT_BTN_H + 18
 SELECT_FIGHT_BTN_X = SCREEN_WIDTH // 2 - 100
 
+BOON_BTN_W   = 200
+BOON_BTN_H   = 40
+BOON_BTN_GAP = 8
+
+# Map screen layout
+MAP_PREVIEW_W  = 700
+MAP_PREVIEW_H  = 340
+MAP_PREVIEW_X  = (SCREEN_WIDTH - MAP_PREVIEW_W) // 2
+MAP_PREVIEW_Y  = 80
+MAP_NAV_BTN_W  = 130
+MAP_NAV_BTN_H  = 45
+MAP_NAV_Y      = MAP_PREVIEW_Y + MAP_PREVIEW_H + 30
+MAP_FIGHT_BTN_W = 160
+MAP_FIGHT_BTN_H = 45
+MAP_CX          = SCREEN_WIDTH // 2
+
 FLOOR_Y      = 510
 FLOOR_HEIGHT = SCREEN_HEIGHT - FLOOR_Y
 
@@ -159,8 +175,8 @@ ACTIONS = {
 menumusic: str = "assets/sfx/menmusica.mp3"
 fightmusic: str = "assets/sfx/fightmusica.mp3"
 forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
-menuscreenimage: str = "assets/forest.jpg"
-fightscreenimage: str = "assets/forest.jpg"
+menuscreenimage: str = "assets/forest.jpg" # DEAFULTIMAGE, not changable from game
+fightscreenimage: str = "assets/forest.jpg" # DEAFULTIMAGE, changable in MapScreen.py
 
 wind = "assets/wind.png"
 Knight       = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight.png"
@@ -173,6 +189,11 @@ clock = pygame.time.Clock()
 
 background = pygame.transform.scale(pygame.image.load(menuscreenimage).convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+fight_backgrounds = {
+    "map1": background,
+    "map2": pygame.transform.scale(pygame.image.load("assets/fields.png").convert(), (SCREEN_WIDTH, SCREEN_HEIGHT)),
+}
+
 knight_sheet        = pygame.image.load(Knight).convert_alpha()
 werebear_sheet      = pygame.image.load(Werebear).convert_alpha()
 knight_templar_sheet = pygame.image.load(KnightTemplar).convert_alpha()
@@ -182,3 +203,18 @@ wind_sheet = pygame.image.load(wind).convert_alpha()
 
 background_music = pygame.mixer.Sound(menumusic)
 fight_music      = pygame.mixer.Sound(fightmusic)
+select_sound     = pygame.mixer.Sound("assets/sfx/select2.mp3")
+ui_error_sound   = pygame.mixer.Sound("assets/sfx/floraphonic-arcade-ui-4.mp3")
+exit_sound       = pygame.mixer.Sound("assets/sfx/musicholder-woosh-260275.mp3")
+exit_sound.set_volume(15.0)
+
+# Store selected character indices (in SelectCharScreen)
+p1_char_idx = 0
+p2_char_idx = 1
+
+# Store selected boons (in Boon Screen)
+p1_boon = None
+p2_boon = None
+
+# Store selected map (dynamicly changable btw, its set in MapScreen)
+selected_map = "map1"

@@ -25,6 +25,7 @@ class FightScreen():
         p2 = getattr(con, "p2_selected", (con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)) # default to werebear if not set
         self.knight   = Fighter(con.PLAYER_1_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, p1[0], p1[1], con.P1_CONTROLS)
         self.werebear = Fighter(con.PLAYER_2_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True,  con.CHARACTER_DATA, p2[0], p2[1], con.P2_CONTROLS)
+        self.background = con.fight_backgrounds[con.selected_map]
 
     def update(self):
         self.knight.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.werebear)
@@ -54,7 +55,7 @@ class FightScreen():
     
     def draw(self):
         x, y = self.screen_shake_offset
-        draw_screen(self.screen, con.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.knight, self.werebear, offset=(x, y))
+        draw_screen(self.screen, self.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.knight, self.werebear, offset=(x, y))
         self.knight.draw(self.screen)
         self.werebear.draw(self.screen)
 
@@ -82,6 +83,7 @@ class FightScreen():
                     return "quit"
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     stop_fight_sounds()
+                    con.exit_sound.play()
                     return "menu"
                 debug.handle_event(event)
 

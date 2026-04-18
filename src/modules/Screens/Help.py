@@ -43,6 +43,7 @@ class Help():
                 if event.type == pygame.QUIT:
                     return "quit"
                 if event.type == pygame.KEYDOWN:
+                    con.exit_sound.play()
                     return "menu"
             self.draw()
             pygame.display.update()
