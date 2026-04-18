@@ -1,5 +1,6 @@
 import pygame
 
+from src.modules.UI import constants as con
 
 def load_fighter_sounds():
     sounds = {
@@ -23,9 +24,9 @@ def load_fighter_sounds():
         )
     }
 
-    sounds["walk"].set_volume(0.3)
-    sounds["attack1"].set_volume(0.4)
-    sounds["attack2"].set_volume(0.4)
-    sounds["attack3"].set_volume(0.4)
+    sounds["walk"].set_volume(con.volume)
+    sounds["attack1"].set_volume(con.volume)
+    sounds["attack2"].set_volume(con.volume)
+    sounds["attack3"].set_volume(con.volume)
 
     return sounds

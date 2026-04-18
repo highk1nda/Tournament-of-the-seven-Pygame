@@ -1,6 +1,7 @@
 import pygame
 from src.modules.fighter.render import load_animation_frames, update_fighter_animation
 from src.modules.sfx.sound_loader import load_fighter_sounds
+from src.modules.UI import constants as con
 
 
 class Fighter():
@@ -209,7 +210,7 @@ class Fighter():
             TARGET.health -= 10
             TARGET.stun = True
         
-        pygame.draw.rect(surface, (0, 255, 0), attacking_rect)
+        pygame.draw.rect(surface, con.GREEN, attacking_rect)
 
     # animation loop
     def update(self):
@@ -217,7 +218,7 @@ class Fighter():
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
-        pygame.draw.rect(surface, (222, 110, 0), self.rect)
+        pygame.draw.rect(surface, con.ORANGE, self.rect)
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
 
