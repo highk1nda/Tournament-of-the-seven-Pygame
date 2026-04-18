@@ -5,6 +5,8 @@ from src.modules.Screens.MainMenu import MainMenuScreen as mainmenu
 from src.modules.Screens.FightScreen import FightScreen as fightscr
 from src.modules.Screens.Help import Help as helpscr
 from src.modules.Screens.SelectCharScreen import SelectCharScreen as charselect
+from src.modules.Screens.BoonScreen import BoonScreen as boonscr
+from src.modules.Screens.MapScreen import MapScreen as mapscr
 from src.modules.UI import constants as con
 pygame.init()
 pygame.display.set_caption("Liberty") #VIVA LA LIBERTAS
@@ -36,7 +38,14 @@ while state != "quit":
         state = run_menu()
 
     elif state == "play":
-        state = charselect(con.display_surface, con.clock).run()
+        sub_state = charselect(con.display_surface, con.clock).run()
+        if sub_state == "boon":
+            sub_state = boonscr(con.display_surface, con.clock).run()
+        if sub_state == "map":
+            sub_state = mapscr(con.display_surface, con.clock).run()
+        if sub_state == "boon":
+            sub_state = "play"
+        state = sub_state
 
     elif state == "fight":
         state = run_fight()

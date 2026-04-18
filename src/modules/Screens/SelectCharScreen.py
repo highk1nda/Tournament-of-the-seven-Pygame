@@ -2,8 +2,7 @@ import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
 from src.modules.UI.Button import Button
-from src.modules.fighter.render import load_animation_frames, crop_and_scale_frames
-
+#TODO: improve constants here too
 BG    = con.SELECT_BG_COLOR
 RED   = con.SELECT_P1_BTN_COLOR
 BLUE  = con.SELECT_P2_BTN_COLOR
@@ -17,8 +16,8 @@ CHAR_DATA = [
     (con.knight_sheet,          con.KNIGHT_ANIMATION_STEPS),
     (con.werebear_sheet,        con.WEREBEAR_ANIMATION_STEPS),
     (con.wizard_sheet,          con.WIZARD_ANIMATION_STEPS),
-    None, # minotaur
-    None, # archer
+    None, # minotaur TODO
+    None, # archer TODO
     (con.knight_templar_sheet,  con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
 ]
 
@@ -76,7 +75,7 @@ class SelectCharScreen:
 
         self.p1_btns   = make_button_rects(P1_CX)
         self.p2_btns   = make_button_rects(P2_CX)
-        self.fight_btn = Button(con.SELECT_FIGHT_BTN_X, FIGHT_Y, 200, 45, "FIGHT",
+        self.fight_btn = Button(con.SELECT_FIGHT_BTN_X, FIGHT_Y, 200, 45, "CONTINUE",
                                 self.font, button_color=GREEN)
 
         self.p1_idx = 0  # default: Knight
@@ -146,17 +145,29 @@ class SelectCharScreen:
                 if event.type == QUIT:
                     return "quit"
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
+                    con.exit_sound.play()
                     return "menu"
                 if event.type == MOUSEBUTTONDOWN:
                     for i in range(6):
                         if self.p1_btns[i].collidepoint(event.pos):
+                            if CHAR_DATA[i] is None:
+                                con.ui_error_sound.play()
+                            else:
+                                con.select_sound.play()
                             self.select_char(1, i)
                         if self.p2_btns[i].collidepoint(event.pos):
+                            if CHAR_DATA[i] is None:
+                                con.ui_error_sound.play()
+                            else:
+                                con.select_sound.play()
                             self.select_char(2, i)
                     if self.fight_btn.is_clicked(event.pos, True):
+                        con.select_sound.play()
                         con.p1_selected = CHAR_DATA[self.p1_idx]
                         con.p2_selected = CHAR_DATA[self.p2_idx]
-                        return "fight"
+                        con.p1_char_idx = self.p1_idx
+                        con.p2_char_idx = self.p2_idx
+                        return "boon"
 
             self.draw()
             pygame.display.update()
