@@ -2,9 +2,11 @@ import pygame
 from pygame.locals import *
 
 from src.modules.UI import constants as con
-from src.modules.UI.Button import Button
+from src.modules.UI.Button import Button 
+from src.modules.systems.applybright import apply_brightness as appBright
+from src.modules.systems import res 
+from src.modules.systems.scalemouse import scale_mouse
 from src.modules.fighter.render import load_menu_background
-
 
 class MainMenuScreen:
     def __init__(self, screen, clock):
@@ -18,12 +20,13 @@ class MainMenuScreen:
         if con.background_music.get_num_channels() == 0:
             con.background_music.play(-1)
 
-        # create the buttons, with play being in the center of the screen TODO add story, multiplayer, and singleplayer, buttons
-        self.button_play = Button((con.SCREEN_WIDTH/2) - 100, con.SCREEN_HEIGHT/2, 200, 40, 'Play', self.font)
-        self.button_help = Button((con.SCREEN_WIDTH/2) - 100, (con.SCREEN_HEIGHT/2) + 70, 200, 40, 'Help', self.font)
-        self.button_options = Button((con.SCREEN_WIDTH/2) - 100, (con.SCREEN_HEIGHT/2) + 140, 200, 40, 'Options', self.font)
-        self.button_quit = Button(con.SCREEN_WIDTH/2 - 100, (con.SCREEN_HEIGHT/2) + 210, 200, 40, 'Quit', self.font)
-        self.buttons = [self.button_play, self.button_help, self.button_options, self.button_quit]
+        self.button_story           = Button(con.button_x, con.button_y, con.buttonwidth, con.buttonheight, 'Story mode', self.font)
+        self.button_singleplayer    = Button(con.button_x, con.button_y + con.buttonspacing, con.buttonwidth, con.buttonheight, 'Singleplayer', self.font)
+        self.button_multiplayer     = Button(con.button_x, con.button_y + (con.buttonspacing*2), con.buttonwidth,con.buttonheight, 'Multiplayer', self.font)
+        self.button_help            = Button(con.button_x, con.button_y + (con.buttonspacing*3), con.buttonwidth, con.buttonheight, 'Help', self.font)
+        self.button_options         = Button(con.button_x, con.button_y + (con.buttonspacing*4), con.buttonwidth, con.buttonheight, 'Options', self.font)
+        self.button_quit            = Button(con.button_x, con.button_y + (con.buttonspacing*5), con.buttonwidth, con.buttonheight, 'Quit', self.font)
+        self.buttons                = [self.button_story, self.button_singleplayer, self.button_multiplayer, self.button_help, self.button_options, self.button_quit]
 
         self.click = False
         self.confirm_quit = False
@@ -62,20 +65,28 @@ class MainMenuScreen:
             return None
 
         #check button interactions
-        mx, my = pygame.mouse.get_pos()
+        mx, my = scale_mouse()
 
-        if self.button_play.is_clicked((mx, my), self.click):
+        if self.button_story.is_clicked((mx, my), self.click):
+            self.click = False
+            con.ui_error_sound.play()
+            return 'Story mode'
+        if self.button_singleplayer.is_clicked((mx, my), self.click):
+            self.click = False
+            con.ui_error_sound.play()
+            return 'Singleplayer'
+        if self.button_multiplayer.is_clicked((mx, my), self.click):
             self.click = False
             con.select_sound.play()
-            return 'play'
+            return 'Multiplayer'
         if self.button_help.is_clicked((mx, my), self.click):
             self.click = False
             con.select_sound.play()
-            return 'help'
+            return 'Help'
         if self.button_options.is_clicked((mx, my), self.click):
             self.click = False
-            con.ui_error_sound.play()
-            return 'options'
+            con.select_sound.play()
+            return 'Options'
         if self.button_quit.is_clicked((mx, my), self.click):
             self.click = False
             con.exit_sound.play()
@@ -109,6 +120,7 @@ class MainMenuScreen:
         # draw buttons
         for button in self.buttons:
             button.draw(self.screen)
+        appBright(self.screen)
 
         if self.confirm_quit:
             self.draw_confirm_dialog()
@@ -129,8 +141,8 @@ class MainMenuScreen:
                 return action
 
             self.draw()
-            pygame.display.update()
-            self.clock.tick(60)
+            res.render_to_surface()
+            self.clock.tick(con.FPS)
 
 # DRACULA
 #                   __,-----,,,,  ,,,--------,__ 
