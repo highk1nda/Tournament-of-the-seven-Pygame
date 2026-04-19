@@ -5,7 +5,7 @@ from pygame.locals import *
 from src.modules.fighter.Fighter import Fighter
 from src.modules.UI import constants as con
 from src.modules.sfx.sound_loader import load_fighter_sounds
-from src.modules.systems.Draw import draw_screen, draw_round_ui
+from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indicator
 from tests.test import DebugPopup
 
 # the fight screen class
@@ -155,6 +155,8 @@ class FightScreen():
         self.player1.draw(self.screen)
         self.player2.draw(self.screen)
         draw_round_ui(self)
+        draw_round_indicator(self.screen, self.p2_wins, False)
+        draw_round_indicator(self.screen, self.p1_wins, True)
 
         if self.fade_alpha > 0:
             self.fade_surface.set_alpha(self.fade_alpha)

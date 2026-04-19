@@ -106,7 +106,28 @@ def draw_round_ui(fight_screen):
         text_rect.centerx = con.SCREEN_WIDTH // 2
         text_rect.y = con.ROUND_TEXT_Y
         fight_screen.screen.blit(text_surface, text_rect)
-        
+
+def draw_round_indicator(display_surface, target_wins, on_right):
+    r = con.ROUND_DOT_RADIUS
+    gap = con.ROUND_DOT_GAP
+    total_width = con.MAX_WINS * (r * 2) + (con.MAX_WINS - 1) * gap
+    y = con.ROUND_DOT_Y
+
+    lifes_remain = con.MAX_WINS - target_wins
+    if not on_right:
+        init_x = con.HEALTH_BAR_LEFT_X + r
+    else:
+        init_x = con.HEALTH_BAR_RIGHT_X + con.HEALTH_BAR_WIDTH - total_width + r
+    for i in range(con.MAX_WINS):
+        x = init_x + i * (r * 2 + gap)
+        if not on_right:
+            if i < lifes_remain:
+                pygame.draw.circle(display_surface, con.RED, (x, y), r)
+        else:
+            if (con.MAX_WINS - i) <= lifes_remain:
+                pygame.draw.circle(display_surface, con.RED, (x, y), r)
+        pygame.draw.circle(display_surface, con.WHITE, (x, y), r, con.ROUND_DOT_BORDER_THICKNESS)
+
 
 def draw_screen(display_surface, background, floor_y, floor_height, screen_width, fighter1, fighter2, offset=(0, 0)):
     # RENDERING
