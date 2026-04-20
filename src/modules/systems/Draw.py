@@ -83,7 +83,7 @@ def draw_round_ui(fight_screen):
         else:
             text_surface = font.render("FIGHT!", True, con.RED)
 
-    elif fight_screen.state == "round_end":
+    elif fight_screen.state in ["round_end", "time_over"]:
         text_surface = font.render(fight_screen.round_text, True, con.RED)
     
     elif fight_screen.state == "fight_end":
@@ -127,6 +127,14 @@ def draw_round_indicator(display_surface, target_wins, on_right):
             if (con.MAX_WINS - i) <= lifes_remain:
                 pygame.draw.circle(display_surface, con.RED, (x, y), r)
         pygame.draw.circle(display_surface, con.WHITE, (x, y), r, con.ROUND_DOT_BORDER_THICKNESS)
+
+def draw_timer(display_surface, second):
+    font = con.FONT_VERY_BIG
+    text_surface = font.render(str(second), True, con.RED)
+    text_rect = text_surface.get_rect()
+    text_rect.centerx = con.SCREEN_WIDTH // 2
+    text_rect.centery = con.HEALTH_BAR_Y + con.HEALTH_BAR_HEIGHT // 2
+    display_surface.blit(text_surface, text_rect)
 
 
 def draw_screen(display_surface, background, floor_y, floor_height, screen_width, fighter1, fighter2, offset=(0, 0)):

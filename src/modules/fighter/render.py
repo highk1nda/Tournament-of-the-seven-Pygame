@@ -71,7 +71,6 @@ def update_fighter_animation(fighter):
     if fighter.frame_index >= len(fighter.animation_list[fighter.action]):
         if fighter.death:
             fighter.frame_index = len(fighter.animation_list[-1]) - 1
-            fighter.death_animation_done = True
         else:
             fighter.frame_index = 0
             if fighter.attacking:

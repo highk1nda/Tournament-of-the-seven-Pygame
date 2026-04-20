@@ -5,7 +5,7 @@ from pygame.locals import *
 from src.modules.fighter.Fighter import Fighter
 from src.modules.UI import constants as con
 from src.modules.sfx.sound_loader import load_fighter_sounds
-from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indicator
+from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indicator, draw_timer
 from tests.test import DebugPopup
 
 # the fight screen class
@@ -25,11 +25,13 @@ class FightScreen():
         self.p2_wins = 0
         self.max_wins = con.MAX_WINS
         self.current_round = 1
-        self.round_text = ""    # Fighter 1 wins! / Fighter 2 wins! / Draw!
+        self.round_text = ""    # Fighter 1 wins! / Fighter 2 wins! / Draw! / Time over
+        self.round_second_text = ""
         self.round_death = None
         self.state = "countdown"    # countdown / fight / death animation / round end / fade out / fade in / fight end
         self.state_timer = 0
         self.winner = "\n"
+        self.round_start_time = 0
 
         # screen fade between rounds
         self.fade_surface = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT))
@@ -48,6 +50,7 @@ class FightScreen():
         if self.state == "countdown":
             if current_time - self.state_timer >= con.ROUND_TEXT_DURATION:
                 self.state = "fight"
+                self.round_start_time = current_time
             return None
         
         if self.state == "fight":
@@ -70,6 +73,29 @@ class FightScreen():
             else:
                 self.screen_shake_offset = (0, 0)
 
+            # time over check
+            round_time = current_time - self.round_start_time
+            if round_time >= con.ROUND_DURATION:
+                self.round_text = "TIME OVER"
+                self.state = "time_over"
+                self.state_timer = current_time
+                if self.player1.health > self.player2.health:
+                    self.round_second_text = "PLAYER 1 WINS!"
+                    self.p1_wins += 1
+                elif self.player2.health > self.player1.health:
+                    self.round_second_text = "PLAYER 2 WINS!"
+                    self.p2_wins += 1
+                else:
+                    self.round_second_text = "DRAW!"
+                    self.p1_wins += 1
+                    self.p2_wins += 1
+
+                for p in (self.player1, self.player2):
+                    p.walk_sound.stop()
+                    p.walk_sound_playing = False
+                return None
+            
+            # player died in round time
             if self.player1.death or self.player2.death:
                 if self.player1.death and self.player2.death:
                     self.round_text = "DRAW!"
@@ -89,23 +115,27 @@ class FightScreen():
                 self.state_timer = current_time
             return None
         
+        if self.state == "time_over":
+            if current_time - self.state_timer > con.ROUND_TEXT_DURATION:
+                self.round_text = self.round_second_text
+                self.state = "round_end"
+                self.state_timer = current_time
+            return None
+        
         if self.state == "death_animation":
+            self.player1.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player2)
+            self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1)
             self.player1.update()
             self.player2.update()
 
-            time_flag = current_time - self.state_timer > con.DEATH_DURATION
+            if current_time - self.state_timer > con.DEATH_DURATION:
+                for p in (self.player1, self.player2):
+                    p.walk_sound.stop()
+                    p.walk_sound_playing = False
 
-            if self.round_death == "both":
-                if self.player1.death_animation_done and self.player2.death_animation_done and time_flag:
-                    self.state = "round_end"
-                    self.state_timer = current_time
-                return None
-            
-            else:
-                if self.round_death.death_animation_done and time_flag:
-                    self.state = "round_end"
-                    self.state_timer = current_time
-                return None
+                self.state = "round_end"
+                self.state_timer = current_time
+            return None
             
         if self.state == "round_end":
             if current_time - self.state_timer > con.ROUND_TEXT_DURATION:
@@ -157,6 +187,11 @@ class FightScreen():
         draw_round_ui(self)
         draw_round_indicator(self.screen, self.p2_wins, False)
         draw_round_indicator(self.screen, self.p1_wins, True)
+
+        if self.state == "fight":
+            round_time = pygame.time.get_ticks() - self.round_start_time
+            display_seconds = max(0, (con.ROUND_DURATION - round_time) // 1000)
+            draw_timer(self.screen, display_seconds)
 
         if self.fade_alpha > 0:
             self.fade_surface.set_alpha(self.fade_alpha)
