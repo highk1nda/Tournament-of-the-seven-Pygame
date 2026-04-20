@@ -90,9 +90,8 @@ class FightScreen():
                     self.p1_wins += 1
                     self.p2_wins += 1
 
-                for p in (self.player1, self.player2):
-                    p.walk_sound.stop()
-                    p.walk_sound_playing = False
+                self.player1.clean_up()
+                self.player2.clean_up()
                 return None
             
             # player died in round time
@@ -129,9 +128,8 @@ class FightScreen():
             self.player2.update()
 
             if current_time - self.state_timer > con.DEATH_DURATION:
-                for p in (self.player1, self.player2):
-                    p.walk_sound.stop()
-                    p.walk_sound_playing = False
+                self.player1.clean_up()
+                self.player2.clean_up()
 
                 self.state = "round_end"
                 self.state_timer = current_time
@@ -215,6 +213,8 @@ class FightScreen():
                     return "quit"
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     forest_sfx.stop()
+                    self.player1.clean_up()
+                    self.player2.clean_up()
                     return "menu"
                 debug.handle_event(event)
 
