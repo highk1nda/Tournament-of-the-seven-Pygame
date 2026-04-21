@@ -89,11 +89,11 @@ def draw_screen(display_surface, background, floor_y, floor_height, screen_width
 
     # Draw health bars
     draw_health_bar(display_surface, fighter1.health, con.healthbar_x, con.healthbar_y, False)
-    draw_health_bar(display_surface, fighter2.health, con.healtbar_xx, con.healthbar_y, True)
+    draw_health_bar(display_surface, fighter2.health, con.healthbar_xx, con.healthbar_y, True)
 
     # Draw dashing bars
     draw_dashing_cooldown_bar(display_surface, fighter1, False)
     draw_dashing_cooldown_bar(display_surface, fighter2, True)
 
     # Draw floor
-    pygame.draw.rect(display_surface, con.GREEN, (x, floor_y + y, screen_width, floor_height))
+    pygame.draw.rect(display_surface, con.FLOOR_COLOR, (x, floor_y + y, screen_width, floor_height))

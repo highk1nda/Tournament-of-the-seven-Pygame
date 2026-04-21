@@ -2,7 +2,6 @@ import pygame
 
 pygame.mixer.init()
 
-
 #constant variables to stop accumalating technical debt
 SCREEN_WIDTH  = 1920
 SCREEN_HEIGHT = 1080
@@ -34,6 +33,8 @@ CYAN = (0, 255, 0)
 ORANGE = (222, 110, 0)
 LIGHT_GREEN = (0, 255, 0)
 BLUE = (80, 180, 255)
+FLOOR_COLOR = (106, 80, 80)
+
 buttonwidth = SCREEN_WIDTH / 5
 buttonheight = SCREEN_HEIGHT / 15
 buttonspacing = SCREEN_HEIGHT / 10
@@ -134,21 +135,20 @@ WIND_SCALE = 0.5
 WIND_FRAMES = 16
 WIND_SCALE_SIZE = WIND_SCALE * WIND_SIZE
 
-HEALTH_BAR_WIDTH = 400
-HEALTH_BAR_HEIGHT = 30
-HEALTH_BAR_LEFT_X = 20
-HEALTH_BAR_RIGHT_X = SCREEN_WIDTH - HEALTH_BAR_LEFT_X - HEALTH_BAR_WIDTH
-HEALTH_BAR_Y = 20
+healthbar_width = int(SCREEN_WIDTH * 0.4)
+healthbar_height = int(SCREEN_WIDTH * 0.037)
+healthbar_padding = 2
+healthbar_x = int(SCREEN_WIDTH * 0.02)
+healthbar_y = int(SCREEN_WIDTH * 0.02)
+healthbar_xx = int(SCREEN_WIDTH * 0.58)
 
-HEALTH_BAR_BORDER_THICKNESS = 2
-
-DASHING_BAR_WIDTH = HEALTH_BAR_WIDTH + (HEALTH_BAR_BORDER_THICKNESS * 2)
-DASHING_BAR_HEIGHT = 5
-DASHING_BAR_HEALTH_BAR_DISTANCE = 4
-DASHING_BAR_LEFT_X = HEALTH_BAR_LEFT_X - HEALTH_BAR_BORDER_THICKNESS
-DASHING_BAR_RIGHT_X = HEALTH_BAR_RIGHT_X - HEALTH_BAR_BORDER_THICKNESS
-DASHING_BAR_Y = HEALTH_BAR_Y + HEALTH_BAR_HEIGHT + HEALTH_BAR_BORDER_THICKNESS + DASHING_BAR_HEALTH_BAR_DISTANCE
-CHARGES_DISTANCE_IN_HALF = 4
+DASHING_BAR_WIDTH = int(SCREEN_WIDTH * 0.4)
+DASHING_BAR_HEIGHT = int(SCREEN_HEIGHT / 150)
+DASHING_BAR_HEALTH_BAR_DISTANCE = int(SCREEN_HEIGHT / 13)
+DASHING_BAR_LEFT_X = healthbar_x
+DASHING_BAR_RIGHT_X = healthbar_xx
+DASHING_BAR_Y = int(healthbar_y * 3)
+CHARGES_DISTANCE_IN_HALF = 8
 DASHING_BAR_COLOR = LIGHT_GREEN
 
 PLAYER_SPEED = 8
@@ -200,18 +200,12 @@ ACTIONS = {
 PLAYER_1_X = int(SCREEN_WIDTH * 0.15)
 PLAYER_2_X = int(SCREEN_WIDTH * 0.7)
 
-healthbar_width = int(SCREEN_WIDTH * 0.4)
-healthbar_height = int(SCREEN_WIDTH * 0.037)
-healthbar_padding = 2
-healthbar_x = int(SCREEN_WIDTH * 0.02)
-healthbar_y = int(SCREEN_WIDTH * 0.02)
-healtbar_xx = int(SCREEN_WIDTH * 0.58)
 
 menumusic: str = "assets/sfx/menmusica.mp3"
 fightmusic: str = "assets/sfx/fightmusica.mp3"
 forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
 menuscreenimage: str = "assets/forest.jpg" # DEAFULTIMAGE, not changable from game
-fightscreenimage: str = "assets/forest.jpg" # DEAFULTIMAGE, changable in MapScreen.py
+fightscreenimage: str = "assets/Colleseum.png" # DEAFULTIMAGE, changable in MapScreen.py
 
 wind = "assets/wind.png"
 Knight       = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight.png"
@@ -219,11 +213,13 @@ Werebear     = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/C
 KnightTemplar = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar.png"
 Wizard       = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard.png"
 
-background = pygame.transform.scale(pygame.image.load(menuscreenimage).convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
+background = pygame.transform.scale(pygame.image.load(fightscreenimage).convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+forest_sfx = pygame.mixer.Sound(forestsound)
 
 fight_backgrounds = {
     "map1": background,
-    "map2": pygame.transform.scale(pygame.image.load("assets/fields.png").convert(), (SCREEN_WIDTH, SCREEN_HEIGHT)),
+    "map2": pygame.transform.scale(pygame.image.load("assets/Heaven.png").convert(), (SCREEN_WIDTH, SCREEN_HEIGHT)),
 }
 
 knight_sheet        = pygame.image.load(Knight).convert_alpha()
@@ -238,7 +234,6 @@ fight_music      = pygame.mixer.Sound(fightmusic)
 select_sound     = pygame.mixer.Sound("assets/sfx/select2.mp3")
 ui_error_sound   = pygame.mixer.Sound("assets/sfx/floraphonic-arcade-ui-4.mp3")
 exit_sound       = pygame.mixer.Sound("assets/sfx/musicholder-woosh-260275.mp3")
-exit_sound.set_volume(15.0)
 
 # Store selected character indices (in SelectCharScreen)
 p1_char_idx = 0

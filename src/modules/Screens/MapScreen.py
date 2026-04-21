@@ -1,6 +1,9 @@
 import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
+from src.modules.systems import res 
+from src.modules.systems.applybright import apply_brightness as appBright
+from src.modules.systems.scalemouse import scale_mouse
 from src.modules.Screens.SelectCharScreen import CharPreview, CHAR_DATA
 #TODO: improve constants calling
 BG    = con.SELECT_BG_COLOR
@@ -8,8 +11,8 @@ GREEN = con.SELECT_FIGHT_BTN_COLOR
 GREY  = con.BUTTON_DISABLED_COLOR
 
 MAPS = [
-    {"name": "Forest",  "path": "assets/forest.jpg",  "key": "map1"},
-    {"name": "Fields",  "path": "assets/fields.png",  "key": "map2"},
+    {"name": "Forest",  "path": "assets/Colleseum.png",  "key": "map1"},
+    {"name": "Fields",  "path": "assets/Heaven.png",  "key": "map2"},
 ]
 
 PREVIEW_W   = con.MAP_PREVIEW_W
@@ -91,6 +94,7 @@ class MapScreen:
         self.draw_button(self.prev_rect,  "< Previous", GREY)
         self.draw_button(self.fight_rect, "FIGHT",      GREEN)
         self.draw_button(self.next_rect,  "Next >",     GREY)
+        appBright(self.screen)
 
     def run(self):
         while True:
@@ -98,20 +102,20 @@ class MapScreen:
                 if event.type == QUIT:
                     return "quit"
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
-                    con.exit_sound.play()
-                    return "boon"
+                    return "Boon"
                 if event.type == MOUSEBUTTONDOWN:
-                    if self.prev_rect.collidepoint(event.pos):
+                    mx, my = scale_mouse()
+                    if self.prev_rect.collidepoint(mx, my):
                         con.select_sound.play()
                         self.map_idx = (self.map_idx - 1) % len(MAPS)
-                    elif self.next_rect.collidepoint(event.pos):
+                    elif self.next_rect.collidepoint(mx, my):
                         con.select_sound.play()
                         self.map_idx = (self.map_idx + 1) % len(MAPS)
-                    elif self.fight_rect.collidepoint(event.pos):
+                    elif self.fight_rect.collidepoint(mx, my):
                         con.select_sound.play()
                         con.selected_map = MAPS[self.map_idx]["key"]
-                        return "fight"
+                        return "Fight"
 
             self.draw()
-            pygame.display.update()
+            res.render_to_surface()
             self.clock.tick(60)

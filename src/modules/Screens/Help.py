@@ -55,6 +55,7 @@ class Help():
                     return "quit"
                 if event.type == pygame.KEYDOWN:
                     con.exit_sound.play()
-                    return "menu"
+                    return "Menu"
             self.draw()
             res.render_to_surface()
+            self.clock.tick(con.FPS)

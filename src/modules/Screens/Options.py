@@ -72,6 +72,9 @@ class Options():
         con.background_music.set_volume(self.volume / 100)
         con.forest_sfx.set_volume(self.volume / 100)
         con.volume = self.volume / 100
+        con.select_sound.set_volume(self.volume / 100)
+        con.exit_sound.set_volume(self.volume / 100)
+        con.fight_music.set_volume(self.volume / 100)
  
     #change the brightness
     def changeBrightness(self):
@@ -158,7 +161,7 @@ class Options():
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        return "menu"
+                        return "Menu"
 
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     #get mouse positions

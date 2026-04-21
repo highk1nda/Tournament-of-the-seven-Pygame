@@ -39,11 +39,11 @@ def run_options():
     return options.run()
 
 #start in the menu state
-state = "menu"
+state = "Menu"
 
 #main game loop
 while state != "quit":
-    if state == "menu":
+    if state == "Menu":
         state = run_menu()      
     
     elif state == "Story mode":
@@ -59,16 +59,20 @@ while state != "quit":
         state = run_fight() 
 
     elif state == "Multiplayer":
-        sub_state = charselect(con.display_surface, con.clock).run()
-        if sub_state == "boon":
-            sub_state = boonscr(con.display_surface, con.clock).run()
-        if sub_state == "map":
-            sub_state = mapscr(con.display_surface, con.clock).run()
-        if sub_state == "boon":
-            sub_state = "play"
-        state = sub_state
+        sub_state = 'Char'
+        while sub_state != "Fight":
+            if sub_state == 'Char':
+                sub_state = charselect(con.display_surface, con.clock).run()
+                if sub_state == "Menu":
+                    state = sub_state
+                    break
+            elif sub_state == "Boon":
+                sub_state = boonscr(con.display_surface, con.clock).run()
+            elif sub_state == "Map":
+                sub_state = mapscr(con.display_surface, con.clock).run()
+            state = sub_state
 
-    elif state == "help":
+    elif state == "Help":
         state = run_help()
 
     elif state == "Options":

@@ -24,8 +24,8 @@ class FightScreen():
     def loadfighters(self):
         p1 = getattr(con, "p1_selected", (con.knight_sheet,   con.KNIGHT_ANIMATION_STEPS)) # default to knight if not set
         p2 = getattr(con, "p2_selected", (con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)) # default to werebear if not set
-        self.knight   = Fighter(con.con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, p1[0], p1[1], con.P1_CONTROLS)
-        self.werebear = Fighter(con.con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True,  con.CHARACTER_DATA, p2[0], p2[1], con.P2_CONTROLS)
+        self.knight   = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, p1[0], p1[1], con.P1_CONTROLS)
+        self.werebear = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True,  con.CHARACTER_DATA, p2[0], p2[1], con.P2_CONTROLS)
         self.background = con.fight_backgrounds[con.selected_map]
 
     def update(self):
@@ -63,16 +63,15 @@ class FightScreen():
 
     def run(self):
         self.loadfighters()
-        forest_sfx = pygame.mixer.Sound(con.forestsound)
 
         con.background_music.stop()
-        forest_sfx.play(-1)
+        con.forest_sfx.play(-1)
         con.fight_music.play(-1)
 
         debug = DebugPopup(self)
 
         def stop_fight_sounds():
-            forest_sfx.stop()
+            con.forest_sfx.stop()
             con.fight_music.stop()
 
         #loop for fightscreen
@@ -86,7 +85,7 @@ class FightScreen():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     stop_fight_sounds()
                     con.exit_sound.play()
-                    return "menu"
+                    return "Menu"
                 debug.handle_event(event)
 
             self.update()

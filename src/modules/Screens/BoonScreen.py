@@ -1,6 +1,9 @@
 import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
+from src.modules.systems import res 
+from src.modules.systems.applybright import apply_brightness as appBright
+from src.modules.systems.scalemouse import scale_mouse
 from src.modules.UI.Button import Button
 from src.modules.Screens.SelectCharScreen import CharPreview, CHAR_DATA
 #TODO: this is a very basic implementation of the boon screen, we can add more functionality later (like different boons, or maybe even a small animation when selecting)
@@ -93,6 +96,7 @@ class BoonScreen:
         both_ready = self.p1_selected is not None and self.p2_selected is not None
         self.confirm_btn.button_color = GREEN if both_ready else GREY
         self.confirm_btn.draw(self.screen)
+        appBright(self.screen)
 
     def run(self):
         while True:
@@ -101,23 +105,24 @@ class BoonScreen:
                     return "quit"
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
                     con.exit_sound.play()
-                    return "play"
+                    return "Char"
                 if event.type == MOUSEBUTTONDOWN:
+                    mx, my = scale_mouse()
                     for i in range(3):
-                        if self.p1_rects[i].collidepoint(event.pos):
+                        if self.p1_rects[i].collidepoint(mx, my):
                             con.select_sound.play()
                             self.p1_selected = i
-                        if self.p2_rects[i].collidepoint(event.pos):
+                        if self.p2_rects[i].collidepoint(mx, my):
                             con.select_sound.play()
                             self.p2_selected = i
 
                     both_ready = self.p1_selected is not None and self.p2_selected is not None
-                    if both_ready and self.confirm_btn.is_clicked(event.pos, True):
+                    if both_ready and self.confirm_btn.is_clicked((mx, my), True):
                         con.select_sound.play()
                         con.p1_boon = BOONS[self.p1_selected]
                         con.p2_boon = BOONS[self.p2_selected]
-                        return "map"
+                        return "Map"
 
             self.draw()
-            pygame.display.update()
+            res.render_to_surface()
             self.clock.tick(60)
