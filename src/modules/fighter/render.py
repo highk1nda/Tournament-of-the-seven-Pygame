@@ -2,6 +2,26 @@ import pygame
 
 from src.modules.UI import constants as con
 
+#TODO: We can use this base function to implement a real background gif later,
+# but for now it just loads the main menu animation frames and darkens them to use as a background in the menu and character select screens.
+def load_menu_background(width, height):
+    dark = pygame.Surface((width, height))
+    dark.set_alpha(80)
+    dark.fill((0, 0, 0))
+
+    frames = []
+    i = 1
+    while True:
+        try:
+            img = pygame.image.load(f"assets/mainmenu_frames/frame_{i:03d}.png").convert()
+        except:
+            break  # no more frames
+        img = pygame.transform.scale(img, (width, height))
+        img.blit(dark, (0, 0))
+        frames.append(img)
+        i += 1
+    return frames
+
 def load_animation_frames(sprite_sheet, size, scale, animation_steps):
     animation_list = []
 
@@ -24,7 +44,21 @@ def load_animation_frames(sprite_sheet, size, scale, animation_steps):
     return animation_list
 
 
-# Update fighter animation & attack states
+#TODO: rewrite my main render char function so the characters image will actually take the space that eye can see, instead of being scaled to the size of the sprite sheet, which includes a lot of empty space.
+def crop_and_scale_frames(frames, target_height):
+    #Used in preview!!!
+    bounds = frames[0].get_bounding_rect()
+    for frame in frames[1:]:
+        bounds = bounds.union(frame.get_bounding_rect())
+    #Used in preview!!!
+    # crop each frame to box, then scale everything to the height needed (with aspect ratio kept and other dimensions)
+    cropped = [frame.subsurface(bounds).copy() for frame in frames]
+    scale = target_height / bounds.height
+    w = int(bounds.width  * scale)
+    h = int(bounds.height * scale)
+    return [pygame.transform.scale(frame, (w, h)) for frame in cropped]
+
+# Update fighter animation n attack states
 def update_fighter_animation(fighter):
     animation_cooldown = con.ANIMATION_COOLDOWNS[fighter.action]
 

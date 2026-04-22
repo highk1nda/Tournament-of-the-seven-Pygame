@@ -4,8 +4,9 @@ from pygame.locals import *
 
 from src.modules.fighter.Fighter import Fighter
 from src.modules.UI import constants as con
-from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indicator, draw_timer
+from src.modules.systems.applybright import apply_brightness as appBright
+from src.modules.systems import res
 from tests.test import DebugPopup
 
 # the fight screen class
@@ -41,9 +42,10 @@ class FightScreen():
     def loadfighters(self):
         p1 = getattr(con, "p1_selected", (con.knight_sheet,   con.KNIGHT_ANIMATION_STEPS)) # default to knight if not set
         p2 = getattr(con, "p2_selected", (con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)) # default to werebear if not set
-        self.player1   = Fighter(con.PLAYER_1_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, p1[0], p1[1], con.P1_CONTROLS)
-        self.player2 = Fighter(con.PLAYER_2_INIT_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True,  con.CHARACTER_DATA, p2[0], p2[1], con.P2_CONTROLS)
-
+        self.player1 = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, p1[0], p1[1], con.P1_CONTROLS)
+        self.player2 = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True,  con.CHARACTER_DATA, p2[0], p2[1], con.P2_CONTROLS)
+        self.background = con.fight_backgrounds[con.selected_map]
+        
     def update(self):
         current_time = pygame.time.get_ticks()
 
@@ -87,8 +89,6 @@ class FightScreen():
                     self.p2_wins += 1
                 else:
                     self.round_second_text = "DRAW!"
-                    self.p1_wins += 1
-                    self.p2_wins += 1
 
                 self.player1.clean_up()
                 self.player2.clean_up()
@@ -194,14 +194,22 @@ class FightScreen():
         if self.fade_alpha > 0:
             self.fade_surface.set_alpha(self.fade_alpha)
             self.screen.blit(self.fade_surface, (0, 0))
-
+        
+        appBright(self.screen)
+        
     def run(self):
         self.loadfighters()
-        forest_sfx = pygame.mixer.Sound(con.forestsound)
-        forest_sfx.play(-1)
+
+        con.background_music.stop()
+        con.forest_sfx.play(-1)
+        con.fight_music.play(-1)
+
         debug = DebugPopup(self)
 
         self.state_timer = pygame.time.get_ticks()
+        def stop_fight_sounds():
+            con.forest_sfx.stop()
+            con.fight_music.stop()
 
         #loop for fightscreen
         while True:
@@ -209,20 +217,22 @@ class FightScreen():
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    forest_sfx.stop()
+                    stop_fight_sounds()
                     return "quit"
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    forest_sfx.stop()
                     self.player1.clean_up()
                     self.player2.clean_up()
-                    return "menu"
+
+                    stop_fight_sounds()
+                    con.exit_sound.play()
+                    return "Menu"
                 debug.handle_event(event)
 
             result = self.update()
+            if result:
+                return result
+
             self.draw()
             debug.draw(self.screen)
-            pygame.display.update()
+            res.render_to_surface()
             
-            if result == "menu":
-                forest_sfx.stop()
-                return result

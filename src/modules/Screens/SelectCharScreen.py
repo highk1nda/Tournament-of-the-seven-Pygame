@@ -1,125 +1,148 @@
 import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
+from src.modules.systems.applybright import apply_brightness as appBright
+from src.modules.systems.scalemouse import scale_mouse
+from src.modules.systems import res 
+from src.modules.UI.Button import Button
+from src.modules.fighter.render import load_animation_frames, crop_and_scale_frames
 
-BG    = (30, 30, 30)
-RED   = (160, 45, 45)
-BLUE  = (45, 70, 160)
-WHITE = (255, 255, 255)
-GREEN = (60, 140, 60)
+#TODO: improve constants here too
+BG    = con.SELECT_BG_COLOR
+RED   = con.SELECT_P1_BTN_COLOR
+BLUE  = con.SELECT_P2_BTN_COLOR
+GREEN = con.SELECT_FIGHT_BTN_COLOR
+GREY  = con.BUTTON_DISABLED_COLOR
 
-LABELS = ["Knight", "Werebear", "Wizard", "Minotaur", "Archer", "K.Templar"]
+LABELS = ["Ser Edward", "Tyland", "Luna", "Rem", "Arland", "Venator"]
 
 # frame sheets and steps per row. #TODO: NONE means not yet implemented (for other characters)
 CHAR_DATA = [
-    (con.knight_sheet,         con.KNIGHT_ANIMATION_STEPS),
-    (con.werebear_sheet,       con.WEREBEAR_ANIMATION_STEPS),
-    (con.wizard_sheet,         con.WIZARD_ANIMATION_STEPS),
-    None,
-    None,
-    (con.knight_templar_sheet, con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
+    (con.knight_sheet,          con.KNIGHT_ANIMATION_STEPS),
+    (con.werebear_sheet,        con.WEREBEAR_ANIMATION_STEPS),
+    (con.wizard_sheet,          con.WIZARD_ANIMATION_STEPS),
+    None, # minotaur TODO
+    None, # archer TODO
+    (con.knight_templar_sheet,  con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
 ]
 
-W, H     = con.SCREEN_WIDTH, con.SCREEN_HEIGHT
-BTN_W    = 140
-BTN_H    = 55
-BTN_GAP  = 16
-START_X  = (W - (3 * BTN_W + 2 * BTN_GAP)) // 2
+LOAD_SCALE   = con.SELECT_LOAD_SCALE
+PREVIEW_SIZE = con.SELECT_PREVIEW_SIZE
+BTN_W        = con.SELECT_BTN_W
+BTN_H        = con.SELECT_BTN_H
+BTN_GAP      = con.SELECT_BTN_GAP
+GRID_WIDTH   = con.SELECT_GRID_WIDTH
+P1_CX        = con.SELECT_P1_CX
+P2_CX        = con.SELECT_P2_CX
+LABEL_Y      = con.SELECT_LABEL_Y
+PREVIEW_Y    = con.SELECT_PREVIEW_Y
+BTN_ROW1_Y   = con.SELECT_BTN_ROW1_Y
+BTN_ROW2_Y   = con.SELECT_BTN_ROW2_Y
+FIGHT_Y      = con.SELECT_FIGHT_Y
 
 
-def _grid_rects(top_y):
+def make_button_rects(center_x):
+    start_x = center_x - GRID_WIDTH // 2
     return [
-        pygame.Rect(START_X + (i % 3) * (BTN_W + BTN_GAP),
-                    top_y   + (i // 3) * (BTN_H + BTN_GAP),
-                    BTN_W, BTN_H)
+        pygame.Rect(
+            start_x + (i % 3) * (BTN_W + BTN_GAP),
+            BTN_ROW1_Y if i < 3 else BTN_ROW2_Y,
+            BTN_W, BTN_H,
+        )
         for i in range(6)
     ]
+
+
+# handles the idle render in the character preview box
+class CharPreview:
+    def __init__(self, sheet, steps):
+        idle_frames  = load_animation_frames(sheet, 100, LOAD_SCALE, steps)[con.ACTIONS["IDLE"]]
+        self.frames  = crop_and_scale_frames(idle_frames, PREVIEW_SIZE)
+
+        self.frame_index = 0
+        self.last_time   = pygame.time.get_ticks()
+
+    def get_frame(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_time > con.ANIMATION_COOLDOWNS[con.ACTIONS["IDLE"]]:
+            self.frame_index = (self.frame_index + 1) % len(self.frames)
+            self.last_time   = now
+        return self.frames[self.frame_index]
 
 
 class SelectCharScreen:
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock  = clock
-        self.font   = con.FONT_SMALL
-        self.big    = con.FONT_BIG
+        self.font   = pygame.font.SysFont(None, 28)
+        self.big    = pygame.font.SysFont(None, 46)
 
-        self.p1_btns   = _grid_rects(top_y=130)
-        self.p2_btns   = _grid_rects(top_y=360)
-        self.fight_btn = pygame.Rect(W // 2 - 100, H - 60, 200, 45)
+        self.p1_btns   = make_button_rects(P1_CX)
+        self.p2_btns   = make_button_rects(P2_CX)
+        self.fight_btn = Button(con.SELECT_FIGHT_BTN_X, FIGHT_Y, 200, 45, "CONTINUE",
+                                self.font, button_color=GREEN)
 
         self.p1_idx = 0  # default: Knight
         self.p2_idx = 1  # default: Werebear
 
-        self.p1_callbacks = [
-            self.p1_select_knight,
-            self.p1_select_werebear,
-            self.p1_select_wizard,
-            self.p1_select_minotaur,
-            self.p1_select_archer,
-            self.p1_select_ktemplar,
-        ]
-        self.p2_callbacks = [
-            self.p2_select_knight,
-            self.p2_select_werebear,
-            self.p2_select_wizard,
-            self.p2_select_minotaur,
-            self.p2_select_archer,
-            self.p2_select_ktemplar,
-        ]
+        self.previews = []
+        for data in CHAR_DATA:
+            if data is not None:
+                sheet, steps = data
+                self.previews.append(CharPreview(sheet, steps))
+            else:
+                self.previews.append(None)
 
-    # p1 character select
-    def p1_select_knight(self):    
-        self.p1_idx = 0
-    def p1_select_werebear(self):  
-        self.p1_idx = 1
-    def p1_select_wizard(self):
-        self.p1_idx = 2
-    def p1_select_minotaur(self):  
-        pass
-    def p1_select_archer(self):    
-        pass
-    def p1_select_ktemplar(self):
-        self.p1_idx = 5
+    def select_char(self, player, idx):
+        # only select if the character is implemented (has char data)
+        if CHAR_DATA[idx] is not None:
+            if player == 1:
+                self.p1_idx = idx
+            else:
+                self.p2_idx = idx
 
-    # p2 character select
-    def p2_select_knight(self):    
-        self.p2_idx = 0
-    def p2_select_werebear(self):  
-        self.p2_idx = 1
-    def p2_select_wizard(self):
-        self.p2_idx = 2
-    def p2_select_minotaur(self):  
-        pass
-    def p2_select_archer(self):    
-        pass
-    def p2_select_ktemplar(self):
-        self.p2_idx = 5
+    # draw helpers
 
-    def _draw_centered(self, surface, rect):
-        self.screen.blit(surface, (rect.x + (rect.w - surface.get_width())  // 2,
-                                   rect.y + (rect.h - surface.get_height()) // 2))
+    def draw_centered(self, surface, center_x, y):
+        self.screen.blit(surface, (center_x - surface.get_width() // 2, y))
 
-    def _draw_btn(self, rect, label, color, selected=False):
-        pygame.draw.rect(self.screen, color, rect)
+    def draw_button(self, rect, label, color, selected=False, disabled=False):
+        btn_color = GREY if disabled else color
+        pygame.draw.rect(self.screen, btn_color, rect, border_radius=5)
         if selected:
-            pygame.draw.rect(self.screen, WHITE, rect, 3)
-        self._draw_centered(self.font.render(label, True, WHITE), rect)
+            pygame.draw.rect(self.screen, con.WHITE, rect, 3, border_radius=5)
+        label_surf = self.font.render(label, True, con.WHITE)
+        self.screen.blit(label_surf, (rect.centerx - label_surf.get_width()  // 2,
+                                      rect.centery - label_surf.get_height() // 2))
 
-    def _draw_label(self, text, color, y):
-        surf = self.big.render(text, True, color)
-        self.screen.blit(surf, (W // 2 - surf.get_width() // 2, y))
-
-    def _draw(self):
+    def draw_preview(self, char_idx, center_x, flip=False):
+        preview = self.previews[char_idx]
+        if preview is not None:
+            frame = preview.get_frame()
+            if flip:
+                frame = pygame.transform.flip(frame, True, False)
+            self.screen.blit(frame, (center_x - frame.get_width()  // 2,
+                                     PREVIEW_Y + (PREVIEW_SIZE - frame.get_height()) // 2))
+            
+    #text and button drawing is all done in this function beloow
+    def draw(self):
         self.screen.fill(BG)
 
-        self._draw_label("PLAYER 1", RED,  85)
-        self._draw_label("PLAYER 2", BLUE, 315)
+        self.draw_centered(self.big.render("PLAYER 1", True, con.SELECT_P1_LABEL_COLOR), con.SELECT_P1_CX, con.SELECT_LABEL_Y)
+        self.draw_centered(self.big.render("PLAYER 2", True, con.SELECT_P2_LABEL_COLOR), con.SELECT_P2_CX, con.SELECT_LABEL_Y)
+
+        self.draw_preview(self.p1_idx, con.SELECT_P1_CX)
+        self.draw_preview(self.p2_idx, con.SELECT_P2_CX, flip=True)
 
         for i in range(6):
-            self._draw_btn(self.p1_btns[i], LABELS[i], RED,  selected=(i == self.p1_idx))
-            self._draw_btn(self.p2_btns[i], LABELS[i], BLUE, selected=(i == self.p2_idx))
+            disabled = CHAR_DATA[i] is None
+            self.draw_button(self.p1_btns[i], LABELS[i], RED,
+                             selected=(i == self.p1_idx), disabled=disabled)
+            self.draw_button(self.p2_btns[i], LABELS[i], BLUE,
+                             selected=(i == self.p2_idx), disabled=disabled)
 
-        self._draw_btn(self.fight_btn, "FIGHT", GREEN)
+        self.fight_btn.draw(self.screen)
+        appBright(self.screen)
 
     def run(self):
         while True:
@@ -127,18 +150,31 @@ class SelectCharScreen:
                 if event.type == QUIT:
                     return "quit"
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
-                    return "menu"
+                    con.exit_sound.play()
+                    return "Menu"
                 if event.type == MOUSEBUTTONDOWN:
+                    mx, my = scale_mouse()
                     for i in range(6):
-                        if self.p1_btns[i].collidepoint(event.pos):
-                            self.p1_callbacks[i]()
-                        if self.p2_btns[i].collidepoint(event.pos):
-                            self.p2_callbacks[i]()
-                    if self.fight_btn.collidepoint(event.pos):
+                        if self.p1_btns[i].collidepoint(mx, my):
+                            if CHAR_DATA[i] is None:
+                                con.ui_error_sound.play()
+                            else:
+                                con.select_sound.play()
+                            self.select_char(1, i)
+                        if self.p2_btns[i].collidepoint(mx, my):
+                            if CHAR_DATA[i] is None:
+                                con.ui_error_sound.play()
+                            else:
+                                con.select_sound.play()
+                            self.select_char(2, i)
+                    if self.fight_btn.is_clicked((mx, my), True):
+                        con.select_sound.play()
                         con.p1_selected = CHAR_DATA[self.p1_idx]
                         con.p2_selected = CHAR_DATA[self.p2_idx]
-                        return "fight"
+                        con.p1_char_idx = self.p1_idx
+                        con.p2_char_idx = self.p2_idx
+                        return "Boon"
 
-            self._draw()
-            pygame.display.update()
+            self.draw()
+            res.render_to_surface()
             self.clock.tick(60)

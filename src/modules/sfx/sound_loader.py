@@ -1,5 +1,6 @@
 import pygame
 
+from src.modules.UI import constants as con
 
 def load_fighter_sounds():
     sounds = {
@@ -27,9 +28,42 @@ def load_fighter_sounds():
         "hit": pygame.mixer.Sound("assets/sfx/hit.mp3")
     }
 
-    sounds["walk"].set_volume(0.3)
-    sounds["attack1"].set_volume(0.4)
-    sounds["attack2"].set_volume(0.4)
-    sounds["attack3"].set_volume(0.4)
-
+    sounds["walk"].set_volume(con.volume)
+    sounds["attack1"].set_volume(con.volume)
+    sounds["attack2"].set_volume(con.volume)
+    sounds["attack3"].set_volume(con.volume)
+    sounds["jump"].set_volume(con.volume)
+    sounds["dash"].set_volume(con.volume) 
+    sounds["death"].set_volume(con.volume)
+    sounds["hit"].set_volume(con.volume)   
     return sounds
+"""
+                                             ,--,  ,.-.
+               ,                   \,       '-,-`,'-.' | ._
+              /|           \    ,   |\         }  )/  / `-,',
+              [ ,          |\  /|   | |        /  \|  |/`  ,`
+              | |       ,.`  `,` `, | |  _,...(   (      .',
+              \  \  __ ,-` `  ,  , `/ |,'      Y     (   /_L\
+               \  \_\,``,   ` , ,  /  |         )         _,/
+                \  '  `  ,_ _`_,-,<._.<        /         /
+                 ', `>.,`  `  `   ,., |_      |         /
+                   \/`  `,   `   ,`  | /__,.-`    _,   `\
+               -,-..\  _  \  `  /  ,  / `._) _,-\`       \
+                \_,,.) /\    ` /  / ) (-,, ``    ,        |
+               ,` )  | \_\       '-`  |  `(               \
+              /  /```(   , --, ,' \   |`<`    ,            |
+             /  /_,--`\   <\  V /> ,` )<_/)  | \      _____)
+       ,-, ,`   `   (_,\ \    |   /) / __/  /   `----`
+      (-, \           ) \ ('_.-._)/ /,`    /
+      | /  `          `/ \\ V   V, /`     /
+   ,--\(        ,     <_/`\\     ||      /
+  (   ,``-     \/|         \-A.A-`|     /
+ ,>,_ )_,..(    )\          -,,_-`  _--`
+(_ \|`   _,/_  /  \_            ,--`
+ \( `   <.,../`     `-.._   _,-`
+    `                 \_      `--`
+                         `---`
+                                              -hmm...  
+                                              
+                                              IN THE NAME OF THE FATHER, THE SON, AND THE HOLY SPIRIT I REBUKE THIS! 
+"""
