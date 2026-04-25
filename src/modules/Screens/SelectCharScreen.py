@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
 from src.modules.UI.Button import Button
+from src.modules.fighter.render import load_animation_frames, crop_and_scale_frames
 #TODO: improve constants here too
 BG    = con.SELECT_BG_COLOR
 RED   = con.SELECT_P1_BTN_COLOR
