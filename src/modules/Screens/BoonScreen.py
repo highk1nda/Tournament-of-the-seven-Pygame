@@ -1,6 +1,9 @@
 import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
+from src.modules.systems import res 
+from src.modules.systems.applybright import apply_brightness as appBright
+from src.modules.systems.scalemouse import scale_mouse
 from src.modules.UI.Button import Button
 from src.modules.Screens.SelectCharScreen import CharPreview, CHAR_DATA
 from src.modules.fighter.render import load_magic_projectiles, draw_magic_effect
@@ -193,8 +196,9 @@ class BoonScreen:
             self.draw_button(self.p2_back,    "Back",    BACK_COLOR)
 
         both_ready = self.p1_selected is not None and self.p2_selected is not None
-        self.continue_btn.button_color = GREEN if both_ready else GREY
-        self.continue_btn.draw(self.screen)
+        self.confirm_btn.button_color = GREEN if both_ready else GREY
+        self.confirm_btn.draw(self.screen)
+        appBright(self.screen)
 
     def run(self):
         while True:
@@ -244,12 +248,12 @@ class BoonScreen:
                             self.p2_viewing = None
 
                     both_ready = self.p1_selected is not None and self.p2_selected is not None
-                    if both_ready and self.continue_btn.is_clicked(pos, True):
+                    if both_ready and self.confirm_btn.is_clicked((mx, my), True):
                         con.select_sound.play()
-                        con.p1_boon = BOONS[self.p1_selected]["name"]
-                        con.p2_boon = BOONS[self.p2_selected]["name"]
-                        return "map"
+                        con.p1_boon = BOONS[self.p1_selected]
+                        con.p2_boon = BOONS[self.p2_selected]
+                        return "Map"
 
             self.draw()
-            pygame.display.update()
+            res.render_to_surface()
             self.clock.tick(60)

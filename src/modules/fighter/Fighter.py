@@ -281,17 +281,6 @@ class Fighter():
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
 
-# Legacy code, don't mind
-#     # Player 1 crouch (S)
-#     if keys[pygame.K_s]:
-#         bottom = player1_rect.bottom
-#         centerx = player1_rect.centerx
-#         player1_rect.size = (CROUCH_WIDTH, CROUCH_HEIGHT)
-#         player1_rect.centerx = centerx
-#         player1_rect.bottom = bottom
-#     else:
-#         bottom = player1_rect.bottom
-#         centerx = player1_rect.centerx
-#         player1_rect.size = (PLAYER_WIDTH, PLAYER_HEIGHT)
-#         player1_rect.centerx = centerx
-#         player1_rect.bottom = bottom
+    def clean_up(self):
+        self.walk_sound.stop()
+        self.walk_sound_playing = False

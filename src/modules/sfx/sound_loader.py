@@ -1,5 +1,6 @@
 import pygame
 
+from src.modules.UI import constants as con
 
 def load_fighter_sounds():
     sounds = {
@@ -27,11 +28,14 @@ def load_fighter_sounds():
         "hit": pygame.mixer.Sound("assets/sfx/hit.mp3")
     }
 
-    sounds["walk"].set_volume(0.3)
-    sounds["attack1"].set_volume(0.4)
-    sounds["attack2"].set_volume(0.4)
-    sounds["attack3"].set_volume(0.4)
-
+    sounds["walk"].set_volume(con.volume)
+    sounds["attack1"].set_volume(con.volume)
+    sounds["attack2"].set_volume(con.volume)
+    sounds["attack3"].set_volume(con.volume)
+    sounds["jump"].set_volume(con.volume)
+    sounds["dash"].set_volume(con.volume) 
+    sounds["death"].set_volume(con.volume)
+    sounds["hit"].set_volume(con.volume)   
     return sounds
 """
                                              ,--,  ,.-.
@@ -59,5 +63,7 @@ def load_fighter_sounds():
  \( `   <.,../`     `-.._   _,-`
     `                 \_      `--`
                          `---`
-                                              -hmm...
+                                              -hmm...  
+                                              
+                                              IN THE NAME OF THE FATHER, THE SON, AND THE HOLY SPIRIT I REBUKE THIS! 
 """
