@@ -58,6 +58,54 @@ def crop_and_scale_frames(frames, target_height):
     h = int(bounds.height * scale)
     return [pygame.transform.scale(frame, (w, h)) for frame in cropped]
 
+def draw_magic_effect(surface, frames, state, cx, cy, scale=6, frame_ms=120, wait_ms=1000, x_offset=0, y_offset=0):
+    # draws one frame of a looping magic effect centered at (cx + x_offset, cy + y_offset),
+    # scale multiplies the raw frame size before drawing
+    # waits wait_ms ms after each full cycle before replaying
+    now = pygame.time.get_ticks()
+    if state["waiting"]:
+        if now - state["wait_start"] >= wait_ms:
+            state["frame"]   = 0
+            state["waiting"] = False
+        return
+    frame_surf = frames[state["frame"]]
+    if scale != 1:
+        new_size = int(frame_surf.get_width() * scale)
+        frame_surf = pygame.transform.scale(frame_surf, (new_size, new_size))
+    surface.blit(frame_surf, (cx + x_offset - frame_surf.get_width()  // 2,
+                               cy + y_offset - frame_surf.get_height() // 2))
+    if now - state["time"] >= frame_ms:
+        state["frame"] += 1
+        state["time"]   = now
+        if state["frame"] >= len(frames):
+            state["frame"]      = 0
+            state["waiting"]    = True
+            state["wait_start"] = now
+
+
+def load_magic_projectiles(scale=1):
+    # loads all 4 magic projectile sprite sheets, each is a 100 by 100
+    base = "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Magic(Projectile)/"
+    size = 100
+    sheets = {
+        "priest_attack":   (base + "Priest-Attack_effect.png",    5),
+        "priest_heal":     (base + "Priest-Heal_Effect.png",      4),
+        "wizard_attack01": (base + "Wizard-Attack01_Effect.png", 10),
+        "wizard_attack02": (base + "Wizard-Attack02_Effect.png",  7),
+    }
+    result = {}
+    for key, (path, frame_count) in sheets.items():
+        sheet  = pygame.image.load(path).convert_alpha()
+        frames = []
+        for x in range(frame_count):
+            frame = sheet.subsurface(x * size, 0, size, size)
+            if scale != 1:
+                frame = pygame.transform.scale(frame, (size * scale, size * scale))
+            frames.append(frame)
+        result[key] = frames
+    return result
+
+
 # Update fighter animation n attack states
 def update_fighter_animation(fighter):
     animation_cooldown = con.ANIMATION_COOLDOWNS[fighter.action]
