@@ -196,8 +196,8 @@ class BoonScreen:
             self.draw_button(self.p2_back,    "Back",    BACK_COLOR)
 
         both_ready = self.p1_selected is not None and self.p2_selected is not None
-        self.confirm_btn.button_color = GREEN if both_ready else GREY
-        self.confirm_btn.draw(self.screen)
+        self.continue_btn.button_color = GREEN if both_ready else GREY
+        self.continue_btn.draw(self.screen)
         appBright(self.screen)
 
     def run(self):
@@ -248,7 +248,7 @@ class BoonScreen:
                             self.p2_viewing = None
 
                     both_ready = self.p1_selected is not None and self.p2_selected is not None
-                    if both_ready and self.confirm_btn.is_clicked((mx, my), True):
+                    if both_ready and self.continue_btn.is_clicked(pos, True):
                         con.select_sound.play()
                         con.p1_boon = BOONS[self.p1_selected]
                         con.p2_boon = BOONS[self.p2_selected]
