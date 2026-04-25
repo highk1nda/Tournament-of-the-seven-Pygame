@@ -1,5 +1,6 @@
 import pygame
 
+pygame.font.init()
 pygame.mixer.init()
 
 #constant variables to stop accumalating technical debt
@@ -23,8 +24,9 @@ SCREEN_SHAKE_INTENSITY = 3  # maximum offset
 
 FPS = 60
 
-RED = (255, 0 , 0)
+BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+RED = (255, 0 , 0)
 GREEN = (26, 66, 28)
 YELLOW = (212, 175, 55)
 BLACK = (0, 0, 0)
@@ -33,6 +35,7 @@ CYAN = (0, 255, 0)
 ORANGE = (222, 110, 0)
 LIGHT_GREEN = (0, 255, 0)
 BLUE = (80, 180, 255)
+
 FLOOR_COLOR = (106, 80, 80)
 
 buttonwidth = SCREEN_WIDTH / 5
@@ -137,7 +140,7 @@ WIND_SCALE_SIZE = WIND_SCALE * WIND_SIZE
 
 healthbar_width = int(SCREEN_WIDTH * 0.4)
 healthbar_height = int(SCREEN_WIDTH * 0.037)
-healthbar_padding = 2
+healthbar_padding = max(1, int(SCREEN_WIDTH * 0.001))
 healthbar_x = int(SCREEN_WIDTH * 0.02)
 healthbar_y = int(SCREEN_WIDTH * 0.02)
 healthbar_xx = int(SCREEN_WIDTH * 0.58)
@@ -148,11 +151,8 @@ DASHING_BAR_HEALTH_BAR_DISTANCE = int(SCREEN_HEIGHT / 13)
 DASHING_BAR_LEFT_X = healthbar_x
 DASHING_BAR_RIGHT_X = healthbar_xx
 DASHING_BAR_Y = int(healthbar_y * 3)
-CHARGES_DISTANCE_IN_HALF = 8
+CHARGES_DISTANCE_IN_HALF = int(SCREEN_WIDTH * 0.0042)
 DASHING_BAR_COLOR = LIGHT_GREEN
-
-PLAYER_SPEED = 8
-JUMPING_SPEED = -30
 
 DASHING_SPEED = 80
 DASHING_BRAKE = 0.5
@@ -162,6 +162,23 @@ DASHING_CHARGE = 2     # Dashing charge system:
                        # Cooldown is triggered when:
                        #    1) 2 dash charges are both used, or
                        #    2) Shift is released after dash (at least 1 dash)
+
+ROUND_DOT_RADIUS = int(SCREEN_HEIGHT * 0.02)
+ROUND_DOT_GAP = int(SCREEN_HEIGHT * 0.004)
+ROUND_DOT_Y = DASHING_BAR_Y + DASHING_BAR_HEIGHT + ROUND_DOT_RADIUS + int(SCREEN_HEIGHT * 0.01)
+ROUND_DOT_BORDER_THICKNESS = 1
+ROUND_FONT = pygame.font.SysFont(None, int(SCREEN_HEIGHT * 0.1))
+
+ROUND_DURATION = 68 * 1000  # 68 seconds
+MAX_WINS = 2
+ROUND_TEXT_DURATION = 1700  # ms
+ROUND_TEXT_Y = int(SCREEN_HEIGHT * 0.15)
+DEATH_DURATION = 1500  # ms
+FADE_OUT_DURATION = 500  # ms
+MAX_ALPHA = 255  # full black
+
+PLAYER_SPEED = 8
+JUMPING_SPEED = -30
 
 GROUND_FRICTION = 0.7
 AIR_FRICTION = 0.93
