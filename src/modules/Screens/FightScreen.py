@@ -183,6 +183,12 @@ class FightScreen():
         draw_screen(self.screen, con.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.player1, self.player2, offset=(x, y))
         self.player1.draw(self.screen)
         self.player2.draw(self.screen)
+
+        for pj in self.player1.projectiles:
+            pj.draw(self.screen)
+        for pj in self.player2.projectiles:
+            pj.draw(self.screen)
+
         draw_round_ui(self)
         draw_round_indicator(self.screen, self.p2_wins, False)
         draw_round_indicator(self.screen, self.p1_wins, True)

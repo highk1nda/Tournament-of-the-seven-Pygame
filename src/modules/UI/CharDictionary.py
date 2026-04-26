@@ -148,12 +148,50 @@ WIZARD_DATA = {
             "ATTACK2": [(4, 5)]
     },
     "attack_width_scale": {
-            "ATTACK1": 0.6,            
-            "ATTACK2": 1,
+            "ATTACK1": 0.1,            
+            "ATTACK2": 0.2,
     },
     "attack_damage": {
-            "ATTACK1": 8,
-            "ATTACK2": 8,
+            "ATTACK1": 0.1,
+            "ATTACK2": 0.2,
+    },
+    "projectiles": {
+        "ATTACK1": {
+            "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Magic(projectile)/Wizard-Attack01_Effect.png",
+            "frame_number": 10,
+            "cooldown": 60,
+            "type": "lock",             # attack will lock on the enemy('s current position)
+            "delay": 800,              # delay for 800ms then attack
+            "gen_frame": 2,             # at Wizard attack1 frame index 2: generate the projectile
+            "active_frame": (1, 3),
+            "speed": 0,
+            "damage": 10,
+            "hitbox_width": 80,
+            "hitbox_height": 80
+        },
+        "ATTACK2": {
+            "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Magic(projectile)/Wizard-Attack02_Effect.png",
+            "frame_number": 7,
+            "cooldown": 60,
+            "type": "explosive",        # explosive fire ball
+            "gen_frame": 4,             
+            "speed": 15,
+            "damage": 10,
+            "hitbox_width": 20,
+            "hitbox_height": 20
+        }
+    },
+    "projectile_size": {
+        "ATTACK1": {
+            "size": DEFAULT_SIZE,
+            "scale": con.SCREEN_WIDTH / 170,
+            "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 22)]
+        },
+        "ATTACK2": {
+            "size": DEFAULT_SIZE,
+            "scale": con.SCREEN_WIDTH / 190,
+            "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 20)]
+        }
     }
 }
 
@@ -235,17 +273,41 @@ ARCHER_DATA = {
                     "frame_number": 4, 
                     "cooldown": 100},
     },
-    "attack_active_frames": {
-            "ATTACK1": [(5, 6)],        
-            "ATTACK2": [(4, 5), (9, 10)]
+    "projectiles": {
+        "ATTACK1": {
+            "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Arrow(projectile)/Arrow02(100x100).png",
+            "frame_number": 1,
+            "cooldown": 100,
+            "type": "arrow",             # fire arrow
+            "gen_frame": 6,             
+            "speed": 23,
+            "damage": 10,
+            "hitbox_width": 40,
+            "hitbox_height": 10
+        },
+        "ATTACK2": {
+            "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Arrow(projectile)/Arrow02(100x100).png",
+            "frame_number": 1,
+            "cooldown": 100,
+            "type": "arrow",        
+            "gen_frame": 9,             
+            "speed": 30,
+            "damage": 20,
+            "hitbox_width": 40,
+            "hitbox_height": 10
+        }
     },
-    "attack_width_scale": {
-            "ATTACK1": 0.6,            
-            "ATTACK2": 1,
-    },
-    "attack_damage": {
-            "ATTACK1": 5,
-            "ATTACK2": 10,
+    "projectile_size": {
+        "ATTACK1": {
+            "size": DEFAULT_SIZE,
+            "scale": con.SCREEN_WIDTH / 300,
+            "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 21.3)]
+        },
+        "ATTACK2": {
+            "size": DEFAULT_SIZE,
+            "scale": con.SCREEN_WIDTH / 300,
+            "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 21.3)]
+        }
     }
 }
 

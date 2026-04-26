@@ -24,10 +24,10 @@ def load_menu_background(width, height):
     return frames
 
 def load_animation_frames(animation_dict, size, scale):
-    animation_list = {}
+    new_animation_dict = {}
     
     for action, data in animation_dict.items():
-        animation_list[action] = {"ground": [], "air": []}
+        new_animation_dict[action] = {"ground": [], "air": []}
         file_air = data.get("file_air")
         if file_air:
             air_sheet = pygame.image.load(data["file_air"]).convert_alpha()
@@ -46,7 +46,7 @@ def load_animation_frames(animation_dict, size, scale):
                 ground_frame,
                 (size * scale, size * scale)
             )
-            animation_list[action]["ground"].append(ground_frame)
+            new_animation_dict[action]["ground"].append(ground_frame)
 
             if file_air:
                 air_frame = air_sheet.subsurface(
@@ -59,9 +59,9 @@ def load_animation_frames(animation_dict, size, scale):
                     air_frame,
                     (size * scale, size * scale)
                 )
-                animation_list[action]["air"].append(air_frame)
+                new_animation_dict[action]["air"].append(air_frame)
 
-    return animation_list
+    return new_animation_dict
 
 
 #TODO: rewrite my main render char function so the characters image will actually take the space that eye can see, instead of being scaled to the size of the sprite sheet, which includes a lot of empty space.
