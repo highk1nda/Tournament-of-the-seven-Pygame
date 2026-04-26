@@ -16,11 +16,12 @@ class Fighter():
         self.animation_list = load_animation_frames(
             char_data["animations"],
             self.size,
-            self.image_scale)
+            self.image_scale
+        )
 
         self.action = "IDLE"
         self.frame_index = 0
-        self.image = self.animation_list[self.action][self.frame_index]
+        self.image = self.animation_list[self.action]["ground"][self.frame_index]  # on ground default
         self.update_time = pygame.time.get_ticks()
         self.rect = pygame.Rect(x, y, player_width, player_height)
         self.vel_x = 0
@@ -44,7 +45,7 @@ class Fighter():
             chardict.WIND_DATA["animation"],
             chardict.WIND_DATA["size"],
             chardict.WIND_DATA["scale"]
-            )["WIND"]
+        )["WIND"]["ground"]
         self.wind_frame_index = 0
         self.wind_update_time = 0
         

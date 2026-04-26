@@ -160,6 +160,7 @@ KNOCKBACK_DISTANCE = 35
 GROUND_FRICTION = 0.7
 AIR_FRICTION = 0.93
 GRAVITY = 2
+DASHING_GRAVITY = 0.5
 
 # =============== Player ===============
 

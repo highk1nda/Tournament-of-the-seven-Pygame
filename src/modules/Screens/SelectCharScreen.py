@@ -51,7 +51,7 @@ def make_button_rects(center_x):
 class CharPreview:
     def __init__(self, char_data):
         idle_dict = {"IDLE": char_data["animations"]["IDLE"]}
-        idle_frames  = load_animation_frames(idle_dict, char_data["size"], LOAD_SCALE)["IDLE"]
+        idle_frames  = load_animation_frames(idle_dict, char_data["size"], LOAD_SCALE)["IDLE"]["ground"]
         self.frames  = crop_and_scale_frames(idle_frames, PREVIEW_SIZE)
 
         self.frame_index = 0

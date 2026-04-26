@@ -27,23 +27,40 @@ def load_animation_frames(animation_dict, size, scale):
     animation_list = {}
     
     for action, data in animation_dict.items():
-        sprite_sheet = pygame.image.load(data["file"]).convert_alpha()
+        animation_list[action] = {"ground": [], "air": []}
+        file_air = data.get("file_air")
+        if file_air:
+            air_sheet = pygame.image.load(data["file_air"]).convert_alpha()
+        ground_sheet = pygame.image.load(data["file_ground"]).convert_alpha()
+        
         frame_number = data["frame_number"]
-        row = []
+ 
         for x in range(frame_number):
-            frame = sprite_sheet.subsurface(
+            ground_frame = ground_sheet.subsurface(
                 x * size,
                 0,
                 size,
                 size
             )
-            frame = pygame.transform.scale(
-                frame,
+            ground_frame = pygame.transform.scale(
+                ground_frame,
                 (size * scale, size * scale)
             )
+            animation_list[action]["ground"].append(ground_frame)
 
-            row.append(frame)
-        animation_list[action] = row
+            if file_air:
+                air_frame = air_sheet.subsurface(
+                    x * size,
+                    0,
+                    size,
+                    size
+                )
+                air_frame = pygame.transform.scale(
+                    air_frame,
+                    (size * scale, size * scale)
+                )
+                animation_list[action]["air"].append(air_frame)
+
     return animation_list
 
 
@@ -96,8 +113,14 @@ def update_fighter_animation(fighter):
         fighter.frame_index = 0
         fighter.update_time = pygame.time.get_ticks()
 
+    # check if on ground or in air
+    if fighter.rect.bottom < con.FLOOR_Y:
+        ground_state_key = "air"
+    else:
+        ground_state_key = "ground"
+
     # update image frame
-    fighter.image = fighter.animation_list[fighter.action][fighter.frame_index]
+    fighter.image = fighter.animation_list[fighter.action][ground_state_key][fighter.frame_index]
 
     # handle frame timing
     if pygame.time.get_ticks() - fighter.update_time > animation_cooldown:
@@ -105,9 +128,9 @@ def update_fighter_animation(fighter):
         fighter.update_time = pygame.time.get_ticks()
 
     # check if animation finished, loop frames and reset actions
-    if fighter.frame_index >= len(fighter.animation_list[fighter.action]):
+    if fighter.frame_index >= len(fighter.animation_list[fighter.action][ground_state_key]):
         if fighter.death:
-            fighter.frame_index = len(fighter.animation_list["DEATH"]) - 1
+            fighter.frame_index = len(fighter.animation_list["DEATH"][ground_state_key]) - 1
         else:
             fighter.frame_index = 0
             if fighter.attacking:
