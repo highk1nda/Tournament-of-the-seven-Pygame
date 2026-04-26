@@ -3,20 +3,22 @@ import pygame
 from src.modules.fighter.render import load_animation_frames, update_fighter_animation, update_wind_animation
 from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.UI import constants as con
+from src.modules.UI import CharDictionary as chardict
 
 class Fighter():
-    def __init__(self, x, y, player_width, player_height, flip, data, sprite_sheet, animation_steps, controls):
-        self.size = data[0]
-        self.image_scale = data[1]
-        self.offset = data[2]
+    def __init__(self, x, y, player_width, player_height, flip, char_data, controls):
+        self.char_data = char_data
+        self.size = char_data["size"]
+        self.image_scale = char_data["scale"]
+        self.offset = char_data["offset"]
         self.flip = flip
+
         self.animation_list = load_animation_frames(
-            sprite_sheet,
+            char_data["animations"],
             self.size,
-            self.image_scale,
-            animation_steps
-        )  # Load in the sheet straight away. List of lists of animations
-        self.action = 0  # 0: idle, 1: run, 2: attack1, 3: attack2, 4: attack3, -2: hit stun, -1: death
+            self.image_scale)
+
+        self.action = "IDLE"
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pygame.time.get_ticks()
@@ -25,6 +27,7 @@ class Fighter():
         self.vel_y = 0
         self.running = False
         self.jumping = False
+        self.jumpable = char_data["jumpable"]
 
         self.attacking = False
         self.attack_type = 0
@@ -38,11 +41,10 @@ class Fighter():
         self.dashing = False
         self.dashing_direction = 0
         self.wind_animation_list = load_animation_frames(
-            con.wind_sheet,
-            con.WIND_SIZE,
-            con.WIND_SCALE,
-            [con.WIND_FRAMES]
-        )[0]
+            chardict.WIND_DATA["animation"],
+            chardict.WIND_DATA["size"],
+            chardict.WIND_DATA["scale"]
+            )["WIND"]
         self.wind_frame_index = 0
         self.wind_update_time = 0
         
@@ -151,22 +153,25 @@ class Fighter():
                         self.vel_x = 0      # avoid infinite issue
             
             # jumping
-            if key[self.controls["up"]] and not self.jumping:  # UP
+            if key[self.controls["up"]] and not self.jumping and self.jumpable:  # UP
                 self.vel_y = con.JUMPING_SPEED
                 self.jumping = True
 
             # attacting
             if not self.attacking:
-                if key[self.controls["attack1"]] or key[self.controls["attack2"]] or key[self.controls["attack3"]]:
+                attack1 = key[self.controls["attack1"]] and ("ATTACK1" in self.char_data["animations"])
+                attack2 = key[self.controls["attack2"]] and ("ATTACK2" in self.char_data["animations"])
+                attack3 = key[self.controls["attack3"]] and ("ATTACK3" in self.char_data["animations"])
+                if attack1 or attack2 or attack3:
                     self.attacking = True
                     self.hitbox_set.clear()
-                    if key[self.controls["attack1"]]:
+                    if attack1:
                         self.attack_type = 1
                         self.attack_sound_played = False
-                    elif key[self.controls["attack2"]]:
+                    elif attack2:
                         self.attack_type = 2
                         self.attack_sound_played = False
-                    elif key[self.controls["attack3"]]:
+                    elif attack3:
                         self.attack_type = 3
                         self.attack_sound_played = False
             
@@ -224,12 +229,13 @@ class Fighter():
         self.rect.y += dy
 
     def attack(self, TARGET):
-        active_frame_list = con.ATTACK_ACTIVE_FRAMES[self.attack_type]
+        attack_key = f"ATTACK{self.attack_type}"
+        active_frame_list = self.char_data["attack_active_frames"].get(attack_key)
         if active_frame_list == None:
             return
 
         current_attack_index = -1
-        attack_width_scale = con.ATTACK_WIDTH_SCALE[self.attack_type]
+        attack_width_scale = self.char_data["attack_width_scale"].get(attack_key)
         for i, (start_frame, end_frame) in enumerate(active_frame_list):
             if start_frame <= self.frame_index <= end_frame:
                 current_attack_index = i
@@ -255,7 +261,7 @@ class Fighter():
                                         self.rect.height)
             # collision detect
             if attacking_rect.colliderect(TARGET.rect) and not TARGET.dashing:
-                TARGET.health -= 10
+                TARGET.health -= self.char_data["attack_damage"].get(attack_key)
                 TARGET.stun = True
                 TARGET.sounds["hit"].play()
                 if not TARGET.death:

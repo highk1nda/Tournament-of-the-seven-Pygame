@@ -4,6 +4,7 @@ from pygame.locals import *
 
 from src.modules.fighter.Fighter import Fighter
 from src.modules.UI import constants as con
+from src.modules.UI import CharDictionary as chardict
 from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indicator, draw_timer
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
@@ -40,10 +41,10 @@ class FightScreen():
         self.fade_alpha = 0  # 0 - 255, transparency of the surface
 
     def loadfighters(self):
-        p1 = getattr(con, "p1_selected", (con.knight_sheet,   con.KNIGHT_ANIMATION_STEPS)) # default to knight if not set
-        p2 = getattr(con, "p2_selected", (con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS)) # default to werebear if not set
-        self.player1 = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, con.CHARACTER_DATA, p1[0], p1[1], con.P1_CONTROLS)
-        self.player2 = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True,  con.CHARACTER_DATA, p2[0], p2[1], con.P2_CONTROLS)
+        p1_data = getattr(con, "p1_selected", chardict.KNIGHT_DATA) # default to knight if not set
+        p2_data = getattr(con, "p2_selected", chardict.WEREBEAR_DATA) # default to werebear if not set
+        self.player1 = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, p1_data, con.P1_CONTROLS)
+        self.player2 = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True, p2_data, con.P2_CONTROLS)
         self.background = con.fight_backgrounds[con.selected_map]
         
     def update(self):

@@ -1,0 +1,291 @@
+import pygame
+from src.modules.UI import constants as con
+
+DEFAULT_SIZE = 100
+DEFAULT_SCALE =  con.SCREEN_WIDTH / 142.86
+DEFAULT_OFFSET = [int(con.SCREEN_WIDTH / 48), int(con.SCREEN_HEIGHT / 27.8)]
+
+KNIGHT_DATA = {
+    "name": "Ser Edward",
+    "size": DEFAULT_SIZE,
+    "scale": DEFAULT_SCALE,
+    "offset": DEFAULT_OFFSET,
+    "jumpable": True,
+    "animations": {
+        "IDLE":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Idle.png",
+                    "frame_number": 6,      # 6 frames for this action
+                    "cooldown": 110},       # 110 ms between frames
+        "WALK":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Walk.png", 
+                    "frame_number": 8,
+                    "cooldown": 110},
+        "ATTACK1": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Attack01.png", 
+                    "frame_number": 7,
+                    "cooldown": 65},
+        "ATTACK2": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Attack02.png", 
+                    "frame_number": 10,
+                    "cooldown": 75},
+        "ATTACK3": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Attack03.png", 
+                    "frame_number": 11,
+                    "cooldown": 85},
+        "HIT":     {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Hurt.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+        "DEATH":   {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Death.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+    },
+    "attack_active_frames": {
+            "ATTACK1": [(3, 4)],        # (Start, End) index of animation
+            "ATTACK2": [(3, 4), (7, 8)],
+            "ATTACK3": [(7, 9)]
+    },
+    "attack_width_scale": {
+            "ATTACK1": 0.6,             # attacking hitbox width scale
+            "ATTACK2": 1,
+            "ATTACK3": 1.5
+    },
+    "attack_damage": {
+            "ATTACK1": 5,               # damage made by attacks
+            "ATTACK2": 3,
+            "ATTACK3": 10
+    }
+}
+
+WEREBEAR_DATA = {
+    "name": "Tyland",
+    "size": DEFAULT_SIZE,
+    "scale": DEFAULT_SCALE,
+    "offset": DEFAULT_OFFSET,
+    "jumpable": True,
+    "animations": {
+        "IDLE":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Idle.png",
+                    "frame_number": 6,      
+                    "cooldown": 110},       
+        "WALK":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Walk.png", 
+                    "frame_number": 8,
+                    "cooldown": 110},
+        "ATTACK1": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Attack01.png", 
+                    "frame_number": 9,
+                    "cooldown": 65},
+        "ATTACK2": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Attack02.png", 
+                    "frame_number": 13,
+                    "cooldown": 75},
+        "ATTACK3": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Attack03.png", 
+                    "frame_number": 9,
+                    "cooldown": 85},
+        "HIT":     {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Hurt.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+        "DEATH":   {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Death.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+    },
+    "attack_active_frames": {
+            "ATTACK1": [(5, 6)],        
+            "ATTACK2": [(4, 5), (9, 10)],
+            "ATTACK3": [(5, 7)]
+    },
+    "attack_width_scale": {
+            "ATTACK1": 1,            
+            "ATTACK2": 1,
+            "ATTACK3": 1.5
+    },
+    "attack_damage": {
+            "ATTACK1": 5,
+            "ATTACK2": 3,
+            "ATTACK3": 10
+    }
+}
+
+WIZARD_DATA = {
+    "name": "Luna",
+    "size": DEFAULT_SIZE,
+    "scale": DEFAULT_SCALE,
+    "offset": DEFAULT_OFFSET,
+    "jumpable": True,
+    "animations": {
+        "IDLE":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Idle.png",
+                    "frame_number": 6,      
+                    "cooldown": 110},       
+        "WALK":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Walk.png", 
+                    "frame_number": 8,
+                    "cooldown": 110},
+        "ATTACK1": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Attack01.png", 
+                    "frame_number": 6,
+                    "cooldown": 65},
+        "ATTACK2": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Attack02.png", 
+                    "frame_number": 6,
+                    "cooldown": 75},
+        "HIT":     {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Hurt.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+        "DEATH":   {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Death.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+    },
+    "attack_active_frames": {
+            "ATTACK1": [(5, 6)],        
+            "ATTACK2": [(4, 5)]
+    },
+    "attack_width_scale": {
+            "ATTACK1": 0.6,            
+            "ATTACK2": 1,
+    },
+    "attack_damage": {
+            "ATTACK1": 8,
+            "ATTACK2": 8,
+    }
+}
+
+MINOTAUR_DATA = {
+    "name": "Rem",
+    "size": 80,
+    "scale": con.SCREEN_WIDTH / 250,
+    "offset": [int(con.SCREEN_WIDTH / 90), int(con.SCREEN_HEIGHT / 40)],
+    "jumpable": False,
+    "animations": {
+        "IDLE":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Idle.png",
+                    "frame_number": 4,      
+                    "cooldown": 200},       
+        "WALK":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Walk.png", 
+                    "frame_number": 8,
+                    "cooldown": 110},
+        "ATTACK1": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Attack01.png", 
+                    "frame_number": 6,
+                    "cooldown": 65},
+        "ATTACK2": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Attack02.png", 
+                    "frame_number": 6,
+                    "cooldown": 75},
+        "ATTACK3": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Attack03.png", 
+                    "frame_number": 6,
+                    "cooldown": 85},
+        "HIT":     {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Hurt.png",
+                    "frame_number": 2, 
+                    "cooldown": 100},
+        "DEATH":   {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Death.png",
+                    "frame_number": 6, 
+                    "cooldown": 100},
+    },
+    "attack_active_frames": {
+            "ATTACK1": [(3, 4)],        
+            "ATTACK2": [(3, 5)],
+            "ATTACK3": [(3, 4)]
+    },
+    "attack_width_scale": {
+            "ATTACK1": 0.6,            
+            "ATTACK2": 1,
+            "ATTACK3": 0.6
+    },
+    "attack_damage": {
+            "ATTACK1": 3,
+            "ATTACK2": 5,
+            "ATTACK3": 8
+    }
+}
+
+ARCHER_DATA = {
+    "name": "Arland",
+    "size": DEFAULT_SIZE,
+    "scale": DEFAULT_SCALE,
+    "offset": DEFAULT_OFFSET,
+    "jumpable": True,
+    "animations": {
+        "IDLE":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Idle.png",
+                    "frame_number": 6,      
+                    "cooldown": 110},       
+        "WALK":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Walk.png", 
+                    "frame_number": 8,
+                    "cooldown": 110},
+        "ATTACK1": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Attack01.png", 
+                    "frame_number": 9,
+                    "cooldown": 65},
+        "ATTACK2": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Attack02.png", 
+                    "frame_number": 12,
+                    "cooldown": 75},
+        "HIT":     {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Hurt.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+        "DEATH":   {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Death.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+    },
+    "attack_active_frames": {
+            "ATTACK1": [(5, 6)],        
+            "ATTACK2": [(4, 5), (9, 10)]
+    },
+    "attack_width_scale": {
+            "ATTACK1": 0.6,            
+            "ATTACK2": 1,
+    },
+    "attack_damage": {
+            "ATTACK1": 5,
+            "ATTACK2": 10,
+    }
+}
+
+KNIGHT_TEMPLAR_DATA = {
+    "name": "Venator",
+    "size": DEFAULT_SIZE,
+    "scale": DEFAULT_SCALE,
+    "offset": DEFAULT_OFFSET,
+    "jumpable": True,
+    "animations": {
+        "IDLE":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Idle.png",
+                    "frame_number": 6,      
+                    "cooldown": 110},       
+        "WALK":    {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Walk01.png", 
+                    "frame_number": 8,                       # Fun fact: this guy has two types of walk (with shield at the side or in front), maybe implement later
+                    "cooldown": 110},
+        "ATTACK1": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Attack01.png", 
+                    "frame_number": 7,
+                    "cooldown": 65},
+        "ATTACK2": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Attack02.png", 
+                    "frame_number": 8,
+                    "cooldown": 75},
+        "ATTACK3": {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Attack03.png", 
+                    "frame_number": 11,
+                    "cooldown": 85},
+        "HIT":     {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Hurt.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+        "DEATH":   {"file": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Death.png",
+                    "frame_number": 4, 
+                    "cooldown": 100},
+    },
+    "attack_active_frames": {
+            "ATTACK1": [(4, 6)],       
+            "ATTACK2": [(5, 6)],
+            "ATTACK3": [(3, 4), (7, 8)]
+    },
+    "attack_width_scale": {
+            "ATTACK1": 1.2,             
+            "ATTACK2": 1,
+            "ATTACK3": 1
+    },
+    "attack_damage": {
+            "ATTACK1": 8,
+            "ATTACK2": 8,
+            "ATTACK3": 8
+    }
+}
+
+
+CHARACTER_DATA = [KNIGHT_DATA, WEREBEAR_DATA, WIZARD_DATA, MINOTAUR_DATA, ARCHER_DATA, KNIGHT_TEMPLAR_DATA]  
+LABELS = ["Ser Edward", "Tyland", "Luna", "Rem", "Arland", "Venator"]
+
+ACTIONS = {
+    "IDLE": 0,
+    "WALK": 1,
+    "ATTACK1": 2,
+    "ATTACK2": 3,
+    "ATTACK3": 4,
+    "HIT": -2,
+    "DEATH": -1
+}
+
+
+WIND_DATA = {
+    "size": 512,
+    "scale": 0.5,
+    "animation": {"WIND": {"file": "assets/wind.png", "frame_number": 16, "cooldown": 5}}
+}

@@ -1,6 +1,7 @@
 import pygame
 
 from src.modules.UI import constants as con
+from src.modules.UI import CharDictionary as chardict
 
 #TODO: We can use this base function to implement a real background gif later,
 # but for now it just loads the main menu animation frames and darkens them to use as a background in the menu and character select screens.
@@ -22,15 +23,17 @@ def load_menu_background(width, height):
         i += 1
     return frames
 
-def load_animation_frames(sprite_sheet, size, scale, animation_steps):
-    animation_list = []
-
-    for y, animation in enumerate(animation_steps):
+def load_animation_frames(animation_dict, size, scale):
+    animation_list = {}
+    
+    for action, data in animation_dict.items():
+        sprite_sheet = pygame.image.load(data["file"]).convert_alpha()
+        frame_number = data["frame_number"]
         row = []
-        for x in range(animation):
+        for x in range(frame_number):
             frame = sprite_sheet.subsurface(
                 x * size,
-                y * size,
+                0,
                 size,
                 size
             )
@@ -40,7 +43,7 @@ def load_animation_frames(sprite_sheet, size, scale, animation_steps):
             )
 
             row.append(frame)
-        animation_list.append(row)
+        animation_list[action] = row
     return animation_list
 
 
@@ -60,7 +63,7 @@ def crop_and_scale_frames(frames, target_height):
 
 # Update fighter animation n attack states
 def update_fighter_animation(fighter):
-    animation_cooldown = con.ANIMATION_COOLDOWNS[fighter.action]
+    animation_cooldown = fighter.char_data["animations"][fighter.action]["cooldown"]
 
     # Determine what action is happening
     if fighter.health <= 0:
@@ -68,24 +71,24 @@ def update_fighter_animation(fighter):
         if not fighter.death:
             fighter.sounds["death"].play()
         fighter.death = True
-        new_action = con.ACTIONS["DEATH"]
+        new_action = "DEATH"
     elif fighter.stun:
-        new_action = con.ACTIONS["HIT"]
+        new_action = "HIT"
     elif fighter.attacking:
         if fighter.attack_type == 1:
-            new_action = con.ACTIONS["ATTACK1"]
+            new_action = "ATTACK1"
         elif fighter.attack_type == 2:
-            new_action = con.ACTIONS["ATTACK2"]
+            new_action = "ATTACK2"
         elif fighter.attack_type == 3:
-            new_action = con.ACTIONS["ATTACK3"]
+            new_action = "ATTACK3"
         else:
             new_action = fighter.action
     elif fighter.dashing:
-        new_action = con.ACTIONS["WALK"]
+        new_action = "WALK"
     elif fighter.running:
-        new_action = con.ACTIONS["WALK"]
+        new_action = "WALK"
     else:
-        new_action = con.ACTIONS["IDLE"]
+        new_action = "IDLE"
 
     # update action if changed
     if new_action != fighter.action:
@@ -104,7 +107,7 @@ def update_fighter_animation(fighter):
     # check if animation finished, loop frames and reset actions
     if fighter.frame_index >= len(fighter.animation_list[fighter.action]):
         if fighter.death:
-            fighter.frame_index = len(fighter.animation_list[-1]) - 1
+            fighter.frame_index = len(fighter.animation_list["DEATH"]) - 1
         else:
             fighter.frame_index = 0
             if fighter.attacking:
@@ -116,18 +119,19 @@ def update_fighter_animation(fighter):
 
 def update_wind_animation(fighter, surface):
     
-    animation_cooldown = 5
+    animation_cooldown = chardict.WIND_DATA["animation"]["WIND"]["cooldown"]
+    wind_scaled_size = chardict.WIND_DATA["size"] * chardict.WIND_DATA["scale"]
     time = pygame.time.get_ticks()
     flip = False
 
     if fighter.dashing_direction == 1:  
-        wind_x_offset = -(con.PLAYER_WIDTH // 2 + con.WIND_SCALE_SIZE)   # dash right
+        wind_x_offset = -(con.PLAYER_WIDTH // 2 + wind_scaled_size)   # dash right
     else:
         flip = True                               
         wind_x_offset = con.PLAYER_WIDTH // 2   # dash left
 
     wind_x = fighter.rect.centerx + wind_x_offset
-    wind_y = fighter.rect.centery - (con.WIND_SCALE_SIZE // 2)
+    wind_y = fighter.rect.centery - (wind_scaled_size // 2)
 
     frame = fighter.wind_animation_list[fighter.wind_frame_index]
     frame = pygame.transform.flip(frame, flip, False)

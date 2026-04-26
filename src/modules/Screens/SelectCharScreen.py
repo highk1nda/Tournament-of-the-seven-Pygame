@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
+from src.modules.UI import CharDictionary as chardict
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems.scalemouse import scale_mouse
 from src.modules.systems import res 
@@ -17,14 +18,7 @@ GREY  = con.BUTTON_DISABLED_COLOR
 LABELS = ["Ser Edward", "Tyland", "Luna", "Rem", "Arland", "Venator"]
 
 # frame sheets and steps per row. #TODO: NONE means not yet implemented (for other characters)
-CHAR_DATA = [
-    (con.knight_sheet,          con.KNIGHT_ANIMATION_STEPS),
-    (con.werebear_sheet,        con.WEREBEAR_ANIMATION_STEPS),
-    (con.wizard_sheet,          con.WIZARD_ANIMATION_STEPS),
-    None, # minotaur TODO
-    None, # archer TODO
-    (con.knight_templar_sheet,  con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
-]
+CHAR_DATA = chardict.CHARACTER_DATA
 
 LOAD_SCALE   = con.SELECT_LOAD_SCALE
 PREVIEW_SIZE = con.SELECT_PREVIEW_SIZE
@@ -55,16 +49,18 @@ def make_button_rects(center_x):
 
 # handles the idle render in the character preview box
 class CharPreview:
-    def __init__(self, sheet, steps):
-        idle_frames  = load_animation_frames(sheet, 100, LOAD_SCALE, steps)[con.ACTIONS["IDLE"]]
+    def __init__(self, char_data):
+        idle_dict = {"IDLE": char_data["animations"]["IDLE"]}
+        idle_frames  = load_animation_frames(idle_dict, char_data["size"], LOAD_SCALE)["IDLE"]
         self.frames  = crop_and_scale_frames(idle_frames, PREVIEW_SIZE)
 
         self.frame_index = 0
         self.last_time   = pygame.time.get_ticks()
 
+        self.cooldown = char_data["animations"]["IDLE"]["cooldown"]
     def get_frame(self):
         now = pygame.time.get_ticks()
-        if now - self.last_time > con.ANIMATION_COOLDOWNS[con.ACTIONS["IDLE"]]:
+        if now - self.last_time > self.cooldown:
             self.frame_index = (self.frame_index + 1) % len(self.frames)
             self.last_time   = now
         return self.frames[self.frame_index]
@@ -88,8 +84,7 @@ class SelectCharScreen:
         self.previews = []
         for data in CHAR_DATA:
             if data is not None:
-                sheet, steps = data
-                self.previews.append(CharPreview(sheet, steps))
+                self.previews.append(CharPreview(data))
             else:
                 self.previews.append(None)
 
