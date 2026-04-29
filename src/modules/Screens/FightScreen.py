@@ -180,7 +180,7 @@ class FightScreen():
     
     def draw(self):
         x, y = self.screen_shake_offset
-        draw_screen(self.screen, con.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.player1, self.player2, offset=(x, y))
+        draw_screen(self.screen, self.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.player1, self.player2, offset=(x, y))
         self.player1.draw(self.screen)
         self.player2.draw(self.screen)
 
