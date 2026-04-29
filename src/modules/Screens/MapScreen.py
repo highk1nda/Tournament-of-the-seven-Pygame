@@ -51,8 +51,7 @@ class MapScreen:
         self.previews = []
         for data in CHAR_DATA:
             if data is not None:
-                sheet, steps = data
-                self.previews.append(CharPreview(sheet, steps))
+                self.previews.append(CharPreview(data))
             else:
                 self.previews.append(None)
 
