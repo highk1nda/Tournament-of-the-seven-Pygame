@@ -9,6 +9,7 @@ from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indi
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
 from tests.test import DebugPopup
+from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
 # the fight screen class
 class FightScreen():
@@ -214,9 +215,6 @@ class FightScreen():
         debug = DebugPopup(self)
 
         self.state_timer = pygame.time.get_ticks()
-        def stop_fight_sounds():
-            con.forest_sfx.stop()
-            con.fight_music.stop()
 
         #loop for fightscreen
         while True:
@@ -224,13 +222,13 @@ class FightScreen():
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    stop_fight_sounds()
-                    return "quit"
+                    result = confscr(self.screen, self.clock, "Fight").run()
+                    return result
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.player1.clean_up()
                     self.player2.clean_up()
-
-                    stop_fight_sounds()
+                    con.forest_sfx.stop()
+                    con.fight_music.stop()
                     con.exit_sound.play()
                     return "Menu"
                 debug.handle_event(event)

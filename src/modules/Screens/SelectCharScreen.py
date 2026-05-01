@@ -7,6 +7,7 @@ from src.modules.systems.scalemouse import scale_mouse
 from src.modules.systems import res 
 from src.modules.UI.Button import Button
 from src.modules.fighter.render import load_animation_frames, crop_and_scale_frames
+from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
 #TODO: improve constants here too
 BG    = con.SELECT_BG_COLOR
@@ -70,13 +71,11 @@ class SelectCharScreen:
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock  = clock
-        self.font   = pygame.font.SysFont(None, 28)
-        self.big    = pygame.font.SysFont(None, 46)
 
         self.p1_btns   = make_button_rects(P1_CX)
         self.p2_btns   = make_button_rects(P2_CX)
         self.fight_btn = Button(con.SELECT_FIGHT_BTN_X, FIGHT_Y, 200, 45, "CONTINUE",
-                                self.font, button_color=GREEN)
+                                con.font_Medium, button_color=GREEN)
 
         self.p1_idx = 0  # default: Knight
         self.p2_idx = 1  # default: Werebear
@@ -106,7 +105,7 @@ class SelectCharScreen:
         pygame.draw.rect(self.screen, btn_color, rect, border_radius=5)
         if selected:
             pygame.draw.rect(self.screen, con.WHITE, rect, 3, border_radius=5)
-        label_surf = self.font.render(label, True, con.WHITE)
+        label_surf = con.font_Medium.render(label, True, con.WHITE)
         self.screen.blit(label_surf, (rect.centerx - label_surf.get_width()  // 2,
                                       rect.centery - label_surf.get_height() // 2))
 
@@ -123,8 +122,8 @@ class SelectCharScreen:
     def draw(self):
         self.screen.fill(BG)
 
-        self.draw_centered(self.big.render("PLAYER 1", True, con.SELECT_P1_LABEL_COLOR), con.SELECT_P1_CX, con.SELECT_LABEL_Y)
-        self.draw_centered(self.big.render("PLAYER 2", True, con.SELECT_P2_LABEL_COLOR), con.SELECT_P2_CX, con.SELECT_LABEL_Y)
+        self.draw_centered(con.font_Large.render("PLAYER 1", True, con.SELECT_P1_LABEL_COLOR), con.SELECT_P1_CX, con.SELECT_LABEL_Y)
+        self.draw_centered(con.font_Large.render("PLAYER 2", True, con.SELECT_P2_LABEL_COLOR), con.SELECT_P2_CX, con.SELECT_LABEL_Y)
 
         self.draw_preview(self.p1_idx, con.SELECT_P1_CX)
         self.draw_preview(self.p2_idx, con.SELECT_P2_CX, flip=True)
@@ -143,7 +142,8 @@ class SelectCharScreen:
         while True:
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    return "quit"
+                    result = confscr(self.screen, self.clock, "Char").run()
+                    return result
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
                     con.exit_sound.play()
                     return "Menu"
@@ -172,4 +172,4 @@ class SelectCharScreen:
 
             self.draw()
             res.render_to_surface()
-            self.clock.tick(60)
+            self.clock.tick(con.FPS)

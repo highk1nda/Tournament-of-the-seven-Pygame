@@ -185,7 +185,7 @@ class Fighter():
         # walking sound
         if self.running:
             if not self.walk_sound_playing:
-                self.walk_sound.play(-2)  # loop
+                self.walk_sound.play(-1)  # loop
                 self.walk_sound_playing = True
         else:
             if self.walk_sound_playing:

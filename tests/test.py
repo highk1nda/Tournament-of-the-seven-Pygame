@@ -2,10 +2,6 @@ import pygame
 from src.modules.fighter.render import load_animation_frames
 from src.modules.UI import constants as con
 
-RED   = (160, 45, 45)
-BLUE  = (45, 70, 160)
-WHITE = (255, 255, 255)
-
 _font = None
 
 def _get_font():
@@ -112,12 +108,12 @@ class DebugPopup:
             return
         font = _get_font()
         screen.blit(self.bg, (self.x, self.y))
-        screen.blit(font.render("PLAYER 1", True, RED),  (self.x + 10, self.y + 15))
-        screen.blit(font.render("PLAYER 2", True, BLUE), (self.x + 10, self.y + 145))
+        screen.blit(font.render("PLAYER 1", True, con.RED),  (self.x + 10, self.y + 15))
+        screen.blit(font.render("PLAYER 2", True, con.BLUE), (self.x + 10, self.y + 145))
         for i in range(6):
-            pygame.draw.rect(screen, RED,  self.p1[i])
-            pygame.draw.rect(screen, BLUE, self.p2[i])
-            t = font.render(self.labels[i], True, WHITE)
+            pygame.draw.rect(screen, con.RED,  self.p1[i])
+            pygame.draw.rect(screen, con.BLUE, self.p2[i])
+            t = font.render(self.labels[i], True, con.WHITE)
             screen.blit(t, (self.p1[i].x + (self.btn_w - t.get_width())//2, self.p1[i].y + (self.btn_h - t.get_height())//2))
             screen.blit(t, (self.p2[i].x + (self.btn_w - t.get_width())//2, self.p2[i].y + (self.btn_h - t.get_height())//2))
 

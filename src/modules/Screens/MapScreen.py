@@ -4,6 +4,7 @@ from src.modules.UI import constants as con
 from src.modules.systems import res 
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems.scalemouse import scale_mouse
+from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.Screens.SelectCharScreen import CharPreview, CHAR_DATA
 #TODO: improve constants calling
 BG    = con.SELECT_BG_COLOR
@@ -11,8 +12,8 @@ GREEN = con.SELECT_FIGHT_BTN_COLOR
 GREY  = con.BUTTON_DISABLED_COLOR
 
 MAPS = [
-    {"name": "Forest",  "path": "assets/Colleseum.png",  "key": "map1"},
-    {"name": "Fields",  "path": "assets/Heaven.png",  "key": "map2"},
+    {"name": "Colleseum",  "path": "assets/Colleseum.png",  "key": "map1"},
+    {"name": "Arena of Lympos",  "path": "assets/Heaven.png",  "key": "map2"},
 ]
 
 PREVIEW_W   = con.MAP_PREVIEW_W
@@ -31,9 +32,6 @@ class MapScreen:
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock  = clock
-        self.font   = pygame.font.SysFont(None, 36)
-        self.big    = pygame.font.SysFont(None, 52)
-        self.small  = pygame.font.SysFont(None, 28)
 
         self.map_idx = 0
 
@@ -64,7 +62,7 @@ class MapScreen:
 
     def draw_button(self, rect, label, color):
         pygame.draw.rect(self.screen, color, rect, border_radius=6)
-        s = self.font.render(label, True, con.WHITE)
+        s = con.font_Medium.render(label, True, con.WHITE)
         self.screen.blit(s, (rect.centerx - s.get_width() // 2,
                              rect.centery - s.get_height() // 2))
 
@@ -81,14 +79,14 @@ class MapScreen:
     def draw(self):
         self.screen.fill(BG)
 
-        self.draw_centered(self.big.render("SELECT MAP", True, con.WHITE), CX, 22)
+        self.draw_centered(con.font_Large.render("SELECT MAP", True, con.WHITE), CX, 22)
 
         self.screen.blit(self.map_images[self.map_idx], (PREVIEW_X, PREVIEW_Y))
 
         self.draw_char_on_preview(self.p1_idx, rel_x=120)
         self.draw_char_on_preview(self.p2_idx, rel_x=PREVIEW_W - 120, flip=True)
 
-        self.draw_centered(self.small.render(MAPS[self.map_idx]["name"], True, con.WHITE), CX, PREVIEW_Y + PREVIEW_H + 6)
+        self.draw_centered(con.font_Small.render(MAPS[self.map_idx]["name"], True, con.WHITE), CX, PREVIEW_Y + PREVIEW_H + 6)
 
         self.draw_button(self.prev_rect,  "< Previous", GREY)
         self.draw_button(self.fight_rect, "FIGHT",      GREEN)
@@ -99,7 +97,8 @@ class MapScreen:
         while True:
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    return "quit"
+                    result = confscr(self.screen, self.clock, "Map").run()
+                    return result
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
                     return "Boon"
                 if event.type == MOUSEBUTTONDOWN:
@@ -117,4 +116,4 @@ class MapScreen:
 
             self.draw()
             res.render_to_surface()
-            self.clock.tick(60)
+            self.clock.tick(con.FPS)

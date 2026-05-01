@@ -16,15 +16,16 @@ pygame.display.set_caption("Liberty") #VIVA LA LIBERTAS
 
 
 # three functions that run all screens that can be called from main menu.
+
 def run_menu():
     menu = mainmenu(con.display_surface, con.clock)
     return menu.run()
 
 def run_story():
-    return "menu"
+    return "Menu"
 
 def run_singleplayer():
-    return "menu"
+    return "Menu"
 
 def run_fight():
     fight = fightscr(con.display_surface, con.clock)
@@ -70,6 +71,8 @@ while state != "quit":
                 sub_state = boonscr(con.display_surface, con.clock).run()
             elif sub_state == "Map":
                 sub_state = mapscr(con.display_surface, con.clock).run()
+            elif sub_state == 'quit':
+                break
             state = sub_state
 
     elif state == "Help":

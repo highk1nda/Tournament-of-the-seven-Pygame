@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 
 pygame.font.init()
 pygame.mixer.init()
@@ -37,6 +38,9 @@ PLAYER_HEIGHT = int(SCREEN_HEIGHT / 4.28)
 
 # =============== Colors ===============
 BLACK = (0, 0, 0)
+RED = (255, 0 , 0)
+DARK_RED = (140, 40, 40)
+DARK_BLUE = (40, 40, 140)
 WHITE = (255, 255, 255)
 RED = (255, 0 , 0)
 GREEN = (26, 66, 28)
@@ -49,6 +53,13 @@ LIGHT_GREEN = (0, 255, 0)
 BLUE = (80, 180, 255)
 
 FLOOR_COLOR = (106, 80, 80)
+
+buttonwidth = SCREEN_WIDTH / 5
+buttonheight = SCREEN_HEIGHT / 15
+buttonspacing = SCREEN_HEIGHT / 10
+
+button_y = (center_y) - (buttonspacing * 2)
+button_x = (center_x) - (buttonwidth / 2)
 
 # Character select screen colours
 SELECT_BG_COLOR        = (30, 30, 30)
@@ -185,8 +196,25 @@ P2_CONTROLS = {
 }
 
 # =============== Assets ===============
+ACTIONS = {
+    "IDLE": 0,
+    "WALK": 1,
+    "ATTACK1": 2,
+    "ATTACK2": 3,
+    "ATTACK3": 4,
+    "HIT": -2,
+    "DEATH": -1
+}
 
-# music
+PLAYER_1_X = int(SCREEN_WIDTH * 0.15)
+PLAYER_2_X = int(SCREEN_WIDTH * 0.7)
+
+# Music
+
+# assetdir = Path(__file__).resolve().parent.parent
+# assetdir = assetdir/"assets"
+# menumusic: str = f"{assetdir}/sfx/menmusica.mp3"
+# fightmusic: str = f"{assetdir}/sfx/fightmusica.mp3"
 menumusic: str = "assets/sfx/menmusica.mp3"
 fightmusic: str = "assets/sfx/fightmusica.mp3"
 forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
@@ -223,3 +251,10 @@ p2_boon = None
 
 # Store selected map (dynamicly changable btw, its set in MapScreen)
 selected_map = "map1"
+
+# fonts
+font_XLarge = pygame.font.SysFont(None, 64)
+font_Large = pygame.font.SysFont(None, 46)
+font_Medium = pygame.font.SysFont(None, 32)
+font_Small = pygame.font.SysFont(None, 29)
+font_Tiny = pygame.font.SysFont(None, 16)
