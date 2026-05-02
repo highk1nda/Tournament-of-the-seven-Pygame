@@ -45,49 +45,60 @@ buttonspacing = SCREEN_HEIGHT / 10
 button_y = (center_y) - (buttonspacing * 2)
 button_x = (center_x) - (buttonwidth / 2)
 # Character select screen colours
-SELECT_BG_COLOR        = (30, 30, 30)
-SELECT_P1_BTN_COLOR    = (160, 45, 45)
-SELECT_P2_BTN_COLOR    = (45, 70, 160)
-SELECT_FIGHT_BTN_COLOR = (60, 140, 60)
-SELECT_P1_LABEL_COLOR  = (210, 65, 65)
-SELECT_P2_LABEL_COLOR  = (65, 100, 210)
-BUTTON_DISABLED_COLOR  = (70, 70, 70)
+select_bg_color = (30, 30, 30)
+select_p1_butt_color = (160, 45, 45)
+select_p2_butt_color = (45, 70, 160)
+select_fight_butt_color = (60, 140, 60)
+select_p1_label_color = (210, 65, 65)
+select_p2_label_color = (65, 100, 210)
+butt_disabled_color = (70, 70, 70)
 
 # Select Char Screen layout and sizes
-SELECT_LOAD_SCALE   = 4
-SELECT_PREVIEW_SIZE = 260
+select_load_scale = 4
+select_preview_size = 260
 
-SELECT_BTN_W       = 120
-SELECT_BTN_H       = 42
-SELECT_BTN_GAP     = 10
-SELECT_GRID_WIDTH  = 3 * SELECT_BTN_W + 2 * SELECT_BTN_GAP
+select_butt_width = 120
+select_butt_height = 42
+select_butt_gap = 10
+select_grid_width = 3 * select_butt_width + 2 * select_butt_gap
 
-SELECT_P1_CX       = SCREEN_WIDTH // 4
-SELECT_P2_CX       = SCREEN_WIDTH * 3 // 4
+select_p1_cx = SCREEN_WIDTH // 4
+select_p2_cx = SCREEN_WIDTH * 3 // 4
 
-_sel_block_top     = (SCREEN_HEIGHT - 517) // 2
-SELECT_LABEL_Y     = _sel_block_top
-SELECT_PREVIEW_Y   = _sel_block_top + 46
-SELECT_BTN_ROW1_Y  = SELECT_PREVIEW_Y + SELECT_PREVIEW_SIZE + 14
-SELECT_BTN_ROW2_Y  = SELECT_BTN_ROW1_Y + SELECT_BTN_H + SELECT_BTN_GAP
-SELECT_FIGHT_Y     = SELECT_BTN_ROW2_Y + SELECT_BTN_H + 18
-SELECT_FIGHT_BTN_X = SCREEN_WIDTH // 2 - 100
+_sel_block_top = (SCREEN_HEIGHT - 517) // 2
+select_label_y = _sel_block_top
+select_preview_y = _sel_block_top + 46
+select_butt_row1_y = select_preview_y + select_preview_size + 14
+select_butt_row2_y = select_butt_row1_y + select_butt_height + select_butt_gap
+select_fight_y = select_butt_row2_y + select_butt_height + 18
+select_fight_butt_x = int(center_x) - 100
 
-BOON_BTN_W   = 200
-BOON_BTN_H   = 40
-BOON_BTN_GAP = 8
+# Boon screen colours
+boon_active_color = (70, 130, 80)
+boon_panel_color  = (40, 42, 58)
+boon_back_color   = (120, 50, 50)
+
+# Boon screen grid dimensions
+boon_cell_width  = 150
+boon_cell_height = 55
+boon_grid_width  = 2 * boon_cell_width  + select_butt_gap
+boon_grid_height = 2 * boon_cell_height + select_butt_gap
+
+boon_p1_grid_x = select_p1_cx - boon_grid_width // 2
+boon_p2_grid_x = select_p2_cx - boon_grid_width // 2
 
 # Map screen layout
-MAP_PREVIEW_W  = 700
-MAP_PREVIEW_H  = 340
-MAP_PREVIEW_X  = (SCREEN_WIDTH - MAP_PREVIEW_W) // 2
-MAP_PREVIEW_Y  = 80
-MAP_NAV_BTN_W  = 130
-MAP_NAV_BTN_H  = 45
-MAP_NAV_Y      = MAP_PREVIEW_Y + MAP_PREVIEW_H + 30
-MAP_FIGHT_BTN_W = 160
-MAP_FIGHT_BTN_H = 45
-MAP_CX          = SCREEN_WIDTH // 2
+map_cx = int(center_x)
+map_preview_width = int(SCREEN_WIDTH * 0.65)                        # 65% of screen width
+map_preview_height = int(map_preview_width * 1120 / 1940)           # preserve 1940:1120 source ratio
+map_preview_x = (SCREEN_WIDTH - map_preview_width) // 2
+map_preview_y = 80
+map_char_rel_x = int(map_preview_width * 0.10)                      # character x offset inside preview
+map_nav_butt_width = 130
+map_nav_butt_height = 45
+map_nav_y = map_preview_y + map_preview_height + 50
+map_fight_butt_width = 160
+map_fight_butt_height = 45
 
 FLOOR_Y      = SCREEN_HEIGHT / 1.1
 FLOOR_HEIGHT = SCREEN_HEIGHT - FLOOR_Y

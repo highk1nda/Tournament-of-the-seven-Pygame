@@ -25,7 +25,8 @@ def load_fighter_sounds():
         "jump": pygame.mixer.Sound("assets/sfx/jump.mp3"),
         "dash": pygame.mixer.Sound("assets/sfx/woosh.mp3"),
         "death": pygame.mixer.Sound("assets/sfx/death.mp3"),
-        "hit": pygame.mixer.Sound("assets/sfx/hit.mp3")
+        "hit":      pygame.mixer.Sound("assets/sfx/hit.mp3"),
+        "cheering": pygame.mixer.Sound("assets/sfx/cheering.mp3") #TODO: use it randomly every 10to20 seconds
     }
 
     sounds["walk"].set_volume(con.volume)

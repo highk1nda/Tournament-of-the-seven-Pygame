@@ -1,9 +1,10 @@
 import pygame
+# from PIL import Image as PILImage  # used by GIF loader (main_menu_sky.gif) — not active
 
 from src.modules.UI import constants as con
 
-#TODO: We can use this base function to implement a real background gif later,
-# but for now it just loads the main menu animation frames and darkens them to use as a background in the menu and character select screens.
+# GIF_PATH = "assets/main_menu_sky.gif"  # night sky GIF — swap load_menu_background below to use it
+
 def load_menu_background(width, height):
     dark = pygame.Surface((width, height))
     dark.set_alpha(80)

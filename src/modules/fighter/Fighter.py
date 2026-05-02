@@ -66,7 +66,7 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET):
+    def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET, cpu_input=None):
         SPEED = con.PLAYER_SPEED
         GRAVITY = con.GRAVITY
         if self.jumping:
@@ -79,7 +79,10 @@ class Fighter():
         self.running = False
 
         # Key presses
-        key = pygame.key.get_pressed()
+        if cpu_input is not None:
+            key = cpu_input
+        else:
+            key = pygame.key.get_pressed()
 
         # reset speed if stun or dead
         if self.stun or self.death:
