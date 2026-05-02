@@ -16,14 +16,14 @@ def get_font():
         font = pygame.font.SysFont(None, 22)
     return font
 
-CHAR_SHEETS = [
-    (con.knight_sheet,          con.KNIGHT_ANIMATION_STEPS),
-    (con.werebear_sheet,        con.WEREBEAR_ANIMATION_STEPS),
-    (con.wizard_sheet,          con.WIZARD_ANIMATION_STEPS),
-    None,
-    None,
-    (con.knight_templar_sheet,  con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
-]
+# CHAR_SHEETS = [
+#     (con.knight_sheet,          con.KNIGHT_ANIMATION_STEPS),
+#     (con.werebear_sheet,        con.WEREBEAR_ANIMATION_STEPS),
+#     (con.wizard_sheet,          con.WIZARD_ANIMATION_STEPS),
+#     None,
+#     None,
+#     (con.knight_templar_sheet,  con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
+# ]
 
 #debug thingy to quickly switch characters during development, gonna be removed later (or maybe not, who knows)
 class DebugPopup:

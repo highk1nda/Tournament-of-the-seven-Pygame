@@ -266,6 +266,7 @@ selected_map = "map1"
 # fonts
 font_XLarge = pygame.font.SysFont(None, 64)
 font_Large = pygame.font.SysFont(None, 46)
+font_Big = pygame.font.SysFont(None, 35)
 font_Medium = pygame.font.SysFont(None, 32)
 font_Small = pygame.font.SysFont(None, 29)
 font_Tiny = pygame.font.SysFont(None, 16)
