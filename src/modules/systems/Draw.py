@@ -20,20 +20,6 @@ def draw_health_bar(display_surface, health, x, y, right_side):
         pygame.draw.rect(display_surface, con.RED, (x, y, current_width, con.healthbar_height))
     else:
         pygame.draw.rect(display_surface, con.RED, (x + con.healthbar_width - current_width, y, current_width, con.healthbar_height))
-#     max_width = con.HEALTH_BAR_WIDTH
-#     current_width = max_width * ratio
-    
-#     pygame.draw.rect(display_surface, con.WHITE, (x - con.HEALTH_BAR_BORDER_THICKNESS, 
-#                                                   y - con.HEALTH_BAR_BORDER_THICKNESS, 
-#                                                   con.HEALTH_BAR_WIDTH + (con.HEALTH_BAR_BORDER_THICKNESS * 2), 
-#                                                   con.HEALTH_BAR_HEIGHT + (con.HEALTH_BAR_BORDER_THICKNESS * 2)), 
-#                                                   con.HEALTH_BAR_BORDER_THICKNESS)
-
-#     # make health bars axially symmetric
-#     if not right_side:
-#         pygame.draw.rect(display_surface, con.RED, (x, y, current_width, con.HEALTH_BAR_HEIGHT))
-#     else:
-#         pygame.draw.rect(display_surface, con.RED, (x + max_width - current_width, y, current_width, con.HEALTH_BAR_HEIGHT))
 
 def draw_dashing_cooldown_bar(display_surface, fighter, right_side):
     current_time = pygame.time.get_ticks()

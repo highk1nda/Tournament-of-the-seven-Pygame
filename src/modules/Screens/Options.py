@@ -5,15 +5,12 @@ from src.modules.UI import constants as con
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res 
 from src.modules.systems.scalemouse import scale_mouse
+from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
 class Options():
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock = clock
-
-        self.font_large = pygame.font.SysFont("arial", 64)
-        self.font_medium = pygame.font.SysFont("arial", 32)
-        self.font_small = pygame.font.SysFont("arial", 16)
 
         # pygame uses 0-1  for volume, but we want to use 0-100, so we multiply
         self.volume = int(con.background_music.get_volume() * 100)
@@ -93,7 +90,7 @@ class Options():
         self.screen.blit(self.overlay, (0, 0))
 
         #draw title
-        title = self.font_large.render("Options", True, con.YELLOW)
+        title = con.font_Large.render("Options", True, con.YELLOW)
         self.screen.blit(title, title.get_rect(center=(con.center_x, int(con.SCREEN_HEIGHT/6.75))))
 
         # draw sliders
@@ -101,7 +98,7 @@ class Options():
             # get current value of slider
             val = getattr(self, slider["setting"])
             name_text = f"{slider['name']}: {val}%"
-            name_surf = self.font_medium.render(name_text, True, con.WHITE)
+            name_surf = con.font_Medium.render(name_text, True, con.WHITE)
             self.screen.blit(name_surf, name_surf.get_rect(center=(con.center_x, slider["y"] - int(con.SCREEN_HEIGHT / 36))))
 
             # grey background for slider 
@@ -118,7 +115,7 @@ class Options():
 
         # window size txt
         butt_y = int(con.SCREEN_HEIGHT / 1.44)
-        butt_name = self.font_medium.render("Window size:", True, con.WHITE)
+        butt_name = con.font_Medium.render("Window size:", True, con.WHITE)
         self.screen.blit(butt_name, butt_name.get_rect(center=(con.center_x, butt_y - 90)))
 
         # button info
@@ -145,10 +142,10 @@ class Options():
                 txt_color = con.BLACK
 
             pygame.draw.rect(self.screen, butt_color, rect, border_radius=5)
-            butt_txt = self.font_small.render(setting_string, True, txt_color)
+            butt_txt = con.font_Small.render(setting_string, True, txt_color)
             self.screen.blit(butt_txt, butt_txt.get_rect(center=rect.center))
 
-        exit_txt = self.font_medium.render("Press ESC to return to main menu", True, con.YELLOW)
+        exit_txt = con.font_Medium.render("Press ESC to return to main menu", True, con.YELLOW)
         self.screen.blit(exit_txt, exit_txt.get_rect(center=(con.center_x, con.SCREEN_HEIGHT - 50)))
         # apply the brightness to everything
         appBright(self.screen)
@@ -157,7 +154,8 @@ class Options():
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return "quit"
+                    result = confscr(self.screen, self.clock, "Options").run()
+                    return result
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:

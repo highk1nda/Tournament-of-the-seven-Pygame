@@ -1,23 +1,17 @@
 import pygame
 
 from src.modules.UI import constants as con
+from src.modules.UI import CharDictionary as chardict
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems.scalemouse import scale_mouse
 from src.modules.systems import res
 from src.modules.UI.Button import Button
 from src.modules.fighter.render import load_animation_frames, crop_and_scale_frames
+from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
 LABELS = ["Ser Edward", "Tyland", "Luna", "Rem", "Arland", "Venator"]
 
-# frame sheets and steps per row. None means not yet implemented
-CHAR_DATA = [
-    (con.knight_sheet, con.KNIGHT_ANIMATION_STEPS),
-    (con.werebear_sheet, con.WEREBEAR_ANIMATION_STEPS),
-    (con.wizard_sheet, con.WIZARD_ANIMATION_STEPS),
-    None, # minotaur TODO
-    None, # archer TODO
-    (con.knight_templar_sheet, con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
-]
+CHAR_DATA = chardict.CHARACTER_DATA
 
 
 def make_button_rects(center_x):
@@ -33,17 +27,19 @@ def make_button_rects(center_x):
 
 
 # handles the idle render in the character preview box
-class CharPreview():
-    def __init__(self, sheet, steps):
-        idle_frames = load_animation_frames(sheet, 100, con.select_load_scale, steps)[con.ACTIONS["IDLE"]]
-        self.frames = crop_and_scale_frames(idle_frames, con.select_preview_size)
+class CharPreview:
+    def __init__(self, char_data):
+        idle_dict = {"IDLE": char_data["animations"]["IDLE"]}
+        idle_frames  = load_animation_frames(idle_dict, char_data["size"], con.select_load_scale)["IDLE"]["ground"]
+        self.frames  = crop_and_scale_frames(idle_frames, con.select_preview_size)
 
         self.frame_index = 0
         self.last_time = pygame.time.get_ticks()
 
+        self.cooldown = char_data["animations"]["IDLE"]["cooldown"]
     def get_frame(self):
         now = pygame.time.get_ticks()
-        if now - self.last_time > con.ANIMATION_COOLDOWNS[con.ACTIONS["IDLE"]]:
+        if now - self.last_time > self.cooldown:
             self.frame_index = (self.frame_index + 1) % len(self.frames)
             self.last_time = now
         return self.frames[self.frame_index]
@@ -67,8 +63,7 @@ class SelectCharScreen():
         self.previews = []
         for data in CHAR_DATA:
             if data is not None:
-                sheet, steps = data
-                self.previews.append(CharPreview(sheet, steps))
+                self.previews.append(CharPreview(data))
             else:
                 self.previews.append(None)
 
@@ -129,7 +124,8 @@ class SelectCharScreen():
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return "quit"
+                    result = confscr(self.screen, self.clock, "Char").run()
+                    return result
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -137,7 +133,6 @@ class SelectCharScreen():
                         return "Menu"
 
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    #get mouse position
                     mx, my = scale_mouse()
 
                     # check character select buttons for both players

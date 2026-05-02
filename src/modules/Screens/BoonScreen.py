@@ -7,6 +7,7 @@ from src.modules.systems.scalemouse import scale_mouse
 from src.modules.UI.Button import Button
 from src.modules.Screens.SelectCharScreen import CharPreview, CHAR_DATA
 from src.modules.fighter.render import load_magic_projectiles, draw_magic_effect
+from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
 # placeholder names and descriptions for now
 boons = [
@@ -55,8 +56,7 @@ class BoonScreen:
         self.previews = []
         for data in CHAR_DATA:
             if data is not None:
-                sheet, steps = data
-                self.previews.append(CharPreview(sheet, steps))
+                self.previews.append(CharPreview(data))
             else:
                 self.previews.append(None)
 
@@ -84,7 +84,17 @@ class BoonScreen:
             "CONTINUE", self.font, button_color=con.butt_disabled_color,
         )
 
-    # draw helpers
+    # # draw helpers
+    #     self.p1_rects = [
+    #         pygame.Rect(P1_CX - BTN_W // 2, BOON_Y + i * (BTN_H + BTN_GAP), BTN_W, BTN_H)
+    #         for i in range(3)
+    #     ]
+    #     self.p2_rects = [
+    #         pygame.Rect(P2_CX - BTN_W // 2, BOON_Y + i * (BTN_H + BTN_GAP), BTN_W, BTN_H)
+    #         for i in range(3)
+    #     ]
+    #     self.confirm_btn = Button(con.SCREEN_WIDTH // 2 - 100, CONFIRM_Y, 200, 45,
+    #                               "CONTINUE", con.font_Small, button_color=GREY)
 
     def draw_centered(self, surface, center_x, y):
         self.screen.blit(surface, (center_x - surface.get_width() // 2, y))
@@ -93,7 +103,7 @@ class BoonScreen:
         pygame.draw.rect(self.screen, color, rect, border_radius=5)
         if selected:
             pygame.draw.rect(self.screen, con.WHITE, rect, 3, border_radius=5)
-        s = self.font.render(label, True, con.WHITE)
+        s = con.font_Small.render(label, True, con.WHITE)
         self.screen.blit(s, (rect.centerx - s.get_width() // 2,
                              rect.centery - s.get_height() // 2))
 
@@ -178,16 +188,18 @@ class BoonScreen:
 
     def run(self):
         while True:
+            mx, my = scale_mouse()
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    return "quit"
+                    result = confscr(self.screen, self.clock, "Boon").run()
+                    return result
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
                     if self.p1_viewing is not None or self.p2_viewing is not None:
                         self.p1_viewing = None
                         self.p2_viewing = None
                     else:
                         con.exit_sound.play()
-                        return "play"
+                        return "Char"
                 if event.type == MOUSEBUTTONDOWN:
                     mx, my = scale_mouse()
 
@@ -232,4 +244,4 @@ class BoonScreen:
 
             self.draw()
             res.render_to_surface()
-            self.clock.tick(60)
+            self.clock.tick(con.FPS)

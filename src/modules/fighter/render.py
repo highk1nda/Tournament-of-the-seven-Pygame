@@ -2,6 +2,7 @@ import pygame
 # from PIL import Image as PILImage  # used by GIF loader (main_menu_sky.gif) — not active
 
 from src.modules.UI import constants as con
+from src.modules.UI import CharDictionary as chardict
 
 # GIF_PATH = "assets/main_menu_sky.gif"  # night sky GIF — swap load_menu_background below to use it
 
@@ -23,26 +24,45 @@ def load_menu_background(width, height):
         i += 1
     return frames
 
-def load_animation_frames(sprite_sheet, size, scale, animation_steps):
-    animation_list = []
-
-    for y, animation in enumerate(animation_steps):
-        row = []
-        for x in range(animation):
-            frame = sprite_sheet.subsurface(
+def load_animation_frames(animation_dict, size, scale):
+    new_animation_dict = {}
+    
+    for action, data in animation_dict.items():
+        new_animation_dict[action] = {"ground": [], "air": []}
+        file_air = data.get("file_air")
+        if file_air:
+            air_sheet = pygame.image.load(data["file_air"]).convert_alpha()
+        ground_sheet = pygame.image.load(data["file_ground"]).convert_alpha()
+        
+        frame_number = data["frame_number"]
+ 
+        for x in range(frame_number):
+            ground_frame = ground_sheet.subsurface(
                 x * size,
-                y * size,
+                0,
                 size,
                 size
             )
-            frame = pygame.transform.scale(
-                frame,
+            ground_frame = pygame.transform.scale(
+                ground_frame,
                 (size * scale, size * scale)
             )
+            new_animation_dict[action]["ground"].append(ground_frame)
 
-            row.append(frame)
-        animation_list.append(row)
-    return animation_list
+            if file_air:
+                air_frame = air_sheet.subsurface(
+                    x * size,
+                    0,
+                    size,
+                    size
+                )
+                air_frame = pygame.transform.scale(
+                    air_frame,
+                    (size * scale, size * scale)
+                )
+                new_animation_dict[action]["air"].append(air_frame)
+
+    return new_animation_dict
 
 
 #TODO: rewrite my main render char function so the characters image will actually take the space that eye can see, instead of being scaled to the size of the sprite sheet, which includes a lot of empty space.
@@ -109,7 +129,7 @@ def load_magic_projectiles(scale=1):
 
 # Update fighter animation n attack states
 def update_fighter_animation(fighter):
-    animation_cooldown = con.ANIMATION_COOLDOWNS[fighter.action]
+    animation_cooldown = fighter.char_data["animations"][fighter.action]["cooldown"]
 
     # Determine what action is happening
     if fighter.health <= 0:
@@ -117,24 +137,24 @@ def update_fighter_animation(fighter):
         if not fighter.death:
             fighter.sounds["death"].play()
         fighter.death = True
-        new_action = con.ACTIONS["DEATH"]
+        new_action = "DEATH"
     elif fighter.stun:
-        new_action = con.ACTIONS["HIT"]
+        new_action = "HIT"
     elif fighter.attacking:
         if fighter.attack_type == 1:
-            new_action = con.ACTIONS["ATTACK1"]
+            new_action = "ATTACK1"
         elif fighter.attack_type == 2:
-            new_action = con.ACTIONS["ATTACK2"]
+            new_action = "ATTACK2"
         elif fighter.attack_type == 3:
-            new_action = con.ACTIONS["ATTACK3"]
+            new_action = "ATTACK3"
         else:
             new_action = fighter.action
     elif fighter.dashing:
-        new_action = con.ACTIONS["WALK"]
+        new_action = "WALK"
     elif fighter.running:
-        new_action = con.ACTIONS["WALK"]
+        new_action = "WALK"
     else:
-        new_action = con.ACTIONS["IDLE"]
+        new_action = "IDLE"
 
     # update action if changed
     if new_action != fighter.action:
@@ -142,8 +162,14 @@ def update_fighter_animation(fighter):
         fighter.frame_index = 0
         fighter.update_time = pygame.time.get_ticks()
 
+    # check if on ground or in air
+    if fighter.rect.bottom < con.FLOOR_Y:
+        ground_state_key = "air"
+    else:
+        ground_state_key = "ground"
+
     # update image frame
-    fighter.image = fighter.animation_list[fighter.action][fighter.frame_index]
+    fighter.image = fighter.animation_list[fighter.action][ground_state_key][fighter.frame_index]
 
     # handle frame timing
     if pygame.time.get_ticks() - fighter.update_time > animation_cooldown:
@@ -151,9 +177,9 @@ def update_fighter_animation(fighter):
         fighter.update_time = pygame.time.get_ticks()
 
     # check if animation finished, loop frames and reset actions
-    if fighter.frame_index >= len(fighter.animation_list[fighter.action]):
+    if fighter.frame_index >= len(fighter.animation_list[fighter.action][ground_state_key]):
         if fighter.death:
-            fighter.frame_index = len(fighter.animation_list[-1]) - 1
+            fighter.frame_index = len(fighter.animation_list["DEATH"][ground_state_key]) - 1
         else:
             fighter.frame_index = 0
             if fighter.attacking:
@@ -165,18 +191,19 @@ def update_fighter_animation(fighter):
 
 def update_wind_animation(fighter, surface):
     
-    animation_cooldown = 5
+    animation_cooldown = chardict.WIND_DATA["animation"]["WIND"]["cooldown"]
+    wind_scaled_size = chardict.WIND_DATA["size"] * chardict.WIND_DATA["scale"]
     time = pygame.time.get_ticks()
     flip = False
 
     if fighter.dashing_direction == 1:  
-        wind_x_offset = -(con.PLAYER_WIDTH // 2 + con.WIND_SCALE_SIZE)   # dash right
+        wind_x_offset = -(con.PLAYER_WIDTH // 2 + wind_scaled_size)   # dash right
     else:
         flip = True                               
         wind_x_offset = con.PLAYER_WIDTH // 2   # dash left
 
     wind_x = fighter.rect.centerx + wind_x_offset
-    wind_y = fighter.rect.centery - (con.WIND_SCALE_SIZE // 2)
+    wind_y = fighter.rect.centery - (wind_scaled_size // 2)
 
     frame = fighter.wind_animation_list[fighter.wind_frame_index]
     frame = pygame.transform.flip(frame, flip, False)
