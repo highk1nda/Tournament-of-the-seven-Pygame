@@ -1,6 +1,7 @@
 import pygame
 from src.modules.fighter.render import load_animation_frames
 from src.modules.UI import constants as con
+from src.modules.UI import CharDictionary as chardict
 from src.modules.systems.cpu import CPUController
 
 RED   = (160, 45, 45)
@@ -16,14 +17,7 @@ def get_font():
         font = pygame.font.SysFont(None, 22)
     return font
 
-# CHAR_SHEETS = [
-#     (con.knight_sheet,          con.KNIGHT_ANIMATION_STEPS),
-#     (con.werebear_sheet,        con.WEREBEAR_ANIMATION_STEPS),
-#     (con.wizard_sheet,          con.WIZARD_ANIMATION_STEPS),
-#     None,
-#     None,
-#     (con.knight_templar_sheet,  con.KNIGHT_TEMPLAR_ANIMATION_STEPS),
-# ]
+CHAR_DATA = chardict.CHARACTER_DATA
 
 #debug thingy to quickly switch characters during development, gonna be removed later (or maybe not, who knows)
 class DebugPopup:
@@ -55,9 +49,9 @@ class DebugPopup:
         self.key_time      = 0
         self.sounds_swapped = False
 
-    def reload(self, fighter, sheet, steps):
-        fighter.animation_list = load_animation_frames(sheet, con.CHARACTER_DATA[0], con.CHARACTER_DATA[1], steps)
-        fighter.action = 0
+    def reload(self, fighter, char_data):
+        fighter.animation_list = load_animation_frames(char_data["animations"], char_data["size"], char_data["scale"])
+        fighter.action = "IDLE"
         fighter.frame_index = 0
 
     def swap_sounds(self):
@@ -65,7 +59,7 @@ class DebugPopup:
                        ("hit",   "assets/sfx/hit2.mp3"),
                        ("dash",  "assets/sfx/jump.mp3")]
         self.sounds_swapped = not self.sounds_swapped
-        for fighter in (self.fs.knight, self.fs.werebear):
+        for fighter in (self.fs.player1, self.fs.player2):
             for key, path in sound_paths:
                 if self.sounds_swapped:
                     fighter.sounds[key + "_"] = fighter.sounds[key]
@@ -88,11 +82,11 @@ class DebugPopup:
                 self.key_step = 0
         if event.type == pygame.MOUSEBUTTONDOWN and self.visible:
             for i in range(6):
-                if CHAR_SHEETS[i]:
+                if CHAR_DATA[i]:
                     if self.p1[i].collidepoint(event.pos):
-                        self.reload(self.fs.knight, *CHAR_SHEETS[i])
+                        self.reload(self.fs.player1, CHAR_DATA[i])
                     if self.p2[i].collidepoint(event.pos):
-                        self.reload(self.fs.werebear, *CHAR_SHEETS[i])
+                        self.reload(self.fs.player2, CHAR_DATA[i])
             for lvl, btn in ((1, self.cpu1_btn), (2, self.cpu2_btn), (3, self.cpu3_btn)):
                 if btn.collidepoint(event.pos):
                     if self.fs.cpu_enabled and self.fs.cpu_level == lvl:
