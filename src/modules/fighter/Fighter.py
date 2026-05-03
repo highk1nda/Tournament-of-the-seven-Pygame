@@ -7,7 +7,7 @@ from src.modules.UI import CharDictionary as chardict
 from src.modules.fighter.Projectile import Projectile
 
 class Fighter():
-    def __init__(self, x, y, player_width, player_height, flip, char_data, controls):
+    def __init__(self, x, y, player_width, player_height, flip, char_data, controls, passive_boon):
         self.char_data = char_data
         self.size = char_data["size"]
         self.image_scale = char_data["scale"]
@@ -71,6 +71,8 @@ class Fighter():
 
         self.walk_sound_playing = False
         self.attack_sound_played = False
+
+        self.passive_boon = passive_boon
 
     def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET):
         SPEED = con.PLAYER_SPEED
