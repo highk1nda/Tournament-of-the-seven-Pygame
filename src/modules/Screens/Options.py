@@ -26,7 +26,7 @@ class Options():
 
         # same thing in help screen, allows text to be readable no matter what we choose as our final image
         self.overlay = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT), pygame.SRCALPHA)
-        self.overlay.fill((100, 100, 100, 200)) # R, G, B, ALPHA (transparency)
+        self.overlay.fill((5, 5, 5, 220)) # R, G, B, ALPHA (transparency)
 
         #slider customization
         self.slider_width = int(con.SCREEN_WIDTH / 2.5)

@@ -39,6 +39,7 @@ class Button():
     # self explanatory, check if the user clicks the button
     def is_clicked(self, mouse_pos, mouse_click):
         if self.rect.collidepoint(mouse_pos) and mouse_click:
+            self.button_color = con.DARK_GREEN
             return True
         return False
 

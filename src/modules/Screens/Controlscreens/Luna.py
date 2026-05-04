@@ -4,6 +4,8 @@ from src.modules.UI import constants as con
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
+from src.modules.UI import CharDictionary as charDict
+from src.modules.Screens.SelectCharScreen import CharPreview
 
 #The help screen
 class Luna():
@@ -11,8 +13,10 @@ class Luna():
         self.screen = screen
         self.clock = clock
 
+        self.preview = CharPreview(charDict.CHARACTER_DATA[2])
+
         self.overlay = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT), pygame.SRCALPHA)
-        self.overlay.fill((100, 100, 100, 200))
+        self.overlay.fill((5, 5, 5, 220))
         
         #text
         self.txt = ["Attack1: Summons crystals around the enemy's current position. After a short delay, the crystals converge and pierce the enemy | P1: r | P2: Slash (/)",
@@ -50,6 +54,9 @@ class Luna():
         self.screen.blit(title, title.get_rect(center=(con.SCREEN_WIDTH // 2, 170)))
 
 
+        frame = self.preview.get_frame()
+        self.screen.blit(frame, (int(con.SCREEN_WIDTH // 28.3), int(con.SCREEN_HEIGHT // 1.45)))
+
         #display text
         count = 0
         for line in self.txt:
@@ -64,7 +71,7 @@ class Luna():
                 if event.type == pygame.QUIT:
                     result = confscr(self.screen, self.clock, "Luna").run()
                     return result
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     con.exit_sound.play()
                     return "Help"
             self.draw()

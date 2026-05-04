@@ -4,6 +4,8 @@ from src.modules.UI import constants as con
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
+from src.modules.UI import CharDictionary as charDict
+from src.modules.Screens.SelectCharScreen import CharPreview
 
 #The help screen
 class Edward():
@@ -11,8 +13,10 @@ class Edward():
         self.screen = screen
         self.clock = clock
 
+        self.preview = CharPreview(charDict.CHARACTER_DATA[0])
+
         self.overlay = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT), pygame.SRCALPHA)
-        self.overlay.fill((100, 100, 100, 200))
+        self.overlay.fill((5, 5, 5, 220))
 
         #text
         self.txt = ["Attack1: A single quick sword slice | P1: r | P2: Slash (/)",
@@ -41,7 +45,7 @@ class Edward():
                     "",
                     "",
                     "Press ESC to return to main menu"]
-
+            
     def draw(self):
         #draw overlay, display title
         self.screen.blit(con.background, (0,0))
@@ -49,6 +53,9 @@ class Edward():
         title = con.font_XLarge.render("Controls for Ser Edward", True, con.YELLOW)
         self.screen.blit(title, title.get_rect(center=(con.SCREEN_WIDTH // 2, 170)))
 
+
+        frame = self.preview.get_frame()
+        self.screen.blit(frame, (int(con.SCREEN_WIDTH // 28.3), int(con.SCREEN_HEIGHT // 1.45)))
 
         #display text
         count = 0
@@ -64,7 +71,7 @@ class Edward():
                 if event.type == pygame.QUIT:
                     result = confscr(self.screen, self.clock, "Edward").run()
                     return result
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     con.exit_sound.play()
                     return "Help"
             self.draw()

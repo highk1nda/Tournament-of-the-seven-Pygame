@@ -4,6 +4,8 @@ from src.modules.UI import constants as con
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
+from src.modules.UI import CharDictionary as charDict
+from src.modules.Screens.SelectCharScreen import CharPreview
 
 #The help screen
 class Venator():
@@ -11,8 +13,10 @@ class Venator():
         self.screen = screen
         self.clock = clock
 
+        self.preview = CharPreview(charDict.CHARACTER_DATA[5])
+
         self.overlay = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT), pygame.SRCALPHA)
-        self.overlay.fill((100, 100, 100, 200))
+        self.overlay.fill((5, 5, 5, 220))
         
         #text
         self.txt = ["Attack1: Thrusts with the spear to pierce through the enemy | P1: r | P2: Slash (/)",
@@ -49,6 +53,8 @@ class Venator():
         title = con.font_XLarge.render("Controls for Venator", True, con.YELLOW)
         self.screen.blit(title, title.get_rect(center=(con.SCREEN_WIDTH // 2, 170)))
 
+        frame = self.preview.get_frame()
+        self.screen.blit(frame, (int(con.SCREEN_WIDTH // 28.3), int(con.SCREEN_HEIGHT // 1.45)))
 
         #display text
         count = 0
@@ -64,7 +70,7 @@ class Venator():
                 if event.type == pygame.QUIT:
                     result = confscr(self.screen, self.clock, "Venator").run()
                     return result
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     con.exit_sound.play()
                     return "Help"
             self.draw()

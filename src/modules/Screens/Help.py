@@ -34,9 +34,11 @@ class Help():
                     "Dash Cooldown is triggered when: 1) 2 dash charges are both used, 2) Shift is released after 1 dash."
                     "",
                     "",
+                    "Hint: Dashing results in a brief moment of invincibility, use it to dodge attacks and reposition."
                     "",
                     "",
-                    "Character specific attacks and mechanics",
+                    "",
+                    "Character specific attacks and mechanics:",
                     "",
                     "",
                     "",
@@ -47,12 +49,11 @@ class Help():
                     "Boon descriptions can be found in the boon select screen, during the selection process",
                     "",
                     "",
-                    "",
                     "Press ESC to return to main menu"]
 
         #overlay to make it smooth
         self.overlay = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT), pygame.SRCALPHA)
-        self.overlay.fill((100, 100, 100, 200))
+        self.overlay.fill((5, 5, 5, 220))
     
     def handle_event(self, event):
         #seperate method for handling events in menu, as it will contain a lot
