@@ -128,7 +128,7 @@ def load_magic_projectiles(scale=1):
 
 # Update fighter animation n attack states
 def update_fighter_animation(fighter):
-    animation_cooldown = fighter.char_data["animations"][fighter.action]["cooldown"]
+    animation_cooldown = fighter.attack_cooldown_mult(fighter.action)
 
     # Determine what action is happening
     if fighter.health <= 0:

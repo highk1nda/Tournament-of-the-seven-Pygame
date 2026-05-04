@@ -5,6 +5,7 @@ from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.UI import constants as con
 from src.modules.UI import CharDictionary as chardict
 from src.modules.fighter.Projectile import Projectile
+from src.modules.boons import Adrenaline, LastStand
 
 class Fighter():
     def __init__(self, x, y, player_width, player_height, flip, char_data, controls, passive_boon):
@@ -73,9 +74,33 @@ class Fighter():
         self.attack_sound_played = False
 
         self.passive_boon = passive_boon
+        self.consecutive_hits = 0  # without getting damaged, for Adrenaline
+        self.last_stand_active = False
+
+    def speed_mult(self):
+        if self.passive_boon == "adrenaline":
+            return Adrenaline.speed_multiply(self.consecutive_hits)
+        if self.passive_boon == "last_stand" and self.last_stand_active:
+            return LastStand.BONUS_MULT
+        return 1.0
+    
+    def damage_mult(self):
+        if self.passive_boon == "adrenaline":
+            return Adrenaline.damage_multiply()
+        if self.passive_boon == "last_stand" and self.last_stand_active:
+            return LastStand.BONUS_MULT
+        return 1.0
+
+    def attack_cooldown_mult(self, action):
+        base = self.char_data["animations"][action]["cooldown"]
+        if action.startswith("ATTACK"):
+            if self.passive_boon == "adrenaline":
+                return max(1, int(base * Adrenaline.attack_speed_multiply(self.consecutive_hits)))
+        return base
+        
 
     def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET):
-        SPEED = con.PLAYER_SPEED
+        SPEED = int(con.PLAYER_SPEED * self.speed_mult())
         GRAVITY = con.GRAVITY
         if self.jumping:
             FRICTION = con.AIR_FRICTION
@@ -95,6 +120,10 @@ class Fighter():
             self.dashing = False
 
         current_time = pygame.time.get_ticks()
+
+        if self.passive_boon == "last_stand" and not self.last_stand_active:
+            if LastStand.check_activation(self):
+                self.last_stand_active = True
 
         # check dashing cooldown
         if self.dashing_in_cooldown:
@@ -296,9 +325,18 @@ class Fighter():
                                         self.rect.height)
             # collision detect
             if attacking_rect.colliderect(TARGET.rect) and not TARGET.dashing:
-                TARGET.health -= self.char_data["attack_damage"].get(attack_key)
+                base_damage = self.char_data["attack_damage"].get(attack_key)
+                damege = int(base_damage * self.damage_mult())
+                TARGET.health -= damege
                 TARGET.stun = True
                 TARGET.sounds["hit"].play()
+
+                if self.passive_boon == "adrenaline":
+                    self.consecutive_hits = min(self.consecutive_hits + 1, Adrenaline.MAX_ADRENALINE)
+
+                if TARGET.passive_boon == "adrenaline":
+                    TARGET.consecutive_hits = 0
+
                 if not TARGET.death:
                     TARGET.frame_index = 0
                     self.screen_shake = True

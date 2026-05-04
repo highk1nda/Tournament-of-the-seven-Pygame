@@ -1,6 +1,7 @@
 import pygame
 
 from src.modules.UI import constants as con
+from src.modules.boons import Adrenaline
 
 class Projectile:
     def __init__(self, x, y, direction, fighter, target, pj_data, frame_list, pj_size_dict):
@@ -98,9 +99,17 @@ class Projectile:
 
 
     def make_damage(self):
-        self.target.health -= self.damage
+        damage = int(self.damage * self.fighter.damage_mult())
+        self.target.health -= damage
         self.target.stun = True
         self.target.sounds["hit"].play()
+
+        if self.fighter.passive_boon == "adrenaline":
+            self.fighter.adrenaline_stacks = min(self.fighter.consecutive_hits + 1, Adrenaline.MAX_ADRENALINE)
+
+        if self.target.passive_boon == "adrenaline":
+            self.target.consecutive_hits = 0
+
         if not self.target.death:
             self.target.frame_index = 0
             self.fighter.screen_shake = True

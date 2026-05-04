@@ -52,7 +52,7 @@ KNIGHT_DATA = {
             "ATTACK3": 1.5
     },
     "attack_damage": {
-            "ATTACK1": 100,               # damage made by attacks
+            "ATTACK1": 5,               # damage made by attacks
             "ATTACK2": 3,
             "ATTACK3": 10
     }
