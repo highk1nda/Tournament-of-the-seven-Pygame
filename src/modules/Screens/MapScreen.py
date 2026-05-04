@@ -1,31 +1,16 @@
 import pygame
 from pygame.locals import *
 from src.modules.UI import constants as con
-from src.modules.systems import res 
+from src.modules.systems import res
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems.scalemouse import scale_mouse
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.Screens.SelectCharScreen import CharPreview, CHAR_DATA
-#TODO: improve constants calling
-BG    = con.SELECT_BG_COLOR
-GREEN = con.SELECT_FIGHT_BTN_COLOR
-GREY  = con.BUTTON_DISABLED_COLOR
 
 MAPS = [
     {"name": "Colleseum",  "path": "assets/Colleseum.png",  "key": "map1"},
     {"name": "Arena of Lympos",  "path": "assets/Heaven.png",  "key": "map2"},
 ]
-
-PREVIEW_W   = con.MAP_PREVIEW_W
-PREVIEW_H   = con.MAP_PREVIEW_H
-PREVIEW_X   = con.MAP_PREVIEW_X
-PREVIEW_Y   = con.MAP_PREVIEW_Y
-NAV_BTN_W   = con.MAP_NAV_BTN_W
-NAV_BTN_H   = con.MAP_NAV_BTN_H
-NAV_Y       = con.MAP_NAV_Y
-FIGHT_BTN_W = con.MAP_FIGHT_BTN_W
-FIGHT_BTN_H = con.MAP_FIGHT_BTN_H
-CX          = con.MAP_CX
 
 
 class MapScreen:
@@ -38,7 +23,7 @@ class MapScreen:
         self.map_images = [
             pygame.transform.scale(
                 pygame.image.load(m["path"]).convert(),
-                (PREVIEW_W, PREVIEW_H)
+                (con.map_preview_width, con.map_preview_height)
             )
             for m in MAPS
         ]
@@ -53,9 +38,9 @@ class MapScreen:
             else:
                 self.previews.append(None)
 
-        self.prev_rect  = pygame.Rect(CX - FIGHT_BTN_W // 2 - NAV_BTN_W - 20, NAV_Y, NAV_BTN_W,   NAV_BTN_H)
-        self.fight_rect = pygame.Rect(CX - FIGHT_BTN_W // 2,                   NAV_Y, FIGHT_BTN_W, FIGHT_BTN_H)
-        self.next_rect  = pygame.Rect(CX + FIGHT_BTN_W // 2 + 20,              NAV_Y, NAV_BTN_W,   NAV_BTN_H)
+        self.prev_rect  = pygame.Rect(con.map_cx - con.map_fight_butt_width // 2 - con.map_nav_butt_width - 20, con.map_nav_y, con.map_nav_butt_width,   con.map_nav_butt_height)
+        self.fight_rect = pygame.Rect(con.map_cx - con.map_fight_butt_width // 2,                              con.map_nav_y, con.map_fight_butt_width, con.map_fight_butt_height)
+        self.next_rect  = pygame.Rect(con.map_cx + con.map_fight_butt_width // 2 + 20,                         con.map_nav_y, con.map_nav_butt_width,   con.map_nav_butt_height)
 
     def draw_centered(self, surface, center_x, y):
         self.screen.blit(surface, (center_x - surface.get_width() // 2, y))
@@ -73,24 +58,24 @@ class MapScreen:
         frame = preview.get_frame()
         if flip:
             frame = pygame.transform.flip(frame, True, False)
-        self.screen.blit(frame, (PREVIEW_X + rel_x - frame.get_width()  // 2,
-                                 PREVIEW_Y + PREVIEW_H - frame.get_height() - 10))
+        self.screen.blit(frame, (con.map_preview_x + rel_x - frame.get_width()  // 2,
+                                 con.map_preview_y + con.map_preview_height - frame.get_height() - 10))
 
     def draw(self):
-        self.screen.fill(BG)
+        self.screen.fill(con.select_bg_color)
 
-        self.draw_centered(con.font_Large.render("SELECT MAP", True, con.WHITE), CX, 22)
+        self.draw_centered(con.font_Large.render("SELECT MAP", True, con.WHITE), con.map_cx, 22)
 
-        self.screen.blit(self.map_images[self.map_idx], (PREVIEW_X, PREVIEW_Y))
+        self.screen.blit(self.map_images[self.map_idx], (con.map_preview_x, con.map_preview_y))
 
-        self.draw_char_on_preview(self.p1_idx, rel_x=120)
-        self.draw_char_on_preview(self.p2_idx, rel_x=PREVIEW_W - 120, flip=True)
+        self.draw_char_on_preview(self.p1_idx, rel_x=con.map_char_rel_x)
+        self.draw_char_on_preview(self.p2_idx, rel_x=con.map_preview_width - con.map_char_rel_x, flip=True)
 
-        self.draw_centered(con.font_Small.render(MAPS[self.map_idx]["name"], True, con.WHITE), CX, PREVIEW_Y + PREVIEW_H + 6)
+        self.draw_centered(con.font_Small.render(MAPS[self.map_idx]["name"], True, con.WHITE), con.map_cx, con.map_preview_y + con.map_preview_height + 6)
 
-        self.draw_button(self.prev_rect,  "< Previous", GREY)
-        self.draw_button(self.fight_rect, "FIGHT",      GREEN)
-        self.draw_button(self.next_rect,  "Next >",     GREY)
+        self.draw_button(self.prev_rect,  "< Previous", con.butt_disabled_color)
+        self.draw_button(self.fight_rect, "FIGHT",      con.select_fight_butt_color)
+        self.draw_button(self.next_rect,  "Next >",     con.butt_disabled_color)
         appBright(self.screen)
 
     def run(self):

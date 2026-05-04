@@ -8,7 +8,8 @@ from src.modules.UI import CharDictionary as chardict
 from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indicator, draw_timer
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
-from tests.test import DebugPopup
+from src.modules.systems.cpu import CPUController
+from tests.debug_tools import DebugPopup
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.boons.DevilsDie import Dice
 
@@ -38,6 +39,10 @@ class FightScreen():
 
         self.state_timer = 0
         self.round_start_time = 0
+
+        self.cpu_enabled = False
+        self.cpu_level   = 1
+        self.cpu = CPUController(level=self.cpu_level)
 
         # screen fade between rounds
         self.fade_surface = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT))
@@ -84,7 +89,11 @@ class FightScreen():
         
         if self.state == "fight":
             self.player1.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player2)
-            self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1)
+            if self.cpu_enabled:
+                cpu_input = self.cpu.decide(self.player2, self.player1)
+                self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1, cpu_input=cpu_input)
+            else:
+                self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1)
             self.player1.update()
             self.player2.update()
             # check if any damage maded (for screen shake)
@@ -150,7 +159,11 @@ class FightScreen():
         
         if self.state == "death_animation":
             self.player1.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player2)
-            self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1)
+            if self.cpu_enabled:
+                cpu_input = self.cpu.decide(self.player2, self.player1)
+                self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1, cpu_input=cpu_input)
+            else:
+                self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1)
             self.player1.update()
             self.player2.update()
 
