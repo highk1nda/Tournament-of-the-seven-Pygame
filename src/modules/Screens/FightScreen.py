@@ -12,7 +12,7 @@ from src.modules.systems.cpu import CPUController
 from tests.debug_tools import DebugPopup
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.boons.DevilsDie import Dice
-
+from src.modules.Screens.RematchScreen import RematchScreen
 # the fight screen class
 class FightScreen():
     def __init__(self, screen, clock):
@@ -171,10 +171,11 @@ class FightScreen():
                 self.player1.clean_up()
                 self.player2.clean_up()
 
-                if self.round_death.passive_boon == "devils_die" and self.round_death != "both":
-                    self.state = "dice_roll"
-                    self.dice_player = self.round_death
-                    self.dice = Dice(self.screen)
+                if self.round_death != "both":
+                    if self.round_death.passive_boon == "devils_die":
+                        self.state = "dice_roll"
+                        self.dice_player = self.round_death
+                        self.dice = Dice(self.screen)
                 else:
                     self.state = "round_end"
                 self.state_timer = current_time
@@ -244,7 +245,10 @@ class FightScreen():
 
         if self.state == "round_end":
             if current_time - self.state_timer > con.ROUND_TEXT_DURATION:
-                    self.state = "fade_out"
+                    if self.p1_wins >= self.max_wins or self.p2_wins >= self.max_wins:
+                        self.state = "fight_end"
+                    else:
+                        self.state = "fade_out"
                     self.state_timer = current_time
             return None
         
@@ -266,10 +270,7 @@ class FightScreen():
             else:
                 self.fade_alpha = 0
                 self.current_round += 1
-                if self.p1_wins >= self.max_wins or self.p2_wins >= self.max_wins:
-                    self.state = "fight_end"
-                else:
-                    self.state = "countdown"
+                self.state = "countdown"
                 self.state_timer = current_time
             return None
        
@@ -281,7 +282,7 @@ class FightScreen():
                 self.winner = "WINNER:\nPLAYER 1"
             elif self.p2_wins > self.p1_wins:
                 self.winner = "WINNER:\nPLAYER 2"
-            return None
+            return "fight_end"
 
     
     def draw(self):
@@ -342,7 +343,35 @@ class FightScreen():
                 debug.handle_event(event)
 
             result = self.update()
-            if result:
+            if result == "fight_end":
+
+                if self.p1_wins > self.p2_wins:
+                    winner_data = con.p1_selected
+                    winner_flip = False   
+                elif self.p2_wins > self.p1_wins:
+                    winner_data = con.p2_selected
+                    winner_flip = True    
+                else:
+                    winner_data = None
+                    winner_flip = False
+
+                rematch_result = RematchScreen(self.screen, self.winner, winner_data, winner_flip).run()
+
+                if rematch_result == "Rematch":
+                    self.p1_wins = 0
+                    self.p2_wins = 0
+                    self.current_round = 1
+                    self.state = "countdown"
+                    self.loadfighters()
+                    self.state_timer = pygame.time.get_ticks()
+                elif rematch_result == "pause":
+                    pass
+                else:
+                    con.forest_sfx.stop()
+                    con.fight_music.stop()
+                    return rematch_result      # "Menu" or "quit"
+           
+            elif result:
                 return result
 
             self.draw()

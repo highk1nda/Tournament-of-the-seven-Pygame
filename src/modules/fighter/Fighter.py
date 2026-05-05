@@ -38,7 +38,7 @@ class Fighter():
 
         self.stun = False
         self.death = False
-        self.health = 100
+        self.health = con.HEALTH
         self.controls = controls
 
         self.dashing = False

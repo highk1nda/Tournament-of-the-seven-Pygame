@@ -84,21 +84,6 @@ def draw_round_ui(fight_screen):
     elif fight_screen.state in ["round_end", "time_over"]:
         text_surface = font.render(fight_screen.round_text, True, con.RED)
     
-    elif fight_screen.state == "fight_end":
-        if fight_screen.winner != "DRAW!":
-            # print miltiple lines of text
-            lines = fight_screen.winner.split("\n")
-            font_height = font.get_height()
-            for i, line in enumerate(lines):
-                text_surface = font.render(line, True, con.RED)    
-                text_rect = text_surface.get_rect()
-                text_rect.centerx = con.SCREEN_WIDTH // 2
-                text_rect.y = con.ROUND_TEXT_Y + i * font_height
-                fight_screen.screen.blit(text_surface, text_rect)
-        else:
-            draw_flag = True
-            text_surface = font.render(fight_screen.winner, True, con.RED)
-    
     valid_states = ["countdown", "round_end", "time_over"]
     if fight_screen.state in valid_states or draw_flag:
         text_rect = text_surface.get_rect()
