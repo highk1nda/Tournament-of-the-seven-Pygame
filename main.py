@@ -9,7 +9,7 @@ from src.modules.Screens.Options import Options as opt
 from src.modules.UI import constants as con
 from src.modules.Screens.Controlscreens.Edward import Edward as Edscr
 from src.modules.Screens.Controlscreens.Tyland import Tyland as Tyscr
-from src.modules.Screens.Controlscreens.Luna import Luna as Lunscr
+from src.modules.Screens.Controlscreens.Luna import Luna as Lunscrf
 from src.modules.Screens.Controlscreens.Rem import Rem as Remscr
 from src.modules.Screens.Controlscreens.Arland import Arland as Arlscr
 from src.modules.Screens.Controlscreens.Venator import Venator as Venscr

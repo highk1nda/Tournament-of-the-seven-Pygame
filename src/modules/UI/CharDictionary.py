@@ -55,6 +55,10 @@ KNIGHT_DATA = {
             "ATTACK1": 5,               # damage made by attacks
             "ATTACK2": 3,
             "ATTACK3": 10
+    },
+    "cpu": {
+            "attack_range":    None,    # None = use level default
+            "min_attack_dist": 0,       # melee: no minimum distance
     }
 }
 
@@ -108,6 +112,10 @@ WEREBEAR_DATA = {
             "ATTACK1": 5,
             "ATTACK2": 3,
             "ATTACK3": 10
+    },
+    "cpu": {
+            "attack_range":    None,    # None = use level default
+            "min_attack_dist": 0,       # melee: no minimum distance
     }
 }
 
@@ -192,6 +200,10 @@ WIZARD_DATA = {
             "scale": con.SCREEN_WIDTH / 190,
             "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 20)]
         }
+    },
+    "cpu": {
+            "attack_range":    con.SCREEN_WIDTH, # ranged: always in range, never close the gap
+            "min_attack_dist": 300,              # ranged: back off if enemy gets too close
     }
 }
 
@@ -238,6 +250,10 @@ MINOTAUR_DATA = {
             "ATTACK1": 3,
             "ATTACK2": 5,
             "ATTACK3": 8
+    },
+    "cpu": {
+            "attack_range":    None,    # None = use level default
+            "min_attack_dist": 0,       # melee: no minimum distance
     }
 }
 
@@ -308,6 +324,10 @@ ARCHER_DATA = {
             "scale": con.SCREEN_WIDTH / 300,
             "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 21.3)]
         }
+    },
+    "cpu": {
+            "attack_range":    con.SCREEN_WIDTH, # ranged: always in range, never close the gap
+            "min_attack_dist": 300,              # ranged: back off if enemy gets too close
     }
 }
 
@@ -361,6 +381,10 @@ KNIGHT_TEMPLAR_DATA = {
             "ATTACK1": 8,
             "ATTACK2": 8,
             "ATTACK3": 8
+    },
+    "cpu": {
+            "attack_range":    None,    # None = use level default
+            "min_attack_dist": 0,       # melee: no minimum distance
     }
 }
 

@@ -9,6 +9,7 @@ from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indi
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
 from src.modules.systems.cpu import CPUController
+from src.modules.systems.active_boons import load_boon_assets, ACTIVE_BOON_CLASS_MAP, BOON_ASSET_KEY
 from tests.debug_tools import DebugPopup
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
@@ -41,6 +42,9 @@ class FightScreen():
         self.cpu_level   = 1
         self.cpu = CPUController(level=self.cpu_level)
 
+        self.boon_assets = load_boon_assets()
+        self.boon_effects = []
+
         # screen fade between rounds
         self.fade_surface = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT))
         self.fade_surface.fill(con.BLACK)
@@ -49,9 +53,14 @@ class FightScreen():
     def loadfighters(self):
         p1_data = getattr(con, "p1_selected", chardict.KNIGHT_DATA) # default to knight if not set
         p2_data = getattr(con, "p2_selected", chardict.WEREBEAR_DATA) # default to werebear if not set
+        self.cpu = CPUController(level=self.cpu_level, char_data=p2_data)
         self.player1 = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, p1_data, con.P1_CONTROLS)
         self.player2 = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True, p2_data, con.P2_CONTROLS)
         self.background = con.fight_backgrounds[con.selected_map]
+        self.boon_effects = []
+        burn_frames = self.boon_assets.get("burn_effect_frames")
+        self.player1.burn_effect_frames = burn_frames
+        self.player2.burn_effect_frames = burn_frames
         
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -71,6 +80,27 @@ class FightScreen():
                 self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1)
             self.player1.update()
             self.player2.update()
+
+            # spawn boon effects when a fighter requests one
+            for fighter, target, boon_con in (
+                (self.player1, self.player2, con.p1_boon),
+                (self.player2, self.player1, con.p2_boon),
+            ):
+                if fighter.wants_boon:
+                    fighter.wants_boon = False
+                    if boon_con and boon_con.get("type") == "ACTIVE":
+                        boon_name = boon_con["name"]
+                        boon_cls  = ACTIVE_BOON_CLASS_MAP.get(boon_name)
+                        asset_key = BOON_ASSET_KEY.get(boon_name)
+                        if boon_cls and asset_key:
+                            frames = self.boon_assets.get(asset_key, [])
+                            self.boon_effects.append(boon_cls(fighter, target, frames))
+
+            # update active boon effects
+            for effect in self.boon_effects:
+                effect.update()
+            self.boon_effects = [e for e in self.boon_effects if not e.done]
+
             # check if any damage maded (for screen shake)
             for fighter in (self.player1, self.player2):
                 if fighter.screen_shake:
@@ -135,7 +165,7 @@ class FightScreen():
         if self.state == "death_animation":
             self.player1.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player2)
             if self.cpu_enabled:
-                cpu_input = self.cpu.decide(self.player2, self.player1)
+                cpu_input = self.cpu.decide(self.player2, self.player1) #read positions and decide -> input for cpu
                 self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1, cpu_input=cpu_input)
             else:
                 self.player2.move(con.SCREEN_WIDTH, con.SCREEN_HEIGHT, con.FLOOR_HEIGHT, self.player1)
@@ -202,6 +232,9 @@ class FightScreen():
             pj.draw(self.screen)
         for pj in self.player2.projectiles:
             pj.draw(self.screen)
+
+        for effect in self.boon_effects:
+            effect.draw(self.screen)
 
         draw_round_ui(self)
         draw_round_indicator(self.screen, self.p2_wins, False)

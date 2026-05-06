@@ -102,7 +102,7 @@ boon_back_color   = (120, 50, 50)
 boon_cell_width  = 150
 boon_cell_height = 55
 boon_grid_width  = 2 * boon_cell_width  + select_butt_gap
-boon_grid_height = 2 * boon_cell_height + select_butt_gap
+boon_grid_height = 3 * boon_cell_height + 2 * select_butt_gap
 
 boon_p1_grid_x = select_p1_cx - boon_grid_width // 2
 boon_p2_grid_x = select_p2_cx - boon_grid_width // 2
@@ -185,7 +185,8 @@ P1_CONTROLS = {
     "attack1": pygame.K_r,
     "attack2": pygame.K_f,
     "attack3": pygame.K_v,
-    "dash": pygame.K_LSHIFT
+    "dash": pygame.K_LSHIFT,
+    "boon": pygame.K_g,
 }
 
 P2_CONTROLS = {
@@ -195,7 +196,8 @@ P2_CONTROLS = {
     "attack1": pygame.K_SLASH,
     "attack2": pygame.K_PERIOD,
     "attack3": pygame.K_COMMA,
-    "dash": pygame.K_RSHIFT
+    "dash": pygame.K_RSHIFT,
+    "boon": pygame.K_SEMICOLON,
 }
 
 # =============== Assets ===============

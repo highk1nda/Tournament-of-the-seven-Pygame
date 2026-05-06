@@ -98,7 +98,7 @@ class Projectile:
 
 
     def make_damage(self):
-        self.target.health -= self.damage
+        self.target.apply_damage(self.damage)
         self.target.stun = True
         self.target.sounds["hit"].play()
         if not self.target.death:
