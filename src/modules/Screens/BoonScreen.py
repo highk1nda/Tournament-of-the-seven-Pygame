@@ -43,12 +43,14 @@ def remaining_center(rects, selected_idx):
 
 
 class BoonScreen:
-    def __init__(self, screen, clock):
+    def __init__(self, screen, clock, story=False):
         self.screen = screen
         self.clock  = clock
         self.font   = pygame.font.SysFont(None, 24)
         self.big    = pygame.font.SysFont(None, 40)
         self.small  = pygame.font.SysFont(None, 20)
+
+        self.story = story
 
         self.p1_idx = con.p1_char_idx
         self.p2_idx = con.p2_char_idx
@@ -64,20 +66,24 @@ class BoonScreen:
         self.heal_frames = load_magic_projectiles()["priest_heal"]  # loaded raw (100by100) then scaled at draw time
         # per player animation state ->  which frame, last frame time, wait flag, wait start time
         self.p1_heal = {"frame": 0, "time": 0, "waiting": False, "wait_start": 0}
-        self.p2_heal = {"frame": 0, "time": 0, "waiting": False, "wait_start": 0}
+        if self.story != True:
+            self.p2_heal = {"frame": 0, "time": 0, "waiting": False, "wait_start": 0}
 
         # viewing-> which boon info panel is open (None = grid view)
         # selected-> which boon the player confirmed (None = not yet)
         self.p1_viewing  = None
-        self.p2_viewing  = None
+        if self.story != True:
+            self.p2_viewing  = None
         self.p1_selected = None
-        self.p2_selected = None
+        if self.story != True:
+            self.p2_selected = None
 
         btn_y = con.select_butt_row1_y + con.boon_grid_height + 8
         self.p1_confirm = pygame.Rect(con.boon_p1_grid_x,                                        btn_y, con.boon_cell_width, 35)
         self.p1_back    = pygame.Rect(con.boon_p1_grid_x + con.boon_cell_width+con.select_butt_gap, btn_y, con.boon_cell_width, 35)
-        self.p2_confirm = pygame.Rect(con.boon_p2_grid_x,                                        btn_y, con.boon_cell_width, 35)
-        self.p2_back    = pygame.Rect(con.boon_p2_grid_x + con.boon_cell_width+con.select_butt_gap, btn_y, con.boon_cell_width, 35)
+        if self.story != True:
+            self.p2_confirm = pygame.Rect(con.boon_p2_grid_x,                                        btn_y, con.boon_cell_width, 35)
+            self.p2_back    = pygame.Rect(con.boon_p2_grid_x + con.boon_cell_width+con.select_butt_gap, btn_y, con.boon_cell_width, 35)
 
         self.continue_btn = Button(
             con.SCREEN_WIDTH // 2 - 100, btn_y + 43, 200, 40,
@@ -157,31 +163,39 @@ class BoonScreen:
         self.screen.fill(con.select_bg_color)
 
         self.draw_centered(self.big.render("PLAYER 1", True, con.select_p1_label_color), con.select_p1_cx, con.select_label_y)
-        self.draw_centered(self.big.render("PLAYER 2", True, con.select_p2_label_color), con.select_p2_cx, con.select_label_y)
+        if self.story != True:
+            self.draw_centered(self.big.render("PLAYER 2", True, con.select_p2_label_color), con.select_p2_cx, con.select_label_y)
 
         self.draw_preview(self.p1_idx, con.select_p1_cx)
-        self.draw_preview(self.p2_idx, con.select_p2_cx, flip=True)
+        if self.story != True:
+            self.draw_preview(self.p2_idx, con.select_p2_cx, flip=True)
 
         heal_y_offset = int(con.select_preview_size * 0.30)  # 30% of select_preview_size — tied to preview height, scales with it
         if self.p1_viewing == heal_boon_idx:
             draw_magic_effect(self.screen, self.heal_frames, self.p1_heal,
                               con.select_p1_cx, con.select_preview_y + con.select_preview_size // 2, y_offset=heal_y_offset)
-        if self.p2_viewing == heal_boon_idx:
-            draw_magic_effect(self.screen, self.heal_frames, self.p2_heal,
-                              con.select_p2_cx, con.select_preview_y + con.select_preview_size // 2, y_offset=heal_y_offset)
+        if self.story != True:
+            if self.p2_viewing == heal_boon_idx:
+                draw_magic_effect(self.screen, self.heal_frames, self.p2_heal,
+                                con.select_p2_cx, con.select_preview_y + con.select_preview_size // 2, y_offset=heal_y_offset)
 
         self.draw_player_boons(p1_boon_rects, con.boon_p1_grid_x, self.p1_viewing, self.p1_selected)
-        self.draw_player_boons(p2_boon_rects, con.boon_p2_grid_x, self.p2_viewing, self.p2_selected)
+        if self.story != True:
+            self.draw_player_boons(p2_boon_rects, con.boon_p2_grid_x, self.p2_viewing, self.p2_selected)
 
         # player confirm/back only visible when pressed
         if self.p1_viewing is not None:
             self.draw_button(self.p1_confirm, "Confirm", con.select_fight_butt_color)
             self.draw_button(self.p1_back,    "Back",    con.boon_back_color)
-        if self.p2_viewing is not None:
-            self.draw_button(self.p2_confirm, "Confirm", con.select_fight_butt_color)
-            self.draw_button(self.p2_back,    "Back",    con.boon_back_color)
+        if self.story != True:
+            if self.p2_viewing is not None:
+                self.draw_button(self.p2_confirm, "Confirm", con.select_fight_butt_color)
+                self.draw_button(self.p2_back,    "Back",    con.boon_back_color)
 
-        both_ready = self.p1_selected is not None and self.p2_selected is not None
+        if self.story != True:
+            both_ready = self.p1_selected is not None and self.p2_selected is not None
+        else:           
+            both_ready = self.p1_selected is not None
         self.continue_btn.button_color = con.select_fight_butt_color if both_ready else con.butt_disabled_color
         self.continue_btn.draw(self.screen)
         appBright(self.screen)
@@ -194,9 +208,10 @@ class BoonScreen:
                     result = confscr(self.screen, self.clock, "Boon").run()
                     return result
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
-                    if self.p1_viewing is not None or self.p2_viewing is not None:
-                        self.p1_viewing = None
-                        self.p2_viewing = None
+                    if self.p1_viewing is not None or (not self.story and self.p2_viewing is not None):
+                            self.p1_viewing = None
+                            if self.story != True:
+                                self.p2_viewing = None
                     else:
                         con.exit_sound.play()
                         return "Char"
@@ -218,29 +233,35 @@ class BoonScreen:
                         elif self.p1_back.collidepoint(mx, my):
                             con.exit_sound.play()
                             self.p1_viewing = None
-
-                    if self.p2_viewing is None:
-                        for i in range(4):
-                            if p2_boon_rects[i].collidepoint(mx, my):
+                    if self.story != True:
+                        if self.p2_viewing is None:
+                            for i in range(4):
+                                if p2_boon_rects[i].collidepoint(mx, my):
+                                    con.select_sound.play()
+                                    self.p2_viewing = i
+                                    if i == heal_boon_idx:
+                                        self.p2_heal = {"frame": 0, "time": pygame.time.get_ticks(), "waiting": False, "wait_start": 0}
+                        else:
+                            if self.p2_confirm.collidepoint(mx, my):
                                 con.select_sound.play()
-                                self.p2_viewing = i
-                                if i == heal_boon_idx:
-                                    self.p2_heal = {"frame": 0, "time": pygame.time.get_ticks(), "waiting": False, "wait_start": 0}
-                    else:
-                        if self.p2_confirm.collidepoint(mx, my):
-                            con.select_sound.play()
-                            self.p2_selected = self.p2_viewing
-                            self.p2_viewing  = None
-                        elif self.p2_back.collidepoint(mx, my):
-                            con.exit_sound.play()
-                            self.p2_viewing = None
-
-                    both_ready = self.p1_selected is not None and self.p2_selected is not None
+                                self.p2_selected = self.p2_viewing
+                                self.p2_viewing  = None
+                            elif self.p2_back.collidepoint(mx, my):
+                                con.exit_sound.play()
+                                self.p2_viewing = None
+                    if self.story != True:
+                        both_ready = self.p1_selected is not None and self.p2_selected is not None
+                    else: 
+                        both_ready = self.p1_selected is not None
                     if both_ready and self.continue_btn.is_clicked((mx, my), True):
                         con.select_sound.play()
                         con.p1_boon = boons[self.p1_selected]
-                        con.p2_boon = boons[self.p2_selected]
-                        return "Map"
+                        if self.story != True:
+                            con.p2_boon = boons[self.p2_selected]
+                        if self.story != True:
+                            return "Map"
+                        else: 
+                            return "Textcrawl"
 
             self.draw()
             res.render_to_surface()

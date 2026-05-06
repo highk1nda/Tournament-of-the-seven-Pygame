@@ -29,14 +29,14 @@ def load_fighter_sounds():
         "cheering": pygame.mixer.Sound("assets/sfx/cheering.mp3") #TODO: use it randomly every 10to20 seconds
     }
 
-    sounds["walk"].set_volume(con.volume)
-    sounds["attack1"].set_volume(con.volume)
-    sounds["attack2"].set_volume(con.volume)
-    sounds["attack3"].set_volume(con.volume)
-    sounds["jump"].set_volume(con.volume)
-    sounds["dash"].set_volume(con.volume) 
-    sounds["death"].set_volume(con.volume)
-    sounds["hit"].set_volume(con.volume)   
+    sounds["walk"].set_volume(con.sfxVolume)
+    sounds["attack1"].set_volume(con.sfxVolume)
+    sounds["attack2"].set_volume(con.sfxVolume)
+    sounds["attack3"].set_volume(con.sfxVolume)
+    sounds["jump"].set_volume(con.sfxVolume)
+    sounds["dash"].set_volume(con.sfxVolume) 
+    sounds["death"].set_volume(con.sfxVolume)
+    sounds["hit"].set_volume(con.sfxVolume)   
     return sounds
 """
                                              ,--,  ,.-.

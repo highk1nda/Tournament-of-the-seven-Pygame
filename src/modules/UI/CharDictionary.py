@@ -381,6 +381,6 @@ ACTIONS = {
 
 WIND_DATA = {
     "size": 512,
-    "scale": 0.5,
+    "scale": 0.8,
     "animation": {"WIND": {"file_ground": "assets/wind.png", "frame_number": 16, "cooldown": 5}}
 }
