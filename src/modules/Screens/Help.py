@@ -29,7 +29,7 @@ class Help():
         self.txt = ["Player 1: Movement: A/D left and right respectively | Jump: W | LShift: Dash  | Attacks: R, F, V | Active boon: e",
                     "",
                     "",
-                    "Player 2: Movement: <- /-> left and right respectively | Jump: ↑ | RShift: Dash  | Attacks: slash (/), period (.), comma (,) | Active boon: Apostrophe (')",
+                    "Player 2: Movement: <- /-> left and right respectively | Jump: ↑ | RShift: Dash  | Attacks: slash (/), period (.), comma (,) | Active boon:  (;)",
                     "",
                     "",
                     "Dash: Press Shift + direction(left or right) to dash in the respective direction. Player has 2 dash charges in every Shift press window(visualized under the health bar).",

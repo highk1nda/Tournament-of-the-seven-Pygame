@@ -160,7 +160,7 @@ ROUND_DOT_Y = DASHING_BAR_Y + DASHING_BAR_HEIGHT + ROUND_DOT_RADIUS + int(SCREEN
 ROUND_DOT_BORDER_THICKNESS = 1
 ROUND_FONT = pygame.font.SysFont(None, int(SCREEN_HEIGHT * 0.1))
 
-ROUND_DURATION = 91 * 1000  # 68 seconds
+ROUND_DURATION = 91 * 1000  # 90 seconds
 MAX_WINS = 2
 ROUND_TEXT_DURATION = 1700  # ms
 ROUND_TEXT_Y = int(SCREEN_HEIGHT * 0.15)
@@ -212,7 +212,7 @@ P1_CONTROLS = {
     "attack2": pygame.K_f,
     "attack3": pygame.K_v,
     "dash": pygame.K_LSHIFT,
-    "boon": pygame.K_g,
+    "boon": pygame.K_e,
 }
 
 P2_CONTROLS = {

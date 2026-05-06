@@ -116,10 +116,36 @@ python main.py
 ---
 
 ## Asset Credits
+	Characters
+	Zerie
+	https://zerie.itch.io/tiny-rpg-character-asset-pack
 
-Character sprites: [Tiny RPG Character Asset Pack](https://www.example.com)
-Minotaur sprite: [Introducing One Dollar Monsters #1: The Minotaur!](https://akari21.itch.io/minotaur)
-Wind animation: [Wind - Pixel Art](https://nyknck.itch.io/wind)
+	Minotaur
+	Akari21
+	https://akari21.itch.io/minotaur
+
+	The two fighting screen maps
+	Martin Mladenov Mladenov
+	Tamuna Lebanidze
+
+	Wind animation
+	nyk_nck
+	https://nyknck.itch.io/wind
+
+	Dice asset
+	Srspooky
+	https://srspooky.itch.io/pixel-spritesheet-dice20d
+	(dice animated via AI)
+
+	Menu Music
+	Music: Planning by Alexander Nakarada (https://www.creatorchords.com)
+	Licensed under Creative Commons BY Attribution 4.0 License
+	https://creativecommons.org/licenses/by/4.0/
+
+	Fight Music
+	Music: Boss Fight by Alexander Nakarada (https://www.creatorchords.com)
+	Licensed under Creative Commons BY Attribution 4.0 License
+	https://creativecommons.org/licenses/by/4.0/
 
 ---
 

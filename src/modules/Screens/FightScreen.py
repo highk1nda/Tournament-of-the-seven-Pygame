@@ -353,7 +353,6 @@ class FightScreen():
         self.loadfighters()
 
         con.background_music.stop()
-        con.forest_sfx.play(-1)
         con.fight_music.play(-1)
 
         debug = DebugPopup(self)

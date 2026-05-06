@@ -1,7 +1,7 @@
 {
   "storyEdwardComplete": false,
-  "storyTylandComplete": true,
-  "storyLunaComplete": true,
+  "storyTylandComplete": false,
+  "storyLunaComplete": false,
   "storyRemComplete": false,
   "storyArlandComplete": false
 }
