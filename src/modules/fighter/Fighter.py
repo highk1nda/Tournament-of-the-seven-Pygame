@@ -5,6 +5,7 @@ from src.modules.sfx.sound_loader import load_fighter_sounds
 from src.modules.UI import constants as con
 from src.modules.UI import CharDictionary as chardict
 from src.modules.fighter.Projectile import Projectile
+from src.modules.systems.active_boons import BOON_COOLDOWN
 
 class Fighter():
     def __init__(self, x, y, player_width, player_height, flip, char_data, controls):
@@ -61,6 +62,21 @@ class Fighter():
 
         self.screen_shake = False
 
+        # debuffs
+        self.frozen = False
+        self.burning = False
+        self.freeze_debuff = None
+        self.burn_debuff = None
+
+        # burn visual (Group 4-3 frames assigned by FightScreen after asset load)
+        self.burn_effect_frames = None
+        self.burn_anim_state = {"frame": 0, "time": 0}
+
+        # boon activation
+        self.wants_boon = False
+        self.boon_cooldown_end = 0
+        self.boon_was_pressed = False
+
         self.sounds = load_fighter_sounds()
         self.walk_sound = self.sounds["walk"]
         self.sword_attack1_sound = self.sounds["attack1"]
@@ -71,6 +87,12 @@ class Fighter():
 
         self.walk_sound_playing = False
         self.attack_sound_played = False
+
+    def apply_damage(self, damage):
+        if self.freeze_debuff and self.freeze_debuff.active:
+            damage = int(damage * self.freeze_debuff.damage_multiplier)
+            self.freeze_debuff.notify_damage()
+        self.health = max(0, self.health - damage)
 
     def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET, cpu_input=None):
         SPEED = con.PLAYER_SPEED
@@ -90,8 +112,8 @@ class Fighter():
         else:
             key = pygame.key.get_pressed()
 
-        # reset speed if stun or dead
-        if self.stun or self.death:
+        # reset speed if stun, dead, or frozen
+        if self.stun or self.death or self.frozen:
             self.vel_x = 0
             self.dashing = False
 
@@ -105,7 +127,7 @@ class Fighter():
                 self.dashing_count = 0
 
         # read input
-        if self.death == False:
+        if self.death == False and not self.frozen:
 
             shift_pressed = key[self.controls["dash"]]
 
@@ -184,6 +206,16 @@ class Fighter():
             
             if self.attacking:
                 self.attack(TARGET)
+
+            # boon activation
+            boon_pressed = key[self.controls["boon"]]
+            if boon_pressed and not self.boon_was_pressed:
+                now = pygame.time.get_ticks()
+                if now >= self.boon_cooldown_end:
+                    self.wants_boon = True
+                    self.boon_cooldown_end = now + BOON_COOLDOWN
+            self.boon_was_pressed = bool(boon_pressed)
+
         # SFX
         # walking sound
         if self.running:
@@ -297,7 +329,7 @@ class Fighter():
                                         self.rect.height)
             # collision detect
             if attacking_rect.colliderect(TARGET.rect) and not TARGET.dashing:
-                TARGET.health -= self.char_data["attack_damage"].get(attack_key)
+                TARGET.apply_damage(self.char_data["attack_damage"].get(attack_key))
                 TARGET.stun = True
                 TARGET.sounds["hit"].play()
                 if not TARGET.death:
@@ -314,6 +346,14 @@ class Fighter():
     def update(self):
         update_fighter_animation(self)  # Update fighter animation & attack states
 
+        # tick debuffs
+        if self.freeze_debuff:
+            if not self.freeze_debuff.update():
+                self.freeze_debuff = None
+        if self.burn_debuff:
+            if not self.burn_debuff.update():
+                self.burn_debuff = None
+
         # update projectiles
         for pj in self.projectiles:
             pj_status = pj.fly_attack_update()
@@ -328,6 +368,20 @@ class Fighter():
         #pygame.draw.rect(surface, con.ORANGE, self.rect)
         surface.blit(img,
                      (self.rect.x - self.offset[0] * self.image_scale, self.rect.y - self.offset[1] * self.image_scale))
+
+        if self.burning and self.burn_effect_frames:
+            now = pygame.time.get_ticks()
+            if now - self.burn_anim_state["time"] > 80:
+                self.burn_anim_state["frame"] = (self.burn_anim_state["frame"] + 1) % len(self.burn_effect_frames)
+                self.burn_anim_state["time"] = now
+            raw = self.burn_effect_frames[self.burn_anim_state["frame"]]
+            flame_w = raw.get_width() * 8
+            flame_h = raw.get_height() * 8
+            flame = pygame.transform.scale(raw, (flame_w, flame_h))
+            # two flames at 1/3 and 2/3 of fighter width, anchored to feet
+            for x_frac in (self.rect.width // 4, self.rect.width * 3 // 4):
+                surface.blit(flame, (self.rect.left + x_frac - flame_w // 2,
+                                     self.rect.bottom - flame_h))
 
     def clean_up(self):
         self.walk_sound.stop()

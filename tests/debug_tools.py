@@ -50,6 +50,7 @@ class DebugPopup:
         self.sounds_swapped = False
 
     def reload(self, fighter, char_data):
+        fighter.char_data = char_data
         fighter.animation_list = load_animation_frames(char_data["animations"], char_data["size"], char_data["scale"])
         fighter.action = "IDLE"
         fighter.frame_index = 0
@@ -87,13 +88,15 @@ class DebugPopup:
                         self.reload(self.fs.player1, CHAR_DATA[i])
                     if self.p2[i].collidepoint(event.pos):
                         self.reload(self.fs.player2, CHAR_DATA[i])
+                        if self.fs.cpu_enabled:
+                            self.fs.cpu = CPUController(level=self.fs.cpu_level, char_data=CHAR_DATA[i])
             for lvl, btn in ((1, self.cpu1_btn), (2, self.cpu2_btn), (3, self.cpu3_btn)):
                 if btn.collidepoint(event.pos):
                     if self.fs.cpu_enabled and self.fs.cpu_level == lvl:
                         self.fs.cpu_enabled = False
                     else:
                         self.fs.cpu_level = lvl
-                        self.fs.cpu = CPUController(level=lvl)
+                        self.fs.cpu = CPUController(level=lvl, char_data=self.fs.player2.char_data)
                         self.fs.cpu_enabled = True
 
     def draw(self, screen):
