@@ -12,7 +12,8 @@ from src.modules.systems.cpu import CPUController
 from src.modules.systems.active_boons import load_boon_assets, ACTIVE_BOON_CLASS_MAP, BOON_ASSET_KEY
 from tests.debug_tools import DebugPopup
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
-
+from src.modules.boons.DevilsDie import Dice
+from src.modules.Screens.RematchScreen import RematchScreen
 # the fight screen class
 class FightScreen():
     def __init__(self, screen, clock):
@@ -33,9 +34,11 @@ class FightScreen():
         self.round_text = ""    # Fighter 1 wins! / Fighter 2 wins! / Draw! / Time over
         self.round_second_text = ""
         self.round_death = None
-        self.state = "countdown"    # countdown / fight / death animation / round end / fade out / fade in / fight end
-        self.state_timer = 0
+        self.state = "countdown"    # countdown / fight / death animation / (dice roll / revive animation) /
+                                    # time over / round end / fade out / fade in / fight end
         self.winner = "\n"
+
+        self.state_timer = 0
         self.round_start_time = 0
 
         self.cpu_enabled = False
@@ -50,24 +53,49 @@ class FightScreen():
         self.fade_surface.fill(con.BLACK)
         self.fade_alpha = 0  # 0 - 255, transparency of the surface
 
+        self.dice = None
+        self.dice_player = None
+
+        self.revive_update_time = 0
+        self.revive_frame_index = 0
+
     def loadfighters(self):
         p1_data = getattr(con, "p1_selected", chardict.KNIGHT_DATA) # default to knight if not set
         p2_data = getattr(con, "p2_selected", chardict.WEREBEAR_DATA) # default to werebear if not set
+
+        p1_passive_boon = getattr(con, "p1_passive_boon", None)
+        p2_passive_boon = getattr(con, "p2_passive_boon", None)
+        self.player1 = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, 
+                               con.PLAYER_HEIGHT, False, p1_data, con.P1_CONTROLS, "last_stand")
+        self.player2 = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, 
+                               con.PLAYER_HEIGHT, True, p2_data, con.P2_CONTROLS, "devils_die")
+
         self.cpu = CPUController(level=self.cpu_level, char_data=p2_data)
-        self.player1 = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, False, p1_data, con.P1_CONTROLS)
-        self.player2 = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, con.PLAYER_HEIGHT, True, p2_data, con.P2_CONTROLS)
+
         self.background = con.fight_backgrounds[con.selected_map]
         self.boon_effects = []
         burn_frames = self.boon_assets.get("burn_effect_frames")
         self.player1.burn_effect_frames = burn_frames
         self.player2.burn_effect_frames = burn_frames
         
+    def revive_fighter(self, fighter):
+        fighter.death = False
+        fighter.health = 100
+        fighter.stun = False
+        fighter.attacking = False
+        fighter.attack_type  = 0
+        fighter.frame_index  = 0
+        fighter.action       = "IDLE"
+        fighter.vel_x        = 0
+        fighter.vel_y        = 0
+
     def update(self):
         current_time = pygame.time.get_ticks()
 
         if self.state == "countdown":
             if current_time - self.state_timer >= con.ROUND_TEXT_DURATION:
                 self.state = "fight"
+                self.round_death = None
                 self.round_start_time = current_time
             return None
         
@@ -176,13 +204,83 @@ class FightScreen():
                 self.player1.clean_up()
                 self.player2.clean_up()
 
-                self.state = "round_end"
+                if self.round_death != "both" and self.round_death.passive_boon == "devils_die":
+                    self.state = "dice_roll"
+                    self.dice_player = self.round_death
+                    self.dice = Dice(self.screen)
+                else:
+                    self.state = "round_end"
                 self.state_timer = current_time
             return None
             
+        if self.state == "dice_roll":
+            dice_state = self.dice.update()
+
+            if dice_state == "done":
+                result = self.dice.result
+
+                if result > 10:
+                    # survived
+                    if self.dice_player is self.player1:
+                        self.p2_wins -= 1
+                    else:
+                        self.p1_wins -= 1
+
+                    # prepare to load revive animation
+                    death_frames = self.dice_player.animation_list["DEATH"]["ground"]
+                    self.revive_frame_index = len(death_frames) - 1
+                    self.revive_update_time = current_time
+
+                    self.dice = None
+                    self.state = "revive_animation"
+
+
+                elif result == 10:
+                    # re-roll
+                    self.dice = Dice(self.screen)
+
+                else: 
+                    # cursed
+                    if self.dice_player is self.player1:
+                        self.p2_wins += 1
+                    else:
+                        self.p1_wins += 1
+                    
+                    self.dice = None
+                    self.dice_player = None
+                    self.state = "round_end"
+                    self.state_timer = current_time
+
+            return None
+        
+        if self.state == "revive_animation":
+            death_frames = self.dice_player.animation_list["DEATH"]["ground"]
+            animation_cooldown = self.dice_player.char_data["animations"]["DEATH"]["cooldown"]
+
+            # reverse death animation frames
+            if current_time - self.revive_update_time >= animation_cooldown:
+                self.revive_frame_index -= 1
+                self.revive_update_time = current_time
+
+            index = max(0, self.revive_frame_index)
+            self.dice_player.image = death_frames[index]
+
+            # animation finished
+            if self.revive_frame_index < 0:
+                self.revive_fighter(self.dice_player)
+                self.dice_player = None
+                self.current_round += 1
+                self.state = "countdown"
+                self.state_timer = current_time
+            
+            return None
+
         if self.state == "round_end":
             if current_time - self.state_timer > con.ROUND_TEXT_DURATION:
-                    self.state = "fade_out"
+                    if self.p1_wins >= self.max_wins or self.p2_wins >= self.max_wins:
+                        self.state = "fight_end"
+                    else:
+                        self.state = "fade_out"
                     self.state_timer = current_time
             return None
         
@@ -204,10 +302,7 @@ class FightScreen():
             else:
                 self.fade_alpha = 0
                 self.current_round += 1
-                if self.p1_wins == self.max_wins or self.p2_wins == self.max_wins:
-                    self.state = "fight_end"
-                else:
-                    self.state = "countdown"
+                self.state = "countdown"
                 self.state_timer = current_time
             return None
        
@@ -219,7 +314,7 @@ class FightScreen():
                 self.winner = "WINNER:\nPLAYER 1"
             elif self.p2_wins > self.p1_wins:
                 self.winner = "WINNER:\nPLAYER 2"
-            return None
+            return "fight_end"
 
     
     def draw(self):
@@ -248,6 +343,9 @@ class FightScreen():
         if self.fade_alpha > 0:
             self.fade_surface.set_alpha(self.fade_alpha)
             self.screen.blit(self.fade_surface, (0, 0))
+        
+        if self.state == "dice_roll" and self.dice:
+            self.dice.draw()
         
         appBright(self.screen)
         
@@ -280,7 +378,35 @@ class FightScreen():
                 debug.handle_event(event)
 
             result = self.update()
-            if result:
+            if result == "fight_end":
+
+                if self.p1_wins > self.p2_wins:
+                    winner_data = con.p1_selected
+                    winner_flip = False   
+                elif self.p2_wins > self.p1_wins:
+                    winner_data = con.p2_selected
+                    winner_flip = True    
+                else:
+                    winner_data = None
+                    winner_flip = False
+
+                rematch_result = RematchScreen(self.screen, self.winner, winner_data, winner_flip).run()
+
+                if rematch_result == "Rematch":
+                    self.p1_wins = 0
+                    self.p2_wins = 0
+                    self.current_round = 1
+                    self.state = "countdown"
+                    self.loadfighters()
+                    self.state_timer = pygame.time.get_ticks()
+                elif rematch_result == "pause":
+                    pass
+                else:
+                    con.forest_sfx.stop()
+                    con.fight_music.stop()
+                    return rematch_result      # "Menu" or "quit"
+           
+            elif result:
                 return result
 
             self.draw()

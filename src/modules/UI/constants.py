@@ -50,6 +50,7 @@ ORANGE = (222, 110, 0)
 LIGHT_GREEN = (0, 255, 0)
 BLUE = (80, 180, 255)
 DARK_GREEN = (1,50,32)
+GRAY_BLUE = (28,28,34)
 
 FLOOR_COLOR = (106, 80, 80)
 
@@ -122,6 +123,8 @@ map_fight_butt_height = 45
 
 # =============== Health Bar ===============
 
+HEALTH = 100
+
 healthbar_width = int(SCREEN_WIDTH * 0.4)
 healthbar_height = int(SCREEN_WIDTH * 0.037)
 healthbar_padding = max(1, int(SCREEN_WIDTH * 0.001))
@@ -157,13 +160,36 @@ ROUND_DOT_Y = DASHING_BAR_Y + DASHING_BAR_HEIGHT + ROUND_DOT_RADIUS + int(SCREEN
 ROUND_DOT_BORDER_THICKNESS = 1
 ROUND_FONT = pygame.font.SysFont(None, int(SCREEN_HEIGHT * 0.1))
 
-ROUND_DURATION = 68 * 1000  # 68 seconds
+ROUND_DURATION = 91 * 1000  # 68 seconds
 MAX_WINS = 2
 ROUND_TEXT_DURATION = 1700  # ms
 ROUND_TEXT_Y = int(SCREEN_HEIGHT * 0.15)
 DEATH_DURATION = 1500  # ms
 FADE_OUT_DURATION = 500  # ms
 MAX_ALPHA = 255  # full black
+
+# =============== Rematch Screen ===============
+
+WINDOW_WIDTH = int(SCREEN_WIDTH * 0.36)
+WINDOW_HEIGHT = int(SCREEN_HEIGHT * 0.52)
+WINDOW_X = (SCREEN_WIDTH - WINDOW_WIDTH) // 2
+WINDOW_Y = (SCREEN_HEIGHT - WINDOW_HEIGHT) // 2
+WINDOW_BORDER_WIDTH = 3
+WINDOW_BORDER_RADIUS = 12
+
+WINDOW_BUTTON_WIDTH = int(WINDOW_WIDTH * 0.30)
+WINDOW_BUTTON_HEIGHT = int(SCREEN_HEIGHT   * 0.055)
+WINDOW_BUTTON_GAP   = int(WINDOW_WIDTH * 0.08)
+WINDOW_BUTTON_Y = WINDOW_Y + WINDOW_HEIGHT - WINDOW_BUTTON_HEIGHT - int(SCREEN_HEIGHT * 0.02)
+
+WINDOW_YES_X = WINDOW_X + WINDOW_WIDTH // 2 - WINDOW_BUTTON_WIDTH - WINDOW_BUTTON_GAP // 2
+WINDOW_NO_X  = WINDOW_X + WINDOW_WIDTH // 2 + WINDOW_BUTTON_GAP // 2
+
+TITLE_GAP = int(SCREEN_HEIGHT * 0.025)
+TITLE_PREVIEW_GAP = int(SCREEN_HEIGHT * 0.015)
+TITLE_REMATCH_GAP = int(SCREEN_HEIGHT * 0.15)   # if draw
+
+PREVIEW_REMATCH_GAP = int(SCREEN_HEIGHT * 0.018)
 
 # =============== Physical Variables ===============
 
@@ -243,8 +269,10 @@ p1_char_idx = 0
 p2_char_idx = 1
 
 # Store selected boons (in Boon Screen)
-p1_boon = None
-p2_boon = None
+p1_active_boon = None
+p2_active_boon = None
+p1_passive_boon = None
+p2_passive_boon = None
 
 # Store selected map (dynamicly changable btw, its set in MapScreen)
 selected_map = "map1"

@@ -408,3 +408,17 @@ WIND_DATA = {
     "scale": 0.8,
     "animation": {"WIND": {"file_ground": "assets/wind.png", "frame_number": 16, "cooldown": 5}}
 }
+
+DICE_ROLLING_DATA = {
+    "size": 96,
+    "scale": con.SCREEN_WIDTH / 480,
+    "rolling_duration": 2500,
+    "animation": {"ROLLING": {"file_ground": "assets/dice_rolling.png", "frame_number": 11, "cooldown": 5}}
+}
+
+DICE_RESULT_DATA = {
+    "size": 96,
+    "scale": con.SCREEN_WIDTH / 290,
+    "showing_duration": 2000,
+    "animation": {"RESULT": {"file_ground": "assets/dice_results.png", "frame_number": 20}}
+}
