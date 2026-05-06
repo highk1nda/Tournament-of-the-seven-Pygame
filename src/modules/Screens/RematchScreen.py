@@ -9,8 +9,6 @@ from src.modules.Screens.SelectCharScreen import CharPreview
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
 class RematchScreen:
-
-
     def __init__(self, screen, winner_text, winner_data, winner_flip=False):
         self.screen      = screen
         self.winner_text = winner_text
