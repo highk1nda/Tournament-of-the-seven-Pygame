@@ -20,7 +20,8 @@ display_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
-volume = 1
+sfxVolume = 1.0
+musicVolume = 1.0
 brightness = 100
 
 SCREEN_SHAKE_DURATION = 300 # ms
@@ -37,8 +38,6 @@ PLAYER_WIDTH = int(SCREEN_WIDTH / 7.14)
 PLAYER_HEIGHT = int(SCREEN_HEIGHT / 4.28)
 
 # =============== Colors ===============
-BLACK = (0, 0, 0)
-RED = (255, 0 , 0)
 DARK_RED = (140, 40, 40)
 DARK_BLUE = (40, 40, 140)
 WHITE = (255, 255, 255)
@@ -47,7 +46,6 @@ GREEN = (26, 66, 28)
 YELLOW = (212, 175, 55)
 BLACK = (0, 0, 0)
 GREY = (100, 100, 100)
-CYAN = (0, 255, 0)
 ORANGE = (222, 110, 0)
 LIGHT_GREEN = (0, 255, 0)
 BLUE = (80, 180, 255)
@@ -105,7 +103,7 @@ boon_back_color   = (120, 50, 50)
 boon_cell_width  = 150
 boon_cell_height = 55
 boon_grid_width  = 2 * boon_cell_width  + select_butt_gap
-boon_grid_height = 2 * boon_cell_height + select_butt_gap
+boon_grid_height = 3 * boon_cell_height + 2 * select_butt_gap
 
 boon_p1_grid_x = select_p1_cx - boon_grid_width // 2
 boon_p2_grid_x = select_p2_cx - boon_grid_width // 2
@@ -145,7 +143,7 @@ DASHING_BAR_Y = int(healthbar_y * 3)
 CHARGES_DISTANCE_IN_HALF = int(SCREEN_WIDTH * 0.0042)
 DASHING_BAR_COLOR = LIGHT_GREEN
 
-DASHING_SPEED = 80
+DASHING_SPEED = 130
 DASHING_BRAKE = 0.5
 DASHING_COOLDOWN = 2000   # ms -- 1000ms = 1s
 DASHING_CHARGE = 2     # Dashing charge system:
@@ -213,7 +211,8 @@ P1_CONTROLS = {
     "attack1": pygame.K_r,
     "attack2": pygame.K_f,
     "attack3": pygame.K_v,
-    "dash": pygame.K_LSHIFT
+    "dash": pygame.K_LSHIFT,
+    "boon": pygame.K_g,
 }
 
 P2_CONTROLS = {
@@ -223,7 +222,8 @@ P2_CONTROLS = {
     "attack1": pygame.K_SLASH,
     "attack2": pygame.K_PERIOD,
     "attack3": pygame.K_COMMA,
-    "dash": pygame.K_RSHIFT
+    "dash": pygame.K_RSHIFT,
+    "boon": pygame.K_SEMICOLON,
 }
 
 # =============== Assets ===============
@@ -237,15 +237,7 @@ ACTIONS = {
     "DEATH": -1
 }
 
-PLAYER_1_X = int(SCREEN_WIDTH * 0.15)
-PLAYER_2_X = int(SCREEN_WIDTH * 0.7)
-
 # Music
-
-# assetdir = Path(__file__).resolve().parent.parent
-# assetdir = assetdir/"assets"
-# menumusic: str = f"{assetdir}/sfx/menmusica.mp3"
-# fightmusic: str = f"{assetdir}/sfx/fightmusica.mp3"
 menumusic: str = "assets/sfx/menmusica.mp3"
 fightmusic: str = "assets/sfx/fightmusica.mp3"
 forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
@@ -293,10 +285,27 @@ font_Medium = pygame.font.SysFont(None, 32)
 font_Small = pygame.font.SysFont(None, 29)
 font_Tiny = pygame.font.SysFont(None, 16)
 
-# buttons
-buttonwidth = SCREEN_WIDTH / 5
-buttonheight = SCREEN_HEIGHT / 15
-buttonspacing = SCREEN_HEIGHT / 10
+#trackers for story completion
+storyEdwardComplete = False
+storyTylandComplete = False
+storyLunaComplete = False
+storyRemComplete = False
+storyArlandComplete = False
 
-button_y = (center_y) - (buttonspacing * 2)
-button_x = (center_x) - (buttonwidth / 2)
+#story paths 
+edwardIntroPath = "assets/stories/EdwardIntro.txt"
+edwardEndingPath = "assets/stories/EdwardEnd.txt"
+
+tylandIntroPath = "assets/stories/TylandIntro.txt"
+tylandEndingPath = "assets/stories/TylandEnd.txt"
+
+lunaIntroPath = "assets/stories/LunaIntro.txt"
+lunaEndingPath = "assets/stories/LunaEnd.txt"
+
+remIntroPath = "assets/stories/RemIntro.txt"
+remEndingPath = "assets/stories/RemEnd.txt"
+
+arlandIntroPath = "assets/stories/ArlandIntro.txt"
+arlandEndingPath = "assets/stories/ArlandEnd.txt"
+
+venatorIntroPath = "assets/stories/VenatorIntro.txt"

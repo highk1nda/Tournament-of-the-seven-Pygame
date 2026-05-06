@@ -10,6 +10,7 @@ from src.modules.systems.scalemouse import scale_mouse
 #The help screen
 class Help():
     def __init__(self, screen, clock):
+        
         self.screen = screen
         self.clock = clock
         self.Button_Edward          = Button(100, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Edward', con.font_Large, con.DARK_RED)
@@ -17,7 +18,10 @@ class Help():
         self.Button_Luna            = Button(700, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Luna', con.font_Large, con.DARK_RED)
         self.Button_Rem             = Button(1000, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Rem', con.font_Large, con.DARK_RED)
         self.Button_Arland          = Button(1300, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Arland', con.font_Large, con.DARK_RED)
-        self.Button_Venator         = Button(1600, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Venator', con.font_Large, con.DARK_RED)
+        if con.storyEdwardComplete or con.storyTylandComplete or con.storyLunaComplete or con.storyRemComplete or con.storyArlandComplete:
+            self.Button_Venator     = Button(1600, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Venator', con.font_Large, con.DARK_RED)
+        else:
+            self.Button_Venator     = Button(1600, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, '???', con.font_Large, con.BLACK, Help=True)
         self.buttons                = [self.Button_Edward, self.Button_Tyland, self.Button_Luna, self.Button_Rem, self.Button_Arland, self.Button_Venator]
         self.click = False
 
@@ -31,15 +35,13 @@ class Help():
                     "Dash: Press Shift + direction(left or right) to dash in the respective direction. Player has 2 dash charges in every Shift press window(visualized under the health bar).",
                     "",
                     "",
-                    "Dash Cooldown is triggered when: 1) 2 dash charges are both used, 2) Shift is released after 1 dash."
+                    "Dash Cooldown is triggered when: 1) 2 dash charges are both used, 2) Shift is released after 1 dash.",
                     "",
                     "",
-                    "Hint: Dashing results in a brief moment of invincibility, use it to dodge attacks and reposition."
-                    "",
+                    "Hint: Dashing results in a brief moment of invincibility, use it to dodge attacks and reposition.",
                     "",
                     "",
                     "Character specific attacks and mechanics:",
-                    "",
                     "",
                     "",
                     "",
@@ -56,11 +58,9 @@ class Help():
         self.overlay.fill((5, 5, 5, 220))
     
     def handle_event(self, event):
-        #seperate method for handling events in menu, as it will contain a lot
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                result = confscr(self.screen, self.clock, "Menu").run()
-                return result
+        if event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                con.exit_sound.play()
+                return "Menu"
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 self.click = True
@@ -94,10 +94,14 @@ class Help():
             con.select_sound.play()
             return 'Arland'
         if self.Button_Venator.is_clicked((mx, my), self.click):
-            self.click = False
-            con.select_sound.play()
-            return "Venator"
-        
+            if con.storyEdwardComplete or con.storyTylandComplete or con.storyLunaComplete or con.storyRemComplete or con.storyArlandComplete:
+                self.click = False
+                con.select_sound.play()
+                return "Venator"
+            else:
+                self.click = False
+                con.ui_error_sound.play()
+                
         return None
 
     def draw(self):
@@ -126,10 +130,9 @@ class Help():
                 if event.type == pygame.QUIT:
                     result = confscr(self.screen, self.clock, "Help").run()
                     return result
-                if event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
-                    con.exit_sound.play()
-                    return "Menu"
-                self.handle_event(event)
+                result = self.handle_event(event)
+                if result:
+                    return result
             action = self.update()
             if action:
                 return action

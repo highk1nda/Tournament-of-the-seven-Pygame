@@ -9,10 +9,12 @@ from src.modules.Screens.Options import Options as opt
 from src.modules.UI import constants as con
 from src.modules.Screens.Controlscreens.Edward import Edward as Edscr
 from src.modules.Screens.Controlscreens.Tyland import Tyland as Tyscr
-from src.modules.Screens.Controlscreens.Luna import Luna as Lunscr
+from src.modules.Screens.Controlscreens.Luna import Luna as Lunscrf
 from src.modules.Screens.Controlscreens.Rem import Rem as Remscr
 from src.modules.Screens.Controlscreens.Arland import Arland as Arlscr
 from src.modules.Screens.Controlscreens.Venator import Venator as Venscr
+from src.modules.Screens.Textcrawl import Textcrawl as txtscr
+from src.modules.systems.save import saveGame, loadSave
 
 
 pygame.init()
@@ -25,8 +27,8 @@ def run_menu():
     menu = mainmenu(con.display_surface, con.clock)
     return menu.run()
 
-def run_story():
-    return "Menu"
+def run_story_levels():
+    pass
 
 def run_singleplayer():
     return "Menu"
@@ -69,23 +71,34 @@ def run_options():
 
 #start in the menu state
 state = "Menu"
+loadSave() 
 
 #main game loop
 while state != "quit":
     if state == "Menu":
         state = run_menu()      
     
-    elif state == "Story mode":
-        con.background_music.stop()
-        state = run_story()
+    elif state == "Story":
+        sub_state = 'Char'
+        while sub_state != "Fight":
+            if sub_state == 'Textcrawl':
+                sub_state = txtscr(con.display_surface, con.clock).run()
+            if sub_state == 'Crawlend':
+                sub_state = txtscr(con.display_surface, con.clock, "Story", True).run()
+            if sub_state == 'Char':
+                sub_state = charselect(con.display_surface, con.clock, True).run()
+            if sub_state == "Menu":
+                state = sub_state
+                break
+            elif sub_state == "Boon":
+                sub_state = boonscr(con.display_surface, con.clock, True).run()
+            elif sub_state == 'quit':
+                state = sub_state
+                break
+            state = sub_state
 
     elif state == "Singleplayer":
-        con.background_music.stop()
         state = run_singleplayer()
-
-    elif state == "Fight":
-        con.background_music.stop()
-        state = run_fight() 
 
     elif state == "Multiplayer":
         sub_state = 'Char'
@@ -102,6 +115,10 @@ while state != "quit":
             elif sub_state == 'quit':
                 break
             state = sub_state
+
+    elif state == "Fight":
+        con.background_music.stop()
+        state = run_fight() 
 
     elif state == "Help":
         state = run_help()

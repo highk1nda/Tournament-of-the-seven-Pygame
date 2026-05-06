@@ -101,6 +101,7 @@ class Projectile:
     def make_damage(self):
         damage = int(self.damage * self.fighter.damage_mult())
         self.target.health -= damage
+        self.target.apply_damage(self.damage)
         self.target.stun = True
         self.target.sounds["hit"].play()
 

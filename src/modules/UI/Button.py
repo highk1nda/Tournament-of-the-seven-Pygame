@@ -8,13 +8,14 @@ from src.modules.systems.scalemouse import scale_mouse
 
 # button class, this will most likely be redone a bit, i just did this for the menu screen but i think we have to readjust it so it works in character select
 class Button():
-    def __init__(self, x, y, width, height, text, font, button_color, text_color= con.WHITE, hovering_color=con.GREY):
+    def __init__(self, x, y, width, height, text, font, button_color, text_color= con.WHITE, hovering_color=con.GREY, Help=False):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.font = font
         self.text_color = text_color
         self.button_color = button_color
         self.hovering_color = hovering_color
+        self.help = Help
         self.clicked = False
 
     def draw(self, screen):
@@ -39,7 +40,9 @@ class Button():
     # self explanatory, check if the user clicks the button
     def is_clicked(self, mouse_pos, mouse_click):
         if self.rect.collidepoint(mouse_pos) and mouse_click:
-            self.button_color = con.DARK_GREEN
+            #simple fix to the button problem, if you want a button disabled, pass True in the help variable.
+            if self.help == False:
+                self.button_color = con.DARK_GREEN
             return True
         return False
 

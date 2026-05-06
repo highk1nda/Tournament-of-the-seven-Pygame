@@ -1,6 +1,5 @@
 import pygame
 from pygame.locals import *
-pygame.init()
 
 from src.modules.UI import constants as con
 from src.modules.UI.Button import Button 
@@ -30,7 +29,6 @@ class MainMenuScreen:
         self.buttons                = [self.button_story, self.button_singleplayer, self.button_multiplayer, self.button_help, self.button_options, self.button_quit]
 
         self.click = False
-        self.confirm_quit = False
 
 
     def handle_event(self, event):
@@ -48,16 +46,13 @@ class MainMenuScreen:
         return None
 
     def update(self):
-        if self.confirm_quit:
-            return None
-
         #check button interactions
         mx, my = scale_mouse()
 
         if self.button_story.is_clicked((mx, my), self.click):
             self.click = False
-            con.ui_error_sound.play()
-            return 'Story mode'
+            con.select_sound.play()
+            return 'Story'
         if self.button_singleplayer.is_clicked((mx, my), self.click):
             self.click = False
             con.ui_error_sound.play()

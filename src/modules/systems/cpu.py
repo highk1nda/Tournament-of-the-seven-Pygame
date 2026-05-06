@@ -7,13 +7,14 @@ EDGE_MARGIN = 80  # 80px from screen edge before treating the wall as blocking, 
 LEVELS = {
     1: {
         "attack_range":    90, # how close the CPU needs to be, to start attacking
-        "min_attack_dist": 10,  # if the CPU is closer than this, it will try to step back to get in range 
+        "min_attack_dist": 10,  # if the CPU is closer than this, it will try to step back to get in range
         "retreat_health":  50, # CPU starts retreating when health drops to 50 or below
         "attack_cooldown": 1100,  # ms between attacks
         "jump_chance":     0.008,
         "dash_chance":     0.003,
         "retreat_jump":    0.02,
         "attack_weights":  (33, 34, 33),
+        "boon_chance":     0.002, # low chance per frame, fires boon slowly and unpredictably
     },
     2: {
         "attack_range":    120,
@@ -24,6 +25,7 @@ LEVELS = {
         "dash_chance":     0.01,
         "retreat_jump":    0.05,
         "attack_weights":  (33, 34, 33),
+        "boon_chance":     0.005,
     },
     3: {
         "attack_range":    150,
@@ -34,12 +36,12 @@ LEVELS = {
         "dash_chance":     0.02,
         "retreat_jump":    0.0,
         "attack_weights":  (2.5, 95, 2.5),
+        "boon_chance":     0.01, # fires boon fairly quickly once available
     },
 }
 
-
 class CPUController:
-    def __init__(self, level=1):
+    def __init__(self, level=1, char_data=None):
         self.last_attack_time = 0
         cfg = LEVELS[level]
         self.attack_range    = cfg["attack_range"]
@@ -50,11 +52,24 @@ class CPUController:
         self.dash_chance     = cfg["dash_chance"]
         self.retreat_jump    = cfg["retreat_jump"]
         self.attack_weights  = cfg["attack_weights"]
+        self.boon_chance     = cfg["boon_chance"]
+        cpu_cfg = char_data.get("cpu", {}) if char_data else {}
+        if cpu_cfg.get("attack_range") is not None:
+            self.attack_range = cpu_cfg["attack_range"]
+        if cpu_cfg.get("min_attack_dist") is not None:
+            self.min_attack_dist = cpu_cfg["min_attack_dist"]
         
     # takes the fighter's controls dict, returns one attack key picked randomly based on attack_weights
-    def pick_attack(self, controls):
-        attack_options = [controls["attack1"], controls["attack2"], controls["attack3"]]
-        chosen = random.choices(attack_options, weights=self.attack_weights) # gives a thing from attack_options with the specified probabilities in attack_weights
+    def pick_attack(self, controls, fighter):
+        all_attacks = [
+            (controls["attack1"], "ATTACK1"),
+            (controls["attack2"], "ATTACK2"),
+            (controls["attack3"], "ATTACK3"),
+        ]
+        available = [(key, w) for (key, name), w in zip(all_attacks, self.attack_weights)
+                     if name in fighter.char_data["animations"]]
+        attack_options, weights = zip(*available)
+        chosen = random.choices(attack_options, weights=weights)
         return chosen[0]
 
     def can_attack(self, now, fighter):
@@ -65,7 +80,7 @@ class CPUController:
     def decide(self, fighter, target):
         controls = fighter.controls
         keys = dict.fromkeys(
-            [controls["left"], controls["right"], controls["up"], controls["attack1"], controls["attack2"], controls["attack3"], controls["dash"]],
+            [controls["left"], controls["right"], controls["up"], controls["attack1"], controls["attack2"], controls["attack3"], controls["dash"], controls["boon"]],
             False
         )
 
@@ -105,7 +120,7 @@ class CPUController:
             # counter attack while retreating if in range
             far_enough = gap >= self.min_attack_dist
             if far_enough and self.can_attack(now, fighter):
-                keys[self.pick_attack(controls)] = True
+                keys[self.pick_attack(controls, fighter)] = True
                 self.last_attack_time = now
 
         elif too_close:
@@ -118,13 +133,13 @@ class CPUController:
                 keys[controls["left"] if to_right else controls["right"]] = True
             # swing while stepping back if cooldown is ready
             if self.can_attack(now, fighter):
-                keys[self.pick_attack(controls)] = True
+                keys[self.pick_attack(controls, fighter)] = True
                 self.last_attack_time = now
 
         elif sweet_spot:
             # if sweet spot -> attack
             if self.can_attack(now, fighter):
-                keys[self.pick_attack(controls)] = True
+                keys[self.pick_attack(controls, fighter)] = True
                 self.last_attack_time = now
 
         else:
@@ -136,5 +151,8 @@ class CPUController:
                 keys[controls["up"]] = True
             if can_dash:
                 keys[controls["dash"]] = True
+
+        if random.random() < self.boon_chance:
+            keys[controls["boon"]] = True
 
         return keys

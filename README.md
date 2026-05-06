@@ -62,11 +62,12 @@ pip install pygame
 python main.py
 ```
 ## System Requirements
+- OS: Windows, macOS, or Linux (Ubuntu)
+- Resolution: 1920×1080 (supports 800x400, 1000x600, 1280x720)
 
-- **OS:** Windows, macOS, or Linux (Ubuntu)
-- **Resolution:** 1920×1080 by default (more supported resolutions are comming)
-- **Performance:** 60+ FPS on typical hardware
-- **Load time:** Should load main menu in under 10 seconds
+## Performance
+- 60 FPS on typical hardware
+- Main menu loads under 10 seconds
 ---
 
 ## Project Structure
