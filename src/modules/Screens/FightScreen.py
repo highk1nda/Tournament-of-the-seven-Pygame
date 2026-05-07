@@ -9,7 +9,7 @@ from src.modules.systems.Draw import draw_screen, draw_round_ui, draw_round_indi
 from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
 from src.modules.systems.cpu import CPUController
-from src.modules.systems.active_boons import load_boon_assets, ACTIVE_BOON_CLASS_MAP, BOON_ASSET_KEY
+from src.modules.boons.active_boons import load_boon_assets, ACTIVE_BOON_CLASS_MAP, BOON_ASSET_KEY
 from tests.debug_tools import DebugPopup
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.boons.DevilsDie import Dice

@@ -6,7 +6,7 @@ from src.modules.UI import constants as con
 from src.modules.UI import CharDictionary as chardict
 from src.modules.fighter.Projectile import Projectile
 from src.modules.boons import Adrenaline, LastStand
-from src.modules.systems.active_boons import BOON_COOLDOWN
+from src.modules.boons.active_boons import BOON_COOLDOWN
 
 class Fighter():
     def __init__(self, x, y, player_width, player_height, flip, char_data, controls, passive_boon):
