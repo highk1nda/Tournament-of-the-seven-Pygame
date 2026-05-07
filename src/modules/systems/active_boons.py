@@ -100,7 +100,7 @@ class BurnDebuff:
             self._end()
             return False
         if self.target.running and now - self.last_tick > self.damage_interval:
-            self.target.health = max(0, self.target.health - self.burn_damage)
+            self.target.receive_damage(self.burn_damage, attacker=None)
             self.last_tick = now
         if now - self.last_hit > self.hit_interval and not self.target.death:
             self.target.stun = True
@@ -237,7 +237,8 @@ class ScorchingRayActiveBoon:
                 self.done = True
                 if not self.target.burn_debuff or not self.target.burn_debuff.active:
                     self.target.burn_debuff = BurnDebuff(self.target)
-                self.target.apply_damage(self.initial_damage)
+
+                self.target.receive_damage(self.initial_damage, attacker=self.caster)
                 self.target.stun = True
                 self.target.sounds["hit"].play()
                 self.caster.screen_shake = True
@@ -296,7 +297,7 @@ class AreaOfWardingActiveBoon:
         )
         if zone_rect.colliderect(self.target.rect) and not self.target.dashing:
             if now - self.last_damage > self.damage_interval and not self.target.death:
-                self.target.health = max(0, self.target.health - self.zone_damage)
+                self.target.receive_damage(self.zone_damage, attacker=self.caster)
                 self.target.stun = True
                 self.target.sounds["hit"].play()
                 self.last_damage = now
