@@ -5,6 +5,7 @@ from src.modules.Screens.Help import Help as helpscr
 from src.modules.Screens.SelectCharScreen import SelectCharScreen as charselect
 from src.modules.Screens.BoonScreen import BoonScreen as boonscr
 from src.modules.Screens.MapScreen import MapScreen as mapscr
+from src.modules.Screens.CPUScreen import CPUScreen as cpuscr
 from src.modules.Screens.Options import Options as opt
 from src.modules.UI import constants as con
 from src.modules.Screens.Controlscreens.Edward import Edward as Edscr
@@ -31,7 +32,21 @@ def run_story_levels():
     pass
 
 def run_singleplayer():
-    return "Menu"
+    sub_state = 'Char'
+    while sub_state != "Fight":
+        if sub_state == 'Char':
+            sub_state = charselect(con.display_surface, con.clock).run()
+            if sub_state == "Menu":
+                return sub_state
+        elif sub_state == "Boon":
+            sub_state = boonscr(con.display_surface, con.clock).run()
+        elif sub_state == "Map":
+            sub_state = mapscr(con.display_surface, con.clock).run()
+        elif sub_state == "CPU":
+            sub_state = cpuscr(con.display_surface, con.clock).run()
+        elif sub_state == 'quit':
+            return sub_state
+    return sub_state
 
 def run_fight():
     fight = fightscr(con.display_surface, con.clock)
@@ -99,8 +114,11 @@ while state != "quit":
 
     elif state == "Singleplayer":
         state = run_singleplayer()
+        if state == "Fight":
+            con.cpu_enabled = True
 
     elif state == "Multiplayer":
+        con.cpu_enabled = False
         sub_state = 'Char'
         while sub_state != "Fight":
             if sub_state == 'Char':
@@ -111,7 +129,7 @@ while state != "quit":
             elif sub_state == "Boon":
                 sub_state = boonscr(con.display_surface, con.clock).run()
             elif sub_state == "Map":
-                sub_state = mapscr(con.display_surface, con.clock).run()
+                sub_state = mapscr(con.display_surface, con.clock, multiplayer=True).run()
             elif sub_state == 'quit':
                 break
             state = sub_state

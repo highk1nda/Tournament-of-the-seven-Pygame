@@ -41,8 +41,8 @@ class FightScreen():
         self.state_timer = 0
         self.round_start_time = 0
 
-        self.cpu_enabled = False
-        self.cpu_level   = 1
+        self.cpu_enabled = con.cpu_enabled
+        self.cpu_level   = con.cpu_level
         self.cpu = CPUController(level=self.cpu_level)
 
         self.boon_assets = load_boon_assets()

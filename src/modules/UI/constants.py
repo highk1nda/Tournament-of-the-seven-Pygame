@@ -277,6 +277,10 @@ p2_passive_boon = None
 # Store selected map (dynamicly changable btw, its set in MapScreen)
 selected_map = "map1"
 
+# CPU settings (set in CPUScreen, read by FightScreen)
+cpu_enabled = False
+cpu_level   = 1
+
 # fonts
 font_XLarge = pygame.font.SysFont(None, 64)
 font_Large = pygame.font.SysFont(None, 46)
