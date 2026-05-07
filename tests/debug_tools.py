@@ -4,6 +4,9 @@ from src.modules.UI import constants as con
 from src.modules.UI import CharDictionary as chardict
 from src.modules.systems.cpu import CPUController
 
+# TO ENABLE THE DEBUG POPUP uncomment line 59 and 60.
+
+
 RED   = (160, 45, 45)
 BLUE  = (45, 70, 160)
 WHITE = (255, 255, 255)
@@ -53,8 +56,8 @@ class DebugPopup:
         fighter.frame_index = 0
 
     def handle_event(self, event):
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            self.visible = not self.visible
+        # if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN: 
+        #     self.visible = not self.visible
         if event.type == pygame.MOUSEBUTTONDOWN and self.visible:
             for i in range(6):
                 if CHAR_DATA[i]:
