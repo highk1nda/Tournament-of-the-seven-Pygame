@@ -1,28 +1,11 @@
 import pygame
-# from PIL import Image as PILImage  # used by GIF loader (main_menu_sky.gif) — not active
 
 from src.modules.UI import constants as con
 from src.modules.UI import CharDictionary as chardict
 
-# GIF_PATH = "assets/main_menu_sky.gif"  # night sky GIF — swap load_menu_background below to use it
-
 def load_menu_background(width, height):
-    dark = pygame.Surface((width, height))
-    dark.set_alpha(80)
-    dark.fill((0, 0, 0))
-
-    frames = []
-    i = 1
-    while True:
-        try:
-            img = pygame.image.load(f"assets/mainmenu_frames/frame_{i:03d}.png").convert()
-        except:
-            break  # no more frames
-        img = pygame.transform.scale(img, (width, height))
-        img.blit(dark, (0, 0))
-        frames.append(img)
-        i += 1
-    return frames
+    img = pygame.image.load("assets/Colleseum.png").convert()
+    return pygame.transform.scale(img, (width, height))
 
 def load_animation_frames(animation_dict, size, scale):
     new_animation_dict = {}

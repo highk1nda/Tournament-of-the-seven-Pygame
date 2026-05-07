@@ -14,18 +14,18 @@ class MainMenuScreen:
         self.screen = screen
         self.clock = clock
         
-        self.bg_frames = load_menu_background(con.SCREEN_WIDTH, con.SCREEN_HEIGHT)
-        self.bg_frame_index = 0
-        self.bg_update_time = pygame.time.get_ticks()
+        self.bg = load_menu_background(con.SCREEN_WIDTH, con.SCREEN_HEIGHT)
+        self.overlay = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT), pygame.SRCALPHA)
+        self.overlay.fill((5, 5, 5, 220))
         if con.background_music.get_num_channels() == 0:
             con.background_music.play(-1)
 
-        self.button_story           = Button(con.button_x, con.button_y, con.buttonwidth, con.buttonheight, 'Story mode', con.font_Large, con.DARK_RED)
-        self.button_singleplayer    = Button(con.button_x, con.button_y + con.buttonspacing, con.buttonwidth, con.buttonheight, 'Singleplayer', con.font_Large, con.DARK_RED)
-        self.button_multiplayer     = Button(con.button_x, con.button_y + (con.buttonspacing*2), con.buttonwidth,con.buttonheight, 'Multiplayer', con.font_Large, con.DARK_RED)
-        self.button_help            = Button(con.button_x, con.button_y + (con.buttonspacing*3), con.buttonwidth, con.buttonheight, 'Help', con.font_Large, con.DARK_RED)
-        self.button_options         = Button(con.button_x, con.button_y + (con.buttonspacing*4), con.buttonwidth, con.buttonheight, 'Options', con.font_Large, con.DARK_RED)
-        self.button_quit            = Button(con.button_x, con.button_y + (con.buttonspacing*5), con.buttonwidth, con.buttonheight, 'Quit', con.font_Large, con.DARK_RED)
+        self.button_story           = Button(con.button_x, con.button_y, con.buttonwidth, con.buttonheight, 'Story mode', con.font_Large, (200, 130, 40))
+        self.button_singleplayer    = Button(con.button_x, con.button_y + con.buttonspacing, con.buttonwidth, con.buttonheight, 'Singleplayer', con.font_Large, (200, 130, 40))
+        self.button_multiplayer     = Button(con.button_x, con.button_y + (con.buttonspacing*2), con.buttonwidth,con.buttonheight, 'Multiplayer', con.font_Large, (200, 130, 40))
+        self.button_help            = Button(con.button_x, con.button_y + (con.buttonspacing*3), con.buttonwidth, con.buttonheight, 'Help', con.font_Large, (200, 130, 40))
+        self.button_options         = Button(con.button_x, con.button_y + (con.buttonspacing*4), con.buttonwidth, con.buttonheight, 'Options', con.font_Large, (200, 130, 40))
+        self.button_quit            = Button(con.button_x, con.button_y + (con.buttonspacing*5), con.buttonwidth, con.buttonheight, 'Quit', con.font_Large, (200, 130, 40))
         self.buttons                = [self.button_story, self.button_singleplayer, self.button_multiplayer, self.button_help, self.button_options, self.button_quit]
 
         self.click = False
@@ -55,7 +55,7 @@ class MainMenuScreen:
             return 'Story'
         if self.button_singleplayer.is_clicked((mx, my), self.click):
             self.click = False
-            con.ui_error_sound.play()
+            con.select_sound.play()
             return 'Singleplayer'
         if self.button_multiplayer.is_clicked((mx, my), self.click):
             self.click = False
@@ -78,11 +78,8 @@ class MainMenuScreen:
         return None
 
     def draw(self):
-        # every 100ms move to the next frame
-        if pygame.time.get_ticks() - self.bg_update_time > 100:
-            self.bg_frame_index = (self.bg_frame_index + 1) % len(self.bg_frames)  # loop back to 0 at the end
-            self.bg_update_time = pygame.time.get_ticks()  # reset timer
-        self.screen.blit(self.bg_frames[self.bg_frame_index], (0, 0))  # draw current frame
+        self.screen.blit(self.bg, (0, 0))
+        self.screen.blit(self.overlay, (0, 0))
 
         # draw buttons
         for button in self.buttons:

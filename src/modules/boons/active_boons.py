@@ -130,6 +130,7 @@ class SubZeroActiveBoon:
         self.last_time = pygame.time.get_ticks()
         self.done = False
         self.freeze_applied = False
+        self.freeze_pending = False
         self.locked_cx = None
         self.locked_bottom = None
 
@@ -154,14 +155,16 @@ class SubZeroActiveBoon:
                 and self.target.freeze_debuff.active
                 and now - self.target.freeze_debuff.start_time >= FreezeDebuff.duration - 1000
             )
-            frozen_hold = self.frame_index >= self.freeze_frame and self.target.frozen and not ending_soon
+            frozen_hold = self.frame_index >= self.freeze_frame and (self.target.frozen or self.freeze_pending) and not ending_soon
             if not frozen_hold and now - self.last_time > self.anim_cooldown:
                 self.frame_index += 1
                 self.last_time = now
             if self.frame_index >= self.freeze_frame and not self.freeze_applied and not self.target.death:
+                self.freeze_pending = True
+            if self.freeze_pending and not self.freeze_applied and not self.target.jumping and not self.target.death:
                 self.target.freeze_debuff = FreezeDebuff(self.target)
                 self.freeze_applied = True
-                # lock position to where target was when frozen
+                self.freeze_pending = False
                 self.locked_cx     = self.target.rect.centerx
                 self.locked_bottom = self.target.rect.bottom
             if self.frame_index >= len(self.frames):

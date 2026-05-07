@@ -137,6 +137,18 @@ python main.py
 	https://srspooky.itch.io/pixel-spritesheet-dice20d
 	(dice animated via AI)
 
+	Active boon 1
+	Coloritmic
+	https://coloritmic.itch.io/icecool-pack
+	
+	Active boon 2
+	Devkidd
+	https://devkidd.itch.io/pixel-fire-asset-pack
+
+	Active boon 3
+	Graksyn
+	https://coloritmic.itch.io/icecool-pack
+
 	Menu Music
 	Music: Planning by Alexander Nakarada (https://www.creatorchords.com)
 	Licensed under Creative Commons BY Attribution 4.0 License
