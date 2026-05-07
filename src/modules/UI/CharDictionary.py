@@ -11,6 +11,8 @@ KNIGHT_DATA = {
     "scale": DEFAULT_SCALE,
     "offset": DEFAULT_OFFSET,
     "jumpable": True,
+    "health": 100,
+    "speed": 8,
     "animations": {
         "IDLE":    {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Idle.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight with shadows/Knight-Idle.png",
@@ -23,11 +25,11 @@ KNIGHT_DATA = {
         "ATTACK1": {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Attack01.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight with shadows/Knight-Attack01.png", 
                     "frame_number": 7,
-                    "cooldown": 65},
+                    "cooldown": 85},
         "ATTACK2": {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Attack02.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight with shadows/Knight-Attack02.png", 
                     "frame_number": 10,
-                    "cooldown": 75},
+                    "cooldown": 105},
         "ATTACK3": {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Attack03.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight with shadows/Knight-Attack03.png", 
                     "frame_number": 11,
@@ -35,7 +37,7 @@ KNIGHT_DATA = {
         "HIT":     {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Hurt.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight with shadows/Knight-Hurt.png",
                     "frame_number": 4, 
-                    "cooldown": 100},
+                    "cooldown": 50},
         "DEATH":   {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight/Knight-Death.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight/Knight with shadows/Knight-Death.png",
                     "frame_number": 4, 
@@ -56,6 +58,16 @@ KNIGHT_DATA = {
             "ATTACK2": 3,
             "ATTACK3": 10
     },
+    "attack_knockback": {
+            "ATTACK1": 30,
+            "ATTACK2": 20,
+            "ATTACK3": 60               
+    },
+    "attack_stun_duration": {       
+            "ATTACK1": 300,  # ms
+            "ATTACK2": 200,
+            "ATTACK3": 600
+    },
     "cpu": {
             "attack_range":    None,    # None = use level default
             "min_attack_dist": 0,       # melee: no minimum distance
@@ -68,6 +80,8 @@ WEREBEAR_DATA = {
     "scale": DEFAULT_SCALE,
     "offset": DEFAULT_OFFSET,
     "jumpable": True,
+    "health": 100,
+    "speed": 5,
     "animations": {
         "IDLE":    {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Idle.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear with shadows/Werebear-Idle.png",
@@ -92,7 +106,7 @@ WEREBEAR_DATA = {
         "HIT":     {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Hurt.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear with shadows/Werebear-Hurt.png",
                     "frame_number": 4, 
-                    "cooldown": 100},
+                    "cooldown": 50},
         "DEATH":   {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear/Werebear-Death.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Werebear/Werebear with shadows/Werebear-Death.png",
                     "frame_number": 4, 
@@ -113,6 +127,16 @@ WEREBEAR_DATA = {
             "ATTACK2": 3,
             "ATTACK3": 10
     },
+    "attack_knockback": {
+            "ATTACK1": 30,
+            "ATTACK2": 20,
+            "ATTACK3": 60               
+    },
+    "attack_stun_duration": {       
+            "ATTACK1": 300,  # ms
+            "ATTACK2": 200,
+            "ATTACK3": 600
+    },
     "cpu": {
             "attack_range":    None,    # None = use level default
             "min_attack_dist": 0,       # melee: no minimum distance
@@ -125,6 +149,8 @@ WIZARD_DATA = {
     "scale": DEFAULT_SCALE,
     "offset": DEFAULT_OFFSET,
     "jumpable": True,
+    "health": 60,
+    "speed": 5,
     "animations": {
         "IDLE":    {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Idle.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard with shadows/Wizard-Idle.png",
@@ -141,27 +167,15 @@ WIZARD_DATA = {
         "ATTACK2": {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Attack02.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard with shadows/Wizard-Attack02.png",
                     "frame_number": 6,
-                    "cooldown": 75},
+                    "cooldown": 150},
         "HIT":     {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Hurt.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard with shadows/Wizard-Hurt.png",
                     "frame_number": 4, 
-                    "cooldown": 100},
+                    "cooldown": 50},
         "DEATH":   {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard/Wizard-Death.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Wizard/Wizard with shadows/Wizard-Death.png",
                     "frame_number": 4, 
                     "cooldown": 100},
-    },
-    "attack_active_frames": {
-            "ATTACK1": [(5, 6)],        
-            "ATTACK2": [(4, 5)]
-    },
-    "attack_width_scale": {
-            "ATTACK1": 0.1,            
-            "ATTACK2": 0.2,
-    },
-    "attack_damage": {
-            "ATTACK1": 0.1,
-            "ATTACK2": 0.2,
     },
     "projectiles": {
         "ATTACK1": {
@@ -174,6 +188,8 @@ WIZARD_DATA = {
             "active_frame": (1, 3),
             "speed": 0,
             "damage": 10,
+            "knockback": 0,
+            "stun_duration": 300,
             "hitbox_width": 80,
             "hitbox_height": 80
         },
@@ -185,6 +201,8 @@ WIZARD_DATA = {
             "gen_frame": 4,             
             "speed": 15,
             "damage": 10,
+            "knockback": 30,
+            "stun_duration": 300,
             "hitbox_width": 20,
             "hitbox_height": 20
         }
@@ -213,6 +231,8 @@ MINOTAUR_DATA = {
     "scale": con.SCREEN_WIDTH / 250,
     "offset": [int(con.SCREEN_WIDTH / 90), int(con.SCREEN_HEIGHT / 40)],
     "jumpable": False,
+    "health": 120,
+    "speed": 5,
     "animations": {
         "IDLE":    {"file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Idle.png",
                     "frame_number": 4,      
@@ -222,16 +242,16 @@ MINOTAUR_DATA = {
                     "cooldown": 110},
         "ATTACK1": {"file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Attack01.png", 
                     "frame_number": 6,
-                    "cooldown": 65},
+                    "cooldown": 100},
         "ATTACK2": {"file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Attack02.png", 
                     "frame_number": 6,
-                    "cooldown": 75},
+                    "cooldown": 100},
         "ATTACK3": {"file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Attack03.png", 
                     "frame_number": 6,
                     "cooldown": 85},
         "HIT":     {"file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Hurt.png",
                     "frame_number": 2, 
-                    "cooldown": 100},
+                    "cooldown": 150},
         "DEATH":   {"file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Minotaur/Minotaur-Death.png",
                     "frame_number": 6, 
                     "cooldown": 100},
@@ -251,6 +271,16 @@ MINOTAUR_DATA = {
             "ATTACK2": 5,
             "ATTACK3": 8
     },
+    "attack_knockback": {
+            "ATTACK1": 30,
+            "ATTACK2": 40,
+            "ATTACK3": 60               
+    },
+    "attack_stun_duration": {       
+            "ATTACK1": 300,  # ms
+            "ATTACK2": 400,
+            "ATTACK3": 500
+    },
     "cpu": {
             "attack_range":    None,    # None = use level default
             "min_attack_dist": 0,       # melee: no minimum distance
@@ -263,6 +293,8 @@ ARCHER_DATA = {
     "scale": DEFAULT_SCALE,
     "offset": DEFAULT_OFFSET,
     "jumpable": True,
+    "health": 70,
+    "speed": 12,
     "animations": {
         "IDLE":    {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Idle.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer with shadows/Archer-Idle.png",
@@ -283,7 +315,7 @@ ARCHER_DATA = {
         "HIT":     {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Hurt.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer with shadows/Archer-Hurt.png",
                     "frame_number": 4, 
-                    "cooldown": 100},
+                    "cooldown": 50},
         "DEATH":   {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer/Archer-Death.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Archer/Archer with shadows/Archer-Death.png",
                     "frame_number": 4, 
@@ -297,7 +329,9 @@ ARCHER_DATA = {
             "type": "arrow",             # fire arrow
             "gen_frame": 6,             
             "speed": 23,
-            "damage": 10,
+            "damage": 6,
+            "knockback": 20,
+            "stun_duration": 250,
             "hitbox_width": 40,
             "hitbox_height": 10
         },
@@ -308,7 +342,9 @@ ARCHER_DATA = {
             "type": "arrow",        
             "gen_frame": 9,             
             "speed": 30,
-            "damage": 20,
+            "damage": 10,
+            "knockback": 45,
+            "stun_duration": 500,
             "hitbox_width": 40,
             "hitbox_height": 10
         }
@@ -337,6 +373,8 @@ KNIGHT_TEMPLAR_DATA = {
     "scale": DEFAULT_SCALE,
     "offset": DEFAULT_OFFSET,
     "jumpable": True,
+    "health": 100,
+    "speed": 5,
     "animations": {
         "IDLE":    {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Idle.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar with shadows/Knight Templar-Idle.png",
@@ -349,19 +387,19 @@ KNIGHT_TEMPLAR_DATA = {
         "ATTACK1": {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Attack01.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar with shadows/Knight Templar-Attack01.png", 
                     "frame_number": 7,
-                    "cooldown": 65},
+                    "cooldown": 100},
         "ATTACK2": {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Attack02.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar with shadows/Knight Templar-Attack02.png", 
                     "frame_number": 8,
-                    "cooldown": 75},
+                    "cooldown": 100},
         "ATTACK3": {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Attack03.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar with shadows/Knight Templar-Attack03.png", 
                     "frame_number": 11,
-                    "cooldown": 85},
+                    "cooldown": 100},
         "HIT":     {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Hurt.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar with shadows/Knight Templar-Hurt.png",
                     "frame_number": 4, 
-                    "cooldown": 100},
+                    "cooldown": 50},
         "DEATH":   {"file_air": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar/Knight Templar-Death.png",
                     "file_ground": "assets/Tiny RPG Character Asset Pack v1.03 -Full 20 Characters/Characters(100x100)/Knight Templar/Knight Templar with shadows/Knight Templar-Death.png",
                     "frame_number": 4, 
@@ -380,7 +418,17 @@ KNIGHT_TEMPLAR_DATA = {
     "attack_damage": {
             "ATTACK1": 8,
             "ATTACK2": 8,
-            "ATTACK3": 8
+            "ATTACK3": 5
+    },
+    "attack_knockback": {
+            "ATTACK1": 60,
+            "ATTACK2": 60,
+            "ATTACK3": 30               
+    },
+    "attack_stun_duration": {       
+            "ATTACK1": 500,  # ms
+            "ATTACK2": 500,
+            "ATTACK3": 200
     },
     "cpu": {
             "attack_range":    None,    # None = use level default

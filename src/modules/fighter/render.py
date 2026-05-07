@@ -163,14 +163,17 @@ def update_fighter_animation(fighter):
     if fighter.frame_index >= len(fighter.animation_list[fighter.action][ground_state_key]):
         if fighter.death:
             fighter.frame_index = len(fighter.animation_list["DEATH"][ground_state_key]) - 1
+        elif fighter.stun:
+            fighter.frame_index = len(fighter.animation_list["HIT"][ground_state_key]) - 1
+            if pygame.time.get_ticks() >= fighter.stun_end_time:
+                fighter.frame_index = 0
+                fighter.stun = False
         else:
             fighter.frame_index = 0
             if fighter.attacking:
                 fighter.attacking = False
                 fighter.attack_type = 0
                 fighter.attack_sound_played = False
-            if fighter.stun:
-                fighter.stun = False
 
 def update_wind_animation(fighter, surface):
     
