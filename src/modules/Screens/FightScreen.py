@@ -382,6 +382,8 @@ class FightScreen():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     result = confscr(self.screen, self.clock, "Fight").run()
+                    if result == "Fight":
+                        continue
                     return result
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.player1.clean_up()
