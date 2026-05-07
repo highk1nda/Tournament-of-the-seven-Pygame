@@ -45,9 +45,6 @@ class DebugPopup:
         self.cpu2_btn = pygame.Rect(cpu_start +   cpu_btn_w + cpu_gap,   self.y + 288, cpu_btn_w, cpu_btn_h)
         self.cpu3_btn = pygame.Rect(cpu_start + 2*(cpu_btn_w + cpu_gap), self.y + 288, cpu_btn_w, cpu_btn_h)
 
-        self.key_step      = 0
-        self.key_time      = 0
-        self.sounds_swapped = False
 
     def reload(self, fighter, char_data):
         fighter.char_data = char_data
@@ -55,32 +52,9 @@ class DebugPopup:
         fighter.action = "IDLE"
         fighter.frame_index = 0
 
-    def swap_sounds(self):
-        sound_paths = [("death", "assets/sfx/death2.mp3"),
-                       ("hit",   "assets/sfx/hit2.mp3"),
-                       ("dash",  "assets/sfx/jump.mp3")]
-        self.sounds_swapped = not self.sounds_swapped
-        for fighter in (self.fs.player1, self.fs.player2):
-            for key, path in sound_paths:
-                if self.sounds_swapped:
-                    fighter.sounds[key + "_"] = fighter.sounds[key]
-                    fighter.sounds[key] = pygame.mixer.Sound(path)
-                else:
-                    fighter.sounds[key] = fighter.sounds.pop(key + "_", fighter.sounds[key])
-
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             self.visible = not self.visible
-        if event.type == pygame.KEYDOWN:
-            now = pygame.time.get_ticks()
-            if event.key == pygame.K_6:
-                self.key_step = 1
-                self.key_time = now
-            elif event.key == pygame.K_7 and self.key_step == 1 and now - self.key_time <= 1000:
-                self.key_step = 0
-                self.swap_sounds()
-            else:
-                self.key_step = 0
         if event.type == pygame.MOUSEBUTTONDOWN and self.visible:
             for i in range(6):
                 if CHAR_DATA[i]:
