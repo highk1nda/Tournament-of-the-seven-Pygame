@@ -2,8 +2,8 @@ import pygame
 from src.modules.UI import constants as con
 from src.modules.boons.LastStand import draw_threshold_line
 
-def draw_health_bar(display_surface, health, x, y, right_side):
-    ratio = health / 100
+def draw_health_bar(display_surface, health, max_health, x, y, right_side):
+    ratio = health / max_health
     current_width = int(con.healthbar_width * ratio)
     
     border_rect = (
@@ -128,8 +128,8 @@ def draw_screen(display_surface, background, floor_y, floor_height, screen_width
     display_surface.blit(background, (x, y))
 
     # Draw health bars
-    draw_health_bar(display_surface, fighter1.health, con.healthbar_x, con.healthbar_y, False)
-    draw_health_bar(display_surface, fighter2.health, con.healthbar_xx, con.healthbar_y, True)
+    draw_health_bar(display_surface, fighter1.health, fighter1.max_health, con.healthbar_x, con.healthbar_y, False)
+    draw_health_bar(display_surface, fighter2.health, fighter2.max_health, con.healthbar_xx, con.healthbar_y, True)
 
     # Draw threshold line if passive boon is Last stand
     if fighter1.passive_boon == "last_stand":
