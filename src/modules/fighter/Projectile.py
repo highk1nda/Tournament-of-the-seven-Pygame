@@ -101,7 +101,11 @@ class Projectile:
     def make_damage(self):
         self.target.receive_damage(self.damage, attacker=self.fighter)
 
+        stun_duration = self.pj_data["stun_duration"]
+        knockback = self.pj_data["knockback"]
+
         self.target.stun = True
+        self.target.stun_end_time = pygame.time.get_ticks() + stun_duration
         self.target.sounds["hit"].play()
 
         if not self.target.death:
@@ -109,9 +113,9 @@ class Projectile:
             self.fighter.screen_shake = True
             # knockback by the attack
             if self.target.flip:
-                self.target.rect.x += con.KNOCKBACK_DISTANCE
+                self.target.rect.x += knockback
             else: 
-                self.target.rect.x -= con.KNOCKBACK_DISTANCE
+                self.target.rect.x -= knockback
     
     def draw(self, surface):
         if self.direction == -1:

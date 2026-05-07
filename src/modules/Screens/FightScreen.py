@@ -84,7 +84,7 @@ class FightScreen():
         
     def revive_fighter(self, fighter):
         fighter.death = False
-        fighter.health = 100
+        fighter.health = fighter.max_health
         fighter.stun = False
         fighter.attacking = False
         fighter.attack_type  = 0

@@ -38,8 +38,10 @@ class Fighter():
         self.hitbox_set = set()     # avoid duplicate collision detection
 
         self.stun = False
+        self.stun_end_time = 0
         self.death = False
-        self.health = con.HEALTH
+        self.health = char_data["health"]
+        self.max_health = self.health
         self.controls = controls
 
         self.dashing = False
@@ -139,7 +141,8 @@ class Fighter():
         return damage
 
     def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET, cpu_input=None):
-        SPEED = int(con.PLAYER_SPEED * self.speed_mult())
+        base_speed = self.char_data["speed"]
+        SPEED = int(base_speed * self.speed_mult())
         GRAVITY = con.GRAVITY
         if self.jumping:
             FRICTION = con.AIR_FRICTION
@@ -380,17 +383,20 @@ class Fighter():
                 base_damage = self.char_data["attack_damage"].get(attack_key)
                 TARGET.receive_damage(base_damage, attacker=self)
 
+                stun_duration = self.char_data["attack_stun_duration"].get(attack_key)
                 TARGET.stun = True
+                TARGET.stun_end_time = pygame.time.get_ticks() + stun_duration
                 TARGET.sounds["hit"].play()
 
                 if not TARGET.death:
                     TARGET.frame_index = 0
                     self.screen_shake = True
                     # knockback by the attack
+                    knockback = self.char_data["attack_knockback"].get(attack_key)
                     if TARGET.flip:
-                        TARGET.rect.x += con.KNOCKBACK_DISTANCE
+                        TARGET.rect.x += knockback
                     else: 
-                        TARGET.rect.x -= con.KNOCKBACK_DISTANCE
+                        TARGET.rect.x -= knockback
 
                 self.hitbox_set.add(current_attack_index)
 
