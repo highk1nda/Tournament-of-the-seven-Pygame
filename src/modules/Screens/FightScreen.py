@@ -66,9 +66,9 @@ class FightScreen():
         p1_passive_boon = getattr(con, "p1_passive_boon", None)
         p2_passive_boon = getattr(con, "p2_passive_boon", None)
         self.player1 = Fighter(con.PLAYER_1_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, 
-                               con.PLAYER_HEIGHT, False, p1_data, con.P1_CONTROLS, "last_stand")
+                               con.PLAYER_HEIGHT, False, p1_data, con.P1_CONTROLS, p1_passive_boon)
         self.player2 = Fighter(con.PLAYER_2_X, con.FLOOR_Y - con.PLAYER_HEIGHT, con.PLAYER_WIDTH, 
-                               con.PLAYER_HEIGHT, True, p2_data, con.P2_CONTROLS, "devils_die")
+                               con.PLAYER_HEIGHT, True, p2_data, con.P2_CONTROLS, p2_passive_boon)
 
         self.cpu = CPUController(level=self.cpu_level, char_data=p2_data)
 
