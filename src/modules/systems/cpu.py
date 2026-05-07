@@ -40,9 +40,12 @@ LEVELS = {
     },
 }
 
+_CORNER_DASH_DELAY = 350  # ms cornered before triggering escape dash
+
 class CPUController:
     def __init__(self, level=1, char_data=None):
         self.last_attack_time = 0
+        self.cornered_since   = None
         cfg = LEVELS[level]
         self.attack_range    = cfg["attack_range"]
         self.min_attack_dist = cfg["min_attack_dist"]
@@ -102,6 +105,20 @@ class CPUController:
         against_right_wall = not to_right and fighter.rect.right > con.SCREEN_WIDTH - EDGE_MARGIN
         cornered = against_left_wall or against_right_wall
 
+        # track how long the CPU has been pinned against the wall while wanting to retreat
+        wants_retreat = (fighter.health <= self.retreat_health and gap < self.attack_range) or gap < self.min_attack_dist
+        if cornered and wants_retreat:
+            if self.cornered_since is None:
+                self.cornered_since = now
+        else:
+            self.cornered_since = None
+        escape_dash = (
+            cornered and wants_retreat
+            and self.cornered_since is not None
+            and now - self.cornered_since >= _CORNER_DASH_DELAY
+            and not fighter.dashing
+        )
+
         low_health   = fighter.health <= self.retreat_health
         in_range     = gap < self.attack_range
         too_close    = gap < self.min_attack_dist
@@ -112,6 +129,9 @@ class CPUController:
                 keys[controls["right"] if to_right else controls["left"]] = True
                 if not fighter.jumping:
                     keys[controls["up"]] = True
+                if escape_dash:
+                    keys[controls["dash"]] = True
+                    self.cornered_since = None
             else:
                 keys[controls["left"] if to_right else controls["right"]] = True
                 can_jump = not fighter.jumping and random.random() < self.retreat_jump
@@ -128,6 +148,9 @@ class CPUController:
                 keys[controls["right"] if to_right else controls["left"]] = True
                 if not fighter.jumping:
                     keys[controls["up"]] = True
+                if escape_dash:
+                    keys[controls["dash"]] = True
+                    self.cornered_since = None
             else:
                 # step back so the hitbox can reach
                 keys[controls["left"] if to_right else controls["right"]] = True

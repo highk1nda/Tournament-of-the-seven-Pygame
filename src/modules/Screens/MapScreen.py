@@ -14,7 +14,8 @@ MAPS = [
 
 
 class MapScreen:
-    def __init__(self, screen, clock):
+    def __init__(self, screen, clock, multiplayer=False):
+        self.multiplayer = multiplayer
         self.screen = screen
         self.clock  = clock
 
@@ -74,7 +75,8 @@ class MapScreen:
         self.draw_centered(con.font_Small.render(MAPS[self.map_idx]["name"], True, con.WHITE), con.map_cx, con.map_preview_y + con.map_preview_height + 6)
 
         self.draw_button(self.prev_rect,  "< Previous", con.butt_disabled_color)
-        self.draw_button(self.fight_rect, "FIGHT",      con.select_fight_butt_color)
+        fight_label = "FIGHT" if self.multiplayer else "CONTINUE"
+        self.draw_button(self.fight_rect, fight_label, con.select_fight_butt_color)
         self.draw_button(self.next_rect,  "Next >",     con.butt_disabled_color)
         appBright(self.screen)
 
@@ -97,7 +99,7 @@ class MapScreen:
                     elif self.fight_rect.collidepoint(mx, my):
                         con.select_sound.play()
                         con.selected_map = MAPS[self.map_idx]["key"]
-                        return "Fight"
+                        return "Fight" if self.multiplayer else "CPU"
 
             self.draw()
             res.render_to_surface()
