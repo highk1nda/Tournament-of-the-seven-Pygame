@@ -89,7 +89,7 @@ class Fighter():
         self.walk_sound_playing = False
         self.attack_sound_played = False
 
-        self.passive_boon = passive_boon
+        self.passive_boon = passive_boon["key"]
         self.consecutive_hits = 0  # without getting damaged, for Adrenaline
         self.last_stand_active = False
 

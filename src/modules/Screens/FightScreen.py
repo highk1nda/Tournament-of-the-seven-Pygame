@@ -10,6 +10,7 @@ from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems import res
 from src.modules.systems.cpu import CPUController
 from src.modules.boons.active_boons import load_boon_assets, ACTIVE_BOON_CLASS_MAP, BOON_ASSET_KEY
+from src.modules.boons.boon_icons import load_icons, draw_boon_icons
 from tests.debug_tools import DebugPopup
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.boons.DevilsDie import Dice
@@ -48,6 +49,8 @@ class FightScreen():
         self.boon_assets = load_boon_assets()
         self.boon_effects = []
 
+        self.boon_icons = load_icons()
+
         # screen fade between rounds
         self.fade_surface = pygame.Surface((con.SCREEN_WIDTH, con.SCREEN_HEIGHT))
         self.fade_surface.fill(con.BLACK)
@@ -55,7 +58,8 @@ class FightScreen():
 
         self.dice = None
         self.dice_player = None
-
+        self.dice_result = None     # curse / revive
+        self.dice_saved = None      # persist after dice_player cleared(for revive icon display)
         self.revive_update_time = 0
         self.revive_frame_index = 0
 
@@ -111,8 +115,8 @@ class FightScreen():
 
             # spawn boon effects when a fighter requests one
             for fighter, target, boon_con in (
-                (self.player1, self.player2, con.p1_boon),
-                (self.player2, self.player1, con.p2_boon),
+                (self.player1, self.player2, con.p1_active_boon),
+                (self.player2, self.player1, con.p2_active_boon),
             ):
                 if fighter.wants_boon:
                     fighter.wants_boon = False
@@ -208,6 +212,8 @@ class FightScreen():
                     self.state = "dice_roll"
                     self.dice_player = self.round_death
                     self.dice = Dice(self.screen)
+                    self.dice_result = None
+                    self.dice_saved = None
                 else:
                     self.state = "round_end"
                 self.state_timer = current_time
@@ -221,6 +227,8 @@ class FightScreen():
 
                 if result > 10:
                     # survived
+                    self.dice_result = "revive"
+                    self.dice_saved = self.dice_player
                     if self.dice_player is self.player1:
                         self.p2_wins -= 1
                     else:
@@ -241,6 +249,8 @@ class FightScreen():
 
                 else: 
                     # cursed
+                    self.dice_result = "curse"
+                    self.dice_saved = self.dice_player
                     if self.dice_player is self.player1:
                         self.p2_wins += 1
                     else:
@@ -319,7 +329,8 @@ class FightScreen():
     
     def draw(self):
         x, y = self.screen_shake_offset
-        draw_screen(self.screen, self.background, con.FLOOR_Y, con.FLOOR_HEIGHT, con.SCREEN_WIDTH, self.player1, self.player2, offset=(x, y))
+        draw_screen(self.screen, self.background, con.FLOOR_Y, con.FLOOR_HEIGHT, 
+                    con.SCREEN_WIDTH, self.player1, self.player2, offset=(x, y))
         self.player1.draw(self.screen)
         self.player2.draw(self.screen)
 
@@ -339,6 +350,11 @@ class FightScreen():
             round_time = pygame.time.get_ticks() - self.round_start_time
             display_seconds = max(0, (con.ROUND_DURATION - round_time) // 1000)
             draw_timer(self.screen, display_seconds)
+
+        draw_boon_icons(self.screen, self.player1, con.p1_active_boon, con.p1_passive_boon, 
+                        self.boon_icons, False, self.state, self.dice_player, self.dice_result, self.dice_saved)
+        draw_boon_icons(self.screen, self.player2, con.p2_active_boon, con.p2_passive_boon, 
+                        self.boon_icons, True, self.state, self.dice_player, self.dice_result, self.dice_saved)
 
         if self.fade_alpha > 0:
             self.fade_surface.set_alpha(self.fade_alpha)

@@ -333,11 +333,11 @@ class BoonScreen:
                     if self.both_ready() and self.continue_btn.is_clicked((mx, my), True):
                         con.select_sound.play()
 
-                        con.p1_boon         = boons[self.p1_active_sel]
-                        con.p1_passive_boon = boons[self.p1_passive_sel]["key"]
+                        con.p1_active_boon = boons[self.p1_active_sel]
+                        con.p1_passive_boon = boons[self.p1_passive_sel]
                         if not self.story:
-                            con.p2_boon         = boons[self.p2_active_sel]
-                            con.p2_passive_boon = boons[self.p2_passive_sel]["key"]
+                            con.p2_active_boon = boons[self.p2_active_sel]
+                            con.p2_passive_boon = boons[self.p2_passive_sel]
         
                         if self.story != True:
                             return "Map"
