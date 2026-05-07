@@ -114,11 +114,29 @@ class Fighter():
                 return max(1, int(base * Adrenaline.attack_speed_multiply(self.consecutive_hits)))
         return base
         
-    def apply_damage(self, damage):
+    def receive_damage(self, base_damage, attacker=None):
+        damage = base_damage
+ 
+        # attacker effect multiply
+        if attacker:
+            damage = int(damage * attacker.damage_mult())
+ 
+        # freeze effect
         if self.freeze_debuff and self.freeze_debuff.active:
             damage = int(damage * self.freeze_debuff.damage_multiplier)
-            self.freeze_debuff.notify_damage()
+            self.freeze_debuff.notify_damage()   # ends the freeze immediately
+ 
         self.health = max(0, self.health - damage)
+ 
+        # Adrenaline effect
+        if attacker is not None and attacker.passive_boon == "adrenaline":
+            attacker.consecutive_hits = min(
+                attacker.consecutive_hits + 1, Adrenaline.MAX_ADRENALINE
+            )
+        if self.passive_boon == "adrenaline":
+            self.consecutive_hits = 0
+
+        return damage
 
     def move(self, SCREEN_WIDTH, SCREEN_HEIGHT, FLOOR_HEIGHT, TARGET, cpu_input=None):
         SPEED = int(con.PLAYER_SPEED * self.speed_mult())
@@ -360,18 +378,10 @@ class Fighter():
             # collision detect
             if attacking_rect.colliderect(TARGET.rect) and not TARGET.dashing:
                 base_damage = self.char_data["attack_damage"].get(attack_key)
-                damege = int(base_damage * self.damage_mult())
-                TARGET.health -= damege
-                
-                TARGET.apply_damage(self.char_data["attack_damage"].get(attack_key))
+                TARGET.receive_damage(base_damage, attacker=self)
+
                 TARGET.stun = True
                 TARGET.sounds["hit"].play()
-
-                if self.passive_boon == "adrenaline":
-                    self.consecutive_hits = min(self.consecutive_hits + 1, Adrenaline.MAX_ADRENALINE)
-
-                if TARGET.passive_boon == "adrenaline":
-                    TARGET.consecutive_hits = 0
 
                 if not TARGET.death:
                     TARGET.frame_index = 0
@@ -381,6 +391,7 @@ class Fighter():
                         TARGET.rect.x += con.KNOCKBACK_DISTANCE
                     else: 
                         TARGET.rect.x -= con.KNOCKBACK_DISTANCE
+
                 self.hitbox_set.add(current_attack_index)
 
     # animation loop

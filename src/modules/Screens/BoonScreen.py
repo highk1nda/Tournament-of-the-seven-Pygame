@@ -40,9 +40,38 @@ boons = [
             "Duration: 8 seconds.",
         ],
     },
-    {"name": "Passive Boon 1", "type": "PASSIVE", "desc": ["Coming soon."]},
-    {"name": "Passive Boon 2", "type": "PASSIVE", "desc": ["Coming soon."]},
-    {"name": "Passive Boon 3", "type": "PASSIVE", "desc": ["Coming soon."]},
+    {
+        "name": "Devil's Die",
+        "type": "PASSIVE",
+        "key": "devils_die",
+        "desc": [
+            "After losing a round, roll a 20-sided die.",
+            "Above 10: revive — no life lost.",
+            "Below 10: lose an extra life.",
+            "Exactly 10: roll again.",
+        ],
+    },
+    {
+        "name": "Adrenaline",
+        "type": "PASSIVE",
+        "key": "adrenaline",
+        "desc": [
+            "-10% damage dealt.",
+            "Each consecutive hit increases attack",
+            "and movement speed (up to a cap).",
+            "Taking damage resets all stacks.",
+        ],
+    },
+    {
+        "name": "Last Stand",
+        "type": "PASSIVE",
+        "key": "last_stand",
+        "desc": [
+            "While below 30% health,",
+            "attack damage and movement speed",
+            "increase by 30%.",
+        ],
+    },
 ]
 
 BOON_PREVIEW_KEYS = [
@@ -54,6 +83,8 @@ BOON_PREVIEW_KEYS = [
     "priest_heal",      # Passive 3
 ]
 
+ACTIVE_INDICES  = [i for i, b in enumerate(boons) if b["type"] == "ACTIVE"]
+PASSIVE_INDICES = [i for i, b in enumerate(boons) if b["type"] == "PASSIVE"]
 
 def make_boon_rects(grid_x):
     return [
@@ -70,7 +101,7 @@ p1_boon_rects = make_boon_rects(con.boon_p1_grid_x)
 p2_boon_rects = make_boon_rects(con.boon_p2_grid_x)
 
 
-def _fresh_anim():
+def fresh_anim():
     return {"frame": 0, "time": pygame.time.get_ticks(), "waiting": False, "wait_start": 0}
 
 
@@ -97,44 +128,55 @@ class BoonScreen:
         magic = load_magic_projectiles()
         self.boon_preview_frames = [magic[k] for k in BOON_PREVIEW_KEYS]
 
-        self.p1_anim = [_fresh_anim() for _ in range(6)]
-        if self.story != True:
-            self.p2_anim = [_fresh_anim() for _ in range(6)]
+        self.p1_anim = [fresh_anim() for _ in range(6)]
+        self.p2_anim = [fresh_anim() for _ in range(6)]
 
-        self.p1_viewing  = None
-        if self.story != True:
-            self.p2_viewing  = None
-        self.p1_selected = None
-        if self.story != True:
-            self.p2_selected = None
+        self.p1_viewing = None
+        self.p2_viewing = None
+
+        self.p1_active_sel  = None
+        self.p1_passive_sel = None
+        self.p2_active_sel  = None
+        self.p2_passive_sel = None
+ 
 
         btn_y = con.select_butt_row1_y + con.boon_grid_height + 8
         self.p1_confirm = pygame.Rect(con.boon_p1_grid_x,
                                       btn_y, con.boon_cell_width, 35)
         self.p1_back    = pygame.Rect(con.boon_p1_grid_x + con.boon_cell_width + con.select_butt_gap,
                                       btn_y, con.boon_cell_width, 35)
-        if self.story != True:
-            self.p2_confirm = pygame.Rect(con.boon_p2_grid_x,
-                                          btn_y, con.boon_cell_width, 35)
-            self.p2_back    = pygame.Rect(con.boon_p2_grid_x + con.boon_cell_width + con.select_butt_gap,
-                                          btn_y, con.boon_cell_width, 35)
+        self.p2_confirm = pygame.Rect(con.boon_p2_grid_x,
+                                        btn_y, con.boon_cell_width, 35)
+        self.p2_back    = pygame.Rect(con.boon_p2_grid_x + con.boon_cell_width + con.select_butt_gap,
+                                        btn_y, con.boon_cell_width, 35)
 
         self.continue_btn = Button(
             con.SCREEN_WIDTH // 2 - 100, btn_y + 43, 200, 40,
             "CONTINUE", self.font, button_color=con.butt_disabled_color,
         )
 
+    def p1_ready(self):
+        return self.p1_active_sel is not None and self.p1_passive_sel is not None
+ 
+    def p2_ready(self):
+        return self.p2_active_sel is not None and self.p2_passive_sel is not None
+    
+    def both_ready(self):
+        if self.story:
+            return self.p1_ready()
+        return self.p1_ready() and self.p2_ready()
+    
     def draw_centered(self, surface, center_x, y):
         self.screen.blit(surface, (center_x - surface.get_width() // 2, y))
 
-    def draw_button(self, rect, label, color, selected=False):
+    def draw_button(self, rect, label, color, border_color=None, border_width=3):
         pygame.draw.rect(self.screen, color, rect, border_radius=5)
-        if selected:
-            pygame.draw.rect(self.screen, con.WHITE, rect, 3, border_radius=5)
+        if border_color is not None:
+            pygame.draw.rect(self.screen, border_color, rect, border_width, border_radius=5)
         s = con.font_Small.render(label, True, con.WHITE)
         self.screen.blit(s, (rect.centerx - s.get_width() // 2,
                              rect.centery - s.get_height() // 2))
-
+ 
     def draw_preview(self, char_idx, center_x, flip=False):
         preview = self.previews[char_idx]
         if preview is None:
@@ -145,11 +187,19 @@ class BoonScreen:
         self.screen.blit(frame, (center_x - frame.get_width() // 2,
                                  con.select_preview_y + (con.select_preview_size - frame.get_height()) // 2))
 
-    def draw_player_boons(self, rects, grid_x, viewing, selected):
+    def draw_player_boons(self, rects, grid_x, viewing, active_sel, passive_sel):
         if viewing is None:
             for i, boon in enumerate(boons):
-                color = con.boon_active_color if boon["type"] == "ACTIVE" else con.select_p2_butt_color
-                self.draw_button(rects[i], boon["name"], color, selected=(i == selected))
+                base_color = con.boon_active_color if boon["type"] == "ACTIVE" else con.select_p2_butt_color
+                
+                if i == active_sel:
+                    border_color = con.YELLOW
+                elif i == passive_sel:
+                    border_color = con.BLUE
+                else:
+                    border_color = None
+                
+                self.draw_button(rects[i], boon["name"], base_color, border_color)
 
             # row labels on the left: ACTIVE for row 0, PASSIVE for row 2
             for label, ref_rect, color in [
@@ -159,6 +209,19 @@ class BoonScreen:
                 surf = self.small.render(label, True, color)
                 self.screen.blit(surf, (grid_x - surf.get_width() - 6,
                                         ref_rect.centery - surf.get_height() // 2))
+                
+            # selection hints under the grid
+            hints = []
+            if active_sel is None:
+                hints.append("choose an Active boon")
+            if passive_sel is None:
+                hints.append("choose a Passive boon")
+            if hints:
+                hint_surf = self.small.render("  ·  ".join(hints), True, (160, 160, 160))
+                hint_y = rects[4].bottom + 6
+                self.screen.blit(hint_surf, (grid_x + con.boon_grid_width // 2 - hint_surf.get_width() // 2,
+                                             hint_y))
+                
         else:
             pygame.draw.rect(self.screen, con.boon_panel_color,
                              pygame.Rect(grid_x, con.select_butt_row1_y,
@@ -168,7 +231,11 @@ class BoonScreen:
             pcx = grid_x + con.boon_grid_width // 2
             pcy = con.select_butt_row1_y + con.boon_grid_height // 2
 
-            type_s = self.small.render(boon["type"], True, (170, 200, 170))
+            if boon["type"] == "ACTIVE":
+                type_color = (140, 210, 140)  
+            else:
+                type_color = (140, 150, 220)
+            type_s = self.small.render(boon["type"], True, type_color)
             self.screen.blit(type_s, (grid_x + 6, con.select_butt_row1_y + 5))
 
             name_s = self.big.render(boon["name"], True, con.WHITE)
@@ -207,9 +274,11 @@ class BoonScreen:
                                   con.select_p2_cx, preview_cy,
                                   y_offset=heal_y_offset)
 
-        self.draw_player_boons(p1_boon_rects, con.boon_p1_grid_x, self.p1_viewing, self.p1_selected)
+        self.draw_player_boons(p1_boon_rects, con.boon_p1_grid_x,
+                               self.p1_viewing, self.p1_active_sel, self.p1_passive_sel)
         if self.story != True:
-            self.draw_player_boons(p2_boon_rects, con.boon_p2_grid_x, self.p2_viewing, self.p2_selected)
+            self.draw_player_boons(p2_boon_rects, con.boon_p2_grid_x,
+                                   self.p2_viewing, self.p2_active_sel, self.p2_passive_sel)
 
         if self.p1_viewing is not None:
             self.draw_button(self.p1_confirm, "Confirm", con.select_fight_butt_color)
@@ -219,12 +288,22 @@ class BoonScreen:
                 self.draw_button(self.p2_confirm, "Confirm", con.select_fight_butt_color)
                 self.draw_button(self.p2_back,    "Back",    con.boon_back_color)
 
-        if self.story != True:
-            both_ready = self.p1_selected is not None and self.p2_selected is not None
-        else:
-            both_ready = self.p1_selected is not None
-        self.continue_btn.button_color = con.select_fight_butt_color if both_ready else con.butt_disabled_color
+        self.continue_btn.button_color = (
+            con.select_fight_butt_color if self.both_ready() else con.butt_disabled_color
+        )
         self.continue_btn.draw(self.screen)
+ 
+        # hint under continue button
+        if not self.both_ready():
+            hint = self.small.render(
+                "Each player must select 1 Active  +  1 Passive boon",
+                True, (120, 120, 120),
+            )
+            self.screen.blit(hint, (
+                con.SCREEN_WIDTH // 2 - hint.get_width() // 2,
+                self.continue_btn.rect.bottom + 6,
+            ))
+ 
         appBright(self.screen)
 
     def run(self):
@@ -242,54 +321,79 @@ class BoonScreen:
                     else:
                         con.exit_sound.play()
                         return "Char"
+                    
                 if event.type == MOUSEBUTTONDOWN:
                     mx, my = scale_mouse()
 
-                    if self.p1_viewing is None:
-                        for i in range(6):
-                            if p1_boon_rects[i].collidepoint(mx, my):
-                                con.select_sound.play()
-                                self.p1_viewing = i
-                                self.p1_anim[i] = _fresh_anim()
-                    else:
-                        if self.p1_confirm.collidepoint(mx, my):
-                            con.select_sound.play()
-                            self.p1_selected = self.p1_viewing
-                            self.p1_viewing  = None
-                        elif self.p1_back.collidepoint(mx, my):
-                            con.exit_sound.play()
-                            self.p1_viewing = None
-
+                    self.handle_click_p1(mx, my)
                     if self.story != True:
-                        if self.p2_viewing is None:
-                            for i in range(6):
-                                if p2_boon_rects[i].collidepoint(mx, my):
-                                    con.select_sound.play()
-                                    self.p2_viewing = i
-                                    self.p2_anim[i] = _fresh_anim()
-                        else:
-                            if self.p2_confirm.collidepoint(mx, my):
-                                con.select_sound.play()
-                                self.p2_selected = self.p2_viewing
-                                self.p2_viewing  = None
-                            elif self.p2_back.collidepoint(mx, my):
-                                con.exit_sound.play()
-                                self.p2_viewing = None
-
-                    if self.story != True:
-                        both_ready = self.p1_selected is not None and self.p2_selected is not None
-                    else:
-                        both_ready = self.p1_selected is not None
-                    if both_ready and self.continue_btn.is_clicked((mx, my), True):
+                        self.handle_click_p2(mx, my)
+ 
+                    # Continue
+                    if self.both_ready() and self.continue_btn.is_clicked((mx, my), True):
                         con.select_sound.play()
-                        con.p1_boon = boons[self.p1_selected]
-                        if self.story != True:
-                            con.p2_boon = boons[self.p2_selected]
+
+                        con.p1_boon         = boons[self.p1_active_sel]
+                        con.p1_passive_boon = boons[self.p1_passive_sel]["key"]
+                        if not self.story:
+                            con.p2_boon         = boons[self.p2_active_sel]
+                            con.p2_passive_boon = boons[self.p2_passive_sel]["key"]
+        
                         if self.story != True:
                             return "Map"
                         else:
                             return "Textcrawl"
-
+ 
             self.draw()
             res.render_to_surface()
             self.clock.tick(con.FPS)
+
+    def handle_click_p1(self, mx, my):
+        if self.p1_viewing is None:
+            for i in range(6):
+                if p1_boon_rects[i].collidepoint(mx, my):
+                    con.select_sound.play()
+                    self.p1_viewing = i
+                    self.p1_anim[i] = fresh_anim()
+                    return
+        else:
+            if self.p1_confirm.collidepoint(mx, my):
+                con.select_sound.play()
+                self.confirm_boon("p1", self.p1_viewing)
+                self.p1_viewing = None
+            elif self.p1_back.collidepoint(mx, my):
+                con.exit_sound.play()
+                self.p1_viewing = None
+ 
+    def handle_click_p2(self, mx, my):
+        if self.p2_viewing is None:
+            for i in range(6):
+                if p2_boon_rects[i].collidepoint(mx, my):
+                    con.select_sound.play()
+                    self.p2_viewing = i
+                    self.p2_anim[i] = fresh_anim()
+                    return
+        else:
+            if self.p2_confirm.collidepoint(mx, my):
+                con.select_sound.play()
+                self.confirm_boon("p2", self.p2_viewing)
+                self.p2_viewing = None
+            elif self.p2_back.collidepoint(mx, my):
+                con.exit_sound.play()
+                self.p2_viewing = None
+ 
+    def confirm_boon(self, player, idx):
+
+        boon = boons[idx]
+        if boon["type"] == "ACTIVE":
+            if player == "p1":
+                self.p1_active_sel = idx
+            else:
+                self.p2_active_sel = idx
+        else:  # PASSIVE
+            if player == "p1":
+                self.p1_passive_sel = idx
+            else:
+                self.p2_passive_sel = idx
+
+        

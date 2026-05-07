@@ -99,17 +99,10 @@ class Projectile:
 
 
     def make_damage(self):
-        damage = int(self.damage * self.fighter.damage_mult())
-        self.target.health -= damage
-        self.target.apply_damage(self.damage)
+        self.target.receive_damage(self.damage, attacker=self.fighter)
+
         self.target.stun = True
         self.target.sounds["hit"].play()
-
-        if self.fighter.passive_boon == "adrenaline":
-            self.fighter.adrenaline_stacks = min(self.fighter.consecutive_hits + 1, Adrenaline.MAX_ADRENALINE)
-
-        if self.target.passive_boon == "adrenaline":
-            self.target.consecutive_hits = 0
 
         if not self.target.death:
             self.target.frame_index = 0
