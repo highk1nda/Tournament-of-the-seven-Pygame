@@ -25,11 +25,11 @@ All modes are best of three. A round ends when someone’s health hits zero (dea
 | Character | Health | Speed | Damage | Notes |
 |-----------|--------|-------|--------|-------|
 | Knight | Normal | Normal | Normal | Good at everything |
-| Werebear | Normal | Slow to Normal | Normal to High | Gets stronger below 40% HP |
-| Wizard | Low | Low | High | Slowly regens HP up to 60% |
-| Minotaur | High | Low | Normal | Pure tank |
-| Archer | Low | High | Normal | Fast and mobile |
-| Knight Templar (Locked) | Normal | Low | High | Unlocked after finishing Story Mode |
+| Werebear | Normal | Slow to Normal | Normal to High | Slow but excels at damage and crowd control |
+| Wizard | Low | Low | High | powerful damage dealer, long range|
+| Minotaur | High | Low | Normal | Pure tank, excels at stunning |
+| Archer | Low | High | Normal | Fast and mobile, excels from a distance |
+| Knight Templar (Locked) | Normal | Low | High | tank and a powerful damage dealer, Unlocked after finishing Story Mode |
 
 ---
 
@@ -195,6 +195,10 @@ python main.py
 
 	Energy hum sound
 	https://pixabay.com/sound-effects/film-special-effects-energy-hum-29083/
+
+	Death sound
+	https://pixabay.com/sound-effects/film-special-effects-battle-end-408433/
+
 ---
 
 <p align="center">

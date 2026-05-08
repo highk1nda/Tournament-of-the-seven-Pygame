@@ -242,7 +242,6 @@ ACTIONS = {
 # Music
 menumusic: str = "assets/sfx/menmusica.mp3"
 fightmusic: str = "assets/sfx/fightmusica.mp3"
-forestsound: str = "assets/sfx/forest-ambience-296528.mp3"
 menuscreenimage: str = "assets/forest.jpg" # DEAFULTIMAGE, not changable from game
 fightscreenimage: str = "assets/Colleseum.png" # DEAFULTIMAGE, changable in MapScreen.py
 
@@ -252,7 +251,6 @@ select_sound     = pygame.mixer.Sound("assets/sfx/select2.mp3")
 ui_error_sound   = pygame.mixer.Sound("assets/sfx/floraphonic-arcade-ui-4.mp3")
 exit_sound       = pygame.mixer.Sound("assets/sfx/musicholder-woosh-260275.mp3")
 
-forest_sfx = pygame.mixer.Sound(forestsound)
 fight_text_sound = pygame.mixer.Sound("assets/sfx/impact.mp3")
 fight_text_sound.set_volume(sfxVolume)
 
