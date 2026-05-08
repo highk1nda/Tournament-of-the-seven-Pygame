@@ -21,7 +21,7 @@ class Help():
         if con.storyEdwardComplete or con.storyTylandComplete or con.storyLunaComplete or con.storyRemComplete or con.storyArlandComplete:
             self.Button_Venator     = Button(1600, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Venator', con.font_Large, con.DARK_RED)
         else:
-            self.Button_Venator     = Button(1600, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, '???', con.font_Large, con.BLACK, Help=True)
+            self.Button_Venator     = Button(1600, 800, int(con.SCREEN_WIDTH/8), con.buttonheight, '???', con.font_Large, con.BLACK, nonselect=True)
         self.buttons                = [self.Button_Edward, self.Button_Tyland, self.Button_Luna, self.Button_Rem, self.Button_Arland, self.Button_Venator]
         self.click = False
 
@@ -64,9 +64,6 @@ class Help():
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 self.click = True
-        elif event.type == MOUSEBUTTONUP:
-            if event.button == 1:
-                self.click = False
         return None
     
     def update(self):
@@ -76,27 +73,33 @@ class Help():
         if self.Button_Edward.is_clicked((mx, my), self.click):
             self.click = False
             con.select_sound.play()
+            con.p1_char_idx = 0
             return 'Edward'
         if self.Button_Tyland.is_clicked((mx, my), self.click):
             self.click = False
             con.select_sound.play()
+            con.p1_char_idx = 1
             return 'Tyland'
         if self.Button_Luna.is_clicked((mx, my), self.click):
             self.click = False
             con.select_sound.play()
+            con.p1_char_idx = 2
             return 'Luna'
         if self.Button_Rem.is_clicked((mx, my), self.click):
             self.click = False
             con.select_sound.play()
+            con.p1_char_idx = 3
             return 'Rem'
         if self.Button_Arland.is_clicked((mx, my), self.click):
             self.click = False
             con.select_sound.play()
+            con.p1_char_idx = 4
             return 'Arland'
         if self.Button_Venator.is_clicked((mx, my), self.click):
             if con.storyEdwardComplete or con.storyTylandComplete or con.storyLunaComplete or con.storyRemComplete or con.storyArlandComplete:
                 self.click = False
                 con.select_sound.play()
+                con.p1_char_idx = 5
                 return "Venator"
             else:
                 self.click = False
@@ -109,13 +112,13 @@ class Help():
         self.screen.blit(con.background, (0,0))
         self.screen.blit(self.overlay, (0,0))
         title = con.font_XLarge.render("Controls", True, con.YELLOW)
-        self.screen.blit(title, title.get_rect(center=(con.SCREEN_WIDTH // 2, 170)))
+        self.screen.blit(title, title.get_rect(center=(con.center_x, 170)))
 
         #display text
         count = 0
         for line in self.txt:
             rendered_l = con.font_Big.render(line, True, con.WHITE)
-            con.display_surface.blit(rendered_l, rendered_l.get_rect(center=(con.SCREEN_WIDTH // 2, count + 400)))
+            self.screen.blit(rendered_l, rendered_l.get_rect(center=(con.center_x, count + 400)))
             count += 25
         
         for button in self.buttons:

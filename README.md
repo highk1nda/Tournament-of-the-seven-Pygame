@@ -148,6 +148,10 @@ python main.py
 	Active boon 3
 	Graksyn
 	https://coloritmic.itch.io/icecool-pack
+	
+	Dice icon
+	SkullReaper
+	https://skullreaper.itch.io/dice-icons
 
 	Menu Music
 	Music: Planning by Alexander Nakarada (https://www.creatorchords.com)

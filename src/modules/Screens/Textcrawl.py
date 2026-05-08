@@ -109,13 +109,12 @@ class Textcrawl:
                             saveGame()
                             return "Menu"
                         else:
-                            return "Boon"   
+                            return "CPU"   
                      
                     if event.key == K_RETURN:
                         con.exit_sound.play()
                         if self.caller == "Story" and self.ending == False:
-                            # Placeholder until loading levels are done
-                            return Textcrawl(self.screen, self.clock, "Story", True).run()
+                            return "Levels"
                         if self.caller == "Story" and self.ending == True: 
                             if con.p1_char_idx == 0:
                                 con.storyEdwardComplete = True

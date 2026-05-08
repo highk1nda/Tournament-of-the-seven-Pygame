@@ -40,9 +40,6 @@ class MainMenuScreen:
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 self.click = True
-        elif event.type == MOUSEBUTTONUP:
-            if event.button == 1:
-                self.click = False
         return None
 
     def update(self):
@@ -80,6 +77,9 @@ class MainMenuScreen:
     def draw(self):
         self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.overlay, (0, 0))
+
+        title = con.font_XXLarge.render("Tournament of Lympos", True, con.YELLOW)
+        self.screen.blit(title, title.get_rect(center=(con.center_x, 230)))
 
         # draw buttons
         for button in self.buttons:

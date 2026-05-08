@@ -20,7 +20,7 @@ class Luna():
         if con.storyLunaComplete:
             self.Ending = Button(1600, 900, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Ending', con.font_Large, con.DARK_RED)
         else:
-            self.Ending = Button(1600, 900, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Ending', con.font_Large, con.BLACK, Help=True)
+            self.Ending = Button(1600, 900, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Ending', con.font_Large, con.BLACK, Nonselect=True)
 
         self.click = False
         self.preview = CharPreview(charDict.CHARACTER_DATA[2])

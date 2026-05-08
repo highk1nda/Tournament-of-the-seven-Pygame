@@ -13,13 +13,15 @@ from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 CHAR_DATA = chardict.CHARACTER_DATA
 
 
-def make_button_rects(center_x):
+def make_char_buttons(center_x, labels, color):
+    # creates 6 character select Button objects in a 3x2 grid centered around center_x
     start_x = center_x - con.select_grid_width // 2
     return [
-        pygame.Rect(
+        Button(
             start_x + (i % 3) * (con.select_butt_width + con.select_butt_gap),
             con.select_butt_row1_y if i < 3 else con.select_butt_row2_y,
             con.select_butt_width, con.select_butt_height,
+            labels[i], con.font_Small, color, SelectScreen=True
         )
         for i in range(6)
     ]
@@ -51,12 +53,6 @@ class SelectCharScreen():
 
         self.story = story
 
-        self.p1_btns = make_button_rects(con.select_p1_cx)
-        if self.story != True:
-            self.p2_btns = make_button_rects(con.select_p2_cx)
-        self.fight_btn = Button(con.select_fight_butt_x, con.select_fight_y, 200, 45, "CONTINUE",
-                                con.font_Small, button_color=con.select_fight_butt_color)
-
         self.p1_idx = 0  # default: Knight
         self.p2_idx = 1  # default: Werebear
 
@@ -77,6 +73,14 @@ class SelectCharScreen():
         else:
             self.LABELS = ["Ser Edward", "Tyland", "Luna", "Rem", "Arland", "???"]
 
+        self.p1_btns = make_char_buttons(con.select_p1_cx, self.LABELS, con.select_p1_butt_color)
+        if self.story != True:
+            self.p2_btns = make_char_buttons(con.select_p2_cx, self.LABELS, con.select_p2_butt_color)
+        self.fight_btn = Button(con.select_fight_butt_x, con.select_fight_y, 200, 45, "CONTINUE",
+                                con.font_Small, button_color=con.select_fight_butt_color, SelectScreen=True)
+
+        self.click = False
+
     def select_char(self, player, idx):
         # only select if the character is implemented (has char data)
         if CHAR_DATA[idx] is not None:
@@ -86,17 +90,8 @@ class SelectCharScreen():
                 self.p2_idx = idx
 
     # draw helpers
-
     def draw_centered(self, surface, center_x, y):
         self.screen.blit(surface, (center_x - surface.get_width() // 2, y))
-
-    def draw_button(self, rect, label, color, selected=False, disabled=False):
-        btn_color = con.butt_disabled_color if disabled else color
-        pygame.draw.rect(self.screen, btn_color, rect, border_radius=5)
-        if selected:
-            pygame.draw.rect(self.screen, con.WHITE, rect, 3, border_radius=5)
-        label_surf = con.font_Small.render(label, True, con.WHITE)
-        self.screen.blit(label_surf, label_surf.get_rect(center=rect.center))
 
     def draw_preview(self, char_idx, center_x, flip=False):
         preview = self.previews[char_idx]
@@ -106,6 +101,56 @@ class SelectCharScreen():
                 frame = pygame.transform.flip(frame, True, False)
             self.screen.blit(frame, (center_x - frame.get_width() // 2,
                                      con.select_preview_y + (con.select_preview_size - frame.get_height()) // 2))
+
+    def handle_event(self, event):
+        if event.type == pygame.QUIT:
+            result = confscr(self.screen, self.clock, "Char").run()
+            return result
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                con.exit_sound.play()
+                return "Menu"
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                self.click = True
+        return None
+
+    def update(self):
+        if not self.click:
+            return None
+
+        self.click = False
+        mx, my = scale_mouse()
+
+        # check character select buttons for both players
+        for i in range(6):
+            if self.p1_btns[i].is_clicked((mx, my), True):
+                if CHAR_DATA[i] is None or (i == 5 and not (con.storyEdwardComplete or con.storyTylandComplete
+                                                            or con.storyLunaComplete or con.storyRemComplete
+                                                            or con.storyArlandComplete)) or (self.story == True and i == 5):
+                    con.ui_error_sound.play()
+                else:
+                    con.select_sound.play()
+                    self.select_char(1, i)
+            if self.story != True:
+                if self.p2_btns[i].is_clicked((mx, my), True):
+                    if CHAR_DATA[i] is None or (i == 5 and not (con.storyEdwardComplete or con.storyTylandComplete
+                                                                or con.storyLunaComplete or con.storyRemComplete or con.storyArlandComplete)):
+                        con.ui_error_sound.play()
+                    else:
+                        con.select_sound.play()
+                        self.select_char(2, i)
+
+        if self.fight_btn.is_clicked((mx, my), True):
+            con.select_sound.play()
+            con.p1_selected = CHAR_DATA[self.p1_idx]
+            if self.story != True:
+                con.p2_selected = CHAR_DATA[self.p2_idx]
+            con.p1_char_idx = self.p1_idx
+            con.p2_char_idx = self.p2_idx
+            return "Boon"
+
+        return None
 
     def draw(self):
         #draw background
@@ -125,16 +170,14 @@ class SelectCharScreen():
 
         #draw character select buttons for both players
         for i in range(6):
-            if i == 5:
-                disabled = venatorDisabled
-            else:
-                disabled = (CHAR_DATA[i] is None)
-
-            self.draw_button(self.p1_btns[i], self.LABELS[i], con.select_p1_butt_color,
-                             selected=(i == self.p1_idx), disabled=disabled)
+            disabled = venatorDisabled if i == 5 else (CHAR_DATA[i] is None)
+            self.p1_btns[i].disabled = disabled
+            self.p1_btns[i].selected = (i == self.p1_idx)
+            self.p1_btns[i].draw(self.screen)
             if self.story != True:
-                self.draw_button(self.p2_btns[i], self.LABELS[i], con.select_p2_butt_color,
-                             selected=(i == self.p2_idx), disabled=disabled)
+                self.p2_btns[i].disabled = disabled
+                self.p2_btns[i].selected = (i == self.p2_idx)
+                self.p2_btns[i].draw(self.screen)
 
         self.fight_btn.draw(self.screen)
         appBright(self.screen)
@@ -142,45 +185,13 @@ class SelectCharScreen():
     def run(self):
         while True:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    result = confscr(self.screen, self.clock, "Char").run()
+                result = self.handle_event(event)
+                if result:
                     return result
 
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        con.exit_sound.play()
-                        return "Menu"
-
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    mx, my = scale_mouse()
-
-                    # check character select buttons for both players
-                    for i in range(6):
-                        if self.p1_btns[i].collidepoint(mx, my):
-                            if CHAR_DATA[i] is None or (i == 5 and not (con.storyEdwardComplete or con.storyTylandComplete 
-                                                                    or con.storyLunaComplete or con.storyRemComplete 
-                                                                    or con.storyArlandComplete)) or (self.story == True and i == 5):
-                                con.ui_error_sound.play()
-                            else:
-                                con.select_sound.play()
-                                self.select_char(1, i)
-                        if self.story != True:
-                            if self.p2_btns[i].collidepoint(mx, my):
-                                if CHAR_DATA[i] is None or (i == 5 and not (con.storyEdwardComplete or con.storyTylandComplete 
-                                                                        or con.storyLunaComplete or con.storyRemComplete or con.storyArlandComplete)):
-                                    con.ui_error_sound.play()
-                                else:
-                                    con.select_sound.play()
-                                    self.select_char(2, i)
-
-                    if self.fight_btn.is_clicked((mx, my), True):
-                        con.select_sound.play()
-                        con.p1_selected = CHAR_DATA[self.p1_idx]
-                        if self.story != True:
-                            con.p2_selected = CHAR_DATA[self.p2_idx]
-                        con.p1_char_idx = self.p1_idx
-                        con.p2_char_idx = self.p2_idx
-                        return "Boon"
+            action = self.update()
+            if action:
+                return action
 
             self.draw()
             res.render_to_surface()

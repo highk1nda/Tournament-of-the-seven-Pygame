@@ -35,8 +35,6 @@ class Options():
         self.musicSlider        = Slider(slider_x, int(con.SCREEN_HEIGHT * 0.30), self.slider_width, self.slider_height, initial=con.musicVolume, name="Music Volume")
         self.sfxSlider          = Slider(slider_x, int(con.SCREEN_HEIGHT * 0.42), self.slider_width, self.slider_height, initial=con.sfxVolume, name="SFX Volume")
         self.brightnessSlider   = Slider(slider_x, int(con.SCREEN_HEIGHT * 0.54), self.slider_width, self.slider_height, initial=con.brightness/100, name="Brightness")
-        self.size_buttons = []
-
         self.wintxt = con.font_Large.render("window size: ", True, con.YELLOW)
 
         self.butt_y = int(con.SCREEN_HEIGHT / 1.44)
@@ -55,7 +53,6 @@ class Options():
         self.fourthres  = Button(self.start_x + self.butt_gap*3 + self.butt_width*3, self.butt_y, self.butt_width, self.butt_height, 
                                  '1920 x 1080', con.font_Large, con.GREY, con.WHITE, con.YELLOW)
         self.buttons    = [self.firstres, self.secondres, self.thirdres, self.fourthres]
-        self.click = False
 
 
     # change the volumes for all possible sounds, in constants

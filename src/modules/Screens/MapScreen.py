@@ -6,6 +6,7 @@ from src.modules.systems.applybright import apply_brightness as appBright
 from src.modules.systems.scalemouse import scale_mouse
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.Screens.SelectCharScreen import CharPreview, CHAR_DATA
+from src.modules.UI.Button import Button
 
 MAPS = [
     {"name": "Colleseum",  "path": "assets/Colleseum.png",  "key": "map1"},
@@ -39,18 +40,13 @@ class MapScreen:
             else:
                 self.previews.append(None)
 
-        self.prev_rect  = pygame.Rect(con.map_cx - con.map_fight_butt_width // 2 - con.map_nav_butt_width - 20, con.map_nav_y, con.map_nav_butt_width,   con.map_nav_butt_height)
-        self.fight_rect = pygame.Rect(con.map_cx - con.map_fight_butt_width // 2,                              con.map_nav_y, con.map_fight_butt_width, con.map_fight_butt_height)
-        self.next_rect  = pygame.Rect(con.map_cx + con.map_fight_butt_width // 2 + 20,                         con.map_nav_y, con.map_nav_butt_width,   con.map_nav_butt_height)
+        fight_label = "FIGHT" if multiplayer else "CONTINUE"
+        self.prev_butt  = Button(con.map_cx - con.map_fight_butt_width // 2 - con.map_nav_butt_width - 20, con.map_nav_y, con.map_nav_butt_width,   con.map_nav_butt_height,  "< Previous", con.font_Medium, con.butt_disabled_color, nonselect=True)
+        self.fight_butt = Button(con.map_cx - con.map_fight_butt_width // 2,                              con.map_nav_y, con.map_fight_butt_width, con.map_fight_butt_height, fight_label,  con.font_Medium, con.select_fight_butt_color, nonselect=True)
+        self.next_butt  = Button(con.map_cx + con.map_fight_butt_width // 2 + 20,                         con.map_nav_y, con.map_nav_butt_width,   con.map_nav_butt_height,  "Next >",      con.font_Medium, con.butt_disabled_color, nonselect=True)
 
     def draw_centered(self, surface, center_x, y):
         self.screen.blit(surface, (center_x - surface.get_width() // 2, y))
-
-    def draw_button(self, rect, label, color):
-        pygame.draw.rect(self.screen, color, rect, border_radius=6)
-        s = con.font_Medium.render(label, True, con.WHITE)
-        self.screen.blit(s, (rect.centerx - s.get_width() // 2,
-                             rect.centery - s.get_height() // 2))
 
     def draw_char_on_preview(self, char_idx, rel_x, flip=False):
         preview = self.previews[char_idx]
@@ -74,10 +70,9 @@ class MapScreen:
 
         self.draw_centered(con.font_Small.render(MAPS[self.map_idx]["name"], True, con.WHITE), con.map_cx, con.map_preview_y + con.map_preview_height + 6)
 
-        self.draw_button(self.prev_rect,  "< Previous", con.butt_disabled_color)
-        fight_label = "FIGHT" if self.multiplayer else "CONTINUE"
-        self.draw_button(self.fight_rect, fight_label, con.select_fight_butt_color)
-        self.draw_button(self.next_rect,  "Next >",     con.butt_disabled_color)
+        self.prev_butt.draw(self.screen)
+        self.fight_butt.draw(self.screen)
+        self.next_butt.draw(self.screen)
         appBright(self.screen)
 
     def run(self):
@@ -89,14 +84,14 @@ class MapScreen:
                 if event.type == KEYDOWN and event.key == K_ESCAPE:
                     return "Boon"
                 if event.type == MOUSEBUTTONDOWN:
-                    mx, my = scale_mouse()
-                    if self.prev_rect.collidepoint(mx, my):
+                    pos = scale_mouse()
+                    if self.prev_butt.is_clicked(pos, True):
                         con.select_sound.play()
                         self.map_idx = (self.map_idx - 1) % len(MAPS)
-                    elif self.next_rect.collidepoint(mx, my):
+                    elif self.next_butt.is_clicked(pos, True):
                         con.select_sound.play()
                         self.map_idx = (self.map_idx + 1) % len(MAPS)
-                    elif self.fight_rect.collidepoint(mx, my):
+                    elif self.fight_butt.is_clicked(pos, True):
                         con.select_sound.play()
                         con.selected_map = MAPS[self.map_idx]["key"]
                         return "Fight" if self.multiplayer else "CPU"

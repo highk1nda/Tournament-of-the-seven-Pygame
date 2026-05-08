@@ -9,11 +9,13 @@ from src.modules.Screens.SelectCharScreen import CharPreview
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 
 class RematchScreen:
-    def __init__(self, screen, winner_text, winner_data, winner_flip=False):
+    def __init__(self, screen, winner_text, winner_data, winner_flip=False, story =False):
         self.screen      = screen
         self.winner_text = winner_text
         self.winner_data = winner_data
         self.winner_flip = winner_flip
+
+        self.story = story
 
         self.window_rect = pygame.Rect(con.WINDOW_X, con.WINDOW_Y, con.WINDOW_WIDTH, con.WINDOW_HEIGHT)
 
@@ -30,8 +32,8 @@ class RematchScreen:
         self.yes = Button(con.WINDOW_YES_X, con.WINDOW_BUTTON_Y, con.WINDOW_BUTTON_WIDTH, con.WINDOW_BUTTON_HEIGHT,
                               "YES", self.font_button,
                               button_color=con.DARK_RED)
-        self.no  = Button(con.WINDOW_NO_X,  con.WINDOW_BUTTON_Y, con.WINDOW_BUTTON_WIDTH, con.WINDOW_BUTTON_HEIGHT,
-                              "NO",  self.font_button,
+        self.no  = Button(con.WINDOW_NO_X,  con.WINDOW_BUTTON_Y, con.WINDOW_NO_BUTTON_WIDTH, con.WINDOW_BUTTON_HEIGHT,
+                              "Select new Character",  self.font_button,
                               button_color=con.DARK_BLUE)
         
         self.background_snapshot = self.screen.copy()
@@ -70,6 +72,13 @@ class RematchScreen:
         text_surface = self.font_rematch.render("Rematch?", True, con.WHITE)
         self.screen.blit(text_surface, text_surface.get_rect(centerx=self.window_rect.centerx, y=rematch_y))
 
+        if self.story:
+            title = con.font_Large.render("Press ESC to return to main menu. Note: going back to main menu or character select will reset progreess", 
+                                          True, con.YELLOW)
+        else:
+            title = con.font_Large.render("Press ESC to return to main menu", True, con.YELLOW)
+        self.screen.blit(title, title.get_rect(center=(con.center_x, 1020)))
+
         self.yes.draw(self.screen)
         self.no.draw(self.screen)
 
@@ -82,6 +91,8 @@ class RematchScreen:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     result = confscr(self.screen, con.clock, "pause").run()
+                    if result != "quit":
+                        continue
                     return result
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -93,7 +104,7 @@ class RematchScreen:
                         return "Rematch"
                     if self.no.is_clicked((mx, my), True):
                         con.exit_sound.play()
-                        return "Menu"
+                        return "Char"
 
             self.draw()
             res.render_to_surface()

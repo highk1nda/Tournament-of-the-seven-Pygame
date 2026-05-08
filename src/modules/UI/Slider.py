@@ -58,7 +58,6 @@ class Slider:
 
     def handle_event(self, event):
         pos = scale_mouse()
-        # check if clicked on slider, if yes then update the value
         track = pygame.Rect(self.x, self.y - self.height // 2, self.width, self.height)
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -69,7 +68,6 @@ class Slider:
                     self.value = new_val
                     return True
 
-        # if mouse is moving and slider is being dragged, update its value
         if event.type == pygame.MOUSEMOTION and self.dragging:
             new_val = self.get_val_from_mouse(pos[0])
             if new_val != self.value:

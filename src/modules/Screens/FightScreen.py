@@ -15,9 +15,10 @@ from tests.debug_tools import DebugPopup
 from src.modules.Screens.ConfirmScreen import confirm_dialog as confscr
 from src.modules.boons.DevilsDie import Dice
 from src.modules.Screens.RematchScreen import RematchScreen
+
 # the fight screen class
 class FightScreen():
-    def __init__(self, screen, clock):
+    def __init__(self, screen, clock, story=False):
         self.screen = screen
         self.clock = clock
         self.player1 = None
@@ -42,6 +43,7 @@ class FightScreen():
         self.state_timer = 0
         self.round_start_time = 0
 
+        self.story = story
         self.cpu_enabled = con.cpu_enabled
         self.cpu_level   = con.cpu_level
         self.cpu = CPUController(level=self.cpu_level)
@@ -411,7 +413,6 @@ class FightScreen():
                     self.player1.clean_up()
                     self.player2.clean_up()
                     self.cleanup_boon_effects()
-                    con.forest_sfx.stop()
                     con.fight_music.stop()
                     con.exit_sound.play()
                     return "Menu"
@@ -420,12 +421,39 @@ class FightScreen():
             result = self.update()
             if result == "fight_end":
 
+                if self.story:
+                    con.fight_music.stop()
+                    if self.p1_wins > self.p2_wins:
+                        return "story_win"
+                    else:
+                        if self.p2_wins > self.p1_wins:
+                            winner_data = con.p2_selected
+                            winner_flip = True
+                        else:
+                            winner_data = None
+                            winner_flip = False
+                        if self.story ==  True:
+                            rematch_result = RematchScreen(self.screen, self.winner, winner_data, winner_flip, story=True).run()
+                        else: 
+                            rematch_result = RematchScreen(self.screen, self.winner, winner_data, winner_flip).run()
+                        if rematch_result == "Rematch":
+                            self.p1_wins = 0
+                            self.p2_wins = 0
+                            self.current_round = 1
+                            self.state = "countdown"
+                            self.loadfighters()
+                            self.state_timer = pygame.time.get_ticks()
+                            con.fight_music.play(-1)
+                            continue
+                        else:
+                            return rematch_result
+
                 if self.p1_wins > self.p2_wins:
                     winner_data = con.p1_selected
-                    winner_flip = False   
+                    winner_flip = False
                 elif self.p2_wins > self.p1_wins:
                     winner_data = con.p2_selected
-                    winner_flip = True    
+                    winner_flip = True
                 else:
                     winner_data = None
                     winner_flip = False
@@ -443,7 +471,6 @@ class FightScreen():
                 elif rematch_result == "pause":
                     pass
                 else:
-                    con.forest_sfx.stop()
                     con.fight_music.stop()
                     return rematch_result      # "Menu" or "quit"
            

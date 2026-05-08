@@ -16,10 +16,10 @@ from src.modules.Screens.Controlscreens.Arland import Arland as Arlscr
 from src.modules.Screens.Controlscreens.Venator import Venator as Venscr
 from src.modules.Screens.Textcrawl import Textcrawl as txtscr
 from src.modules.systems.save import saveGame, loadSave
-
+from src.modules.UI.Levels import LoadLvls
 
 pygame.init()
-pygame.display.set_caption("Liberty") #VIVA LA LIBERTAS
+pygame.display.set_caption("Tournament of Lympos")
 
 
 # three functions that run all screens that can be called from main menu.
@@ -28,33 +28,13 @@ def run_menu():
     menu = mainmenu(con.display_surface, con.clock)
     return menu.run()
 
-def run_story_levels():
-    pass
-
-def run_singleplayer():
-    sub_state = 'Char'
-    while sub_state != "Fight":
-        if sub_state == 'Char':
-            sub_state = charselect(con.display_surface, con.clock).run()
-            if sub_state == "Menu":
-                return sub_state
-        elif sub_state == "Boon":
-            sub_state = boonscr(con.display_surface, con.clock).run()
-        elif sub_state == "Map":
-            sub_state = mapscr(con.display_surface, con.clock).run()
-        elif sub_state == "CPU":
-            sub_state = cpuscr(con.display_surface, con.clock).run()
-        elif sub_state == 'quit':
-            return sub_state
-    return sub_state
-
 def run_fight():
     fight = fightscr(con.display_surface, con.clock)
     return fight.run()
 
 def run_help():
-    help = helpscr(con.display_surface, con.clock)
-    return help.run()
+    Help = helpscr(con.display_surface, con.clock)
+    return Help.run()
 
 def run_edward():
     Edward = Edscr(con.display_surface, con.clock)
@@ -95,48 +75,59 @@ while state != "quit":
     
     elif state == "Story":
         sub_state = 'Char'
-        while sub_state != "Fight":
+        while sub_state != "Menu":
             if sub_state == 'Textcrawl':
                 sub_state = txtscr(con.display_surface, con.clock).run()
-            if sub_state == 'Crawlend':
+            elif sub_state == 'Crawlend':
                 sub_state = txtscr(con.display_surface, con.clock, "Story", True).run()
-            if sub_state == 'Char':
+            elif sub_state == 'Char':
                 sub_state = charselect(con.display_surface, con.clock, True).run()
-            if sub_state == "Menu":
-                state = sub_state
-                break
+            elif sub_state == "CPU":
+                sub_state = cpuscr(con.display_surface, con.clock, story=True).run()
             elif sub_state == "Boon":
                 sub_state = boonscr(con.display_surface, con.clock, True).run()
+            elif sub_state == "Levels":
+                sub_state = LoadLvls().run()
             elif sub_state == 'quit':
                 state = sub_state
                 break
             state = sub_state
 
     elif state == "Singleplayer":
-        state = run_singleplayer()
-        if state == "Fight":
-            con.cpu_enabled = True
-
-    elif state == "Multiplayer":
-        con.cpu_enabled = False
         sub_state = 'Char'
-        while sub_state != "Fight":
+        while sub_state != "Menu":
             if sub_state == 'Char':
                 sub_state = charselect(con.display_surface, con.clock).run()
-                if sub_state == "Menu":
-                    state = sub_state
-                    break
             elif sub_state == "Boon":
                 sub_state = boonscr(con.display_surface, con.clock).run()
             elif sub_state == "Map":
-                sub_state = mapscr(con.display_surface, con.clock, multiplayer=True).run()
+                sub_state = mapscr(con.display_surface, con.clock).run()
+            elif sub_state == "CPU":
+                sub_state = cpuscr(con.display_surface, con.clock).run()
+            elif sub_state == "Fight":
+                con.background_music.stop()
+                con.cpu_enabled = True
+                sub_state = run_fight() 
             elif sub_state == 'quit':
                 break
             state = sub_state
 
-    elif state == "Fight":
-        con.background_music.stop()
-        state = run_fight() 
+    elif state == "Multiplayer":
+        con.cpu_enabled = False
+        sub_state = 'Char'
+        while sub_state != "Menu":
+            if sub_state == 'Char':
+                sub_state = charselect(con.display_surface, con.clock).run()
+            elif sub_state == "Boon":
+                sub_state = boonscr(con.display_surface, con.clock).run()
+            elif sub_state == "Map":
+                sub_state = mapscr(con.display_surface, con.clock, multiplayer=True).run()
+            elif sub_state == "Fight":
+                con.background_music.stop()
+                sub_state = run_fight() 
+            elif sub_state == 'quit':
+                break
+            state = sub_state
 
     elif state == "Help":
         state = run_help()

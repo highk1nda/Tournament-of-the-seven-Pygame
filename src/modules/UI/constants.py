@@ -1,10 +1,8 @@
 import pygame
-from pathlib import Path
 
 pygame.font.init()
 pygame.mixer.init()
 
-# constant variables to stop accumalating technical debt:
 
 # =============== Initial Screen ===============
 
@@ -72,7 +70,7 @@ buttonwidth = SCREEN_WIDTH / 5
 buttonheight = SCREEN_HEIGHT / 15
 buttonspacing = SCREEN_HEIGHT / 10
 
-button_y = (center_y) - (buttonspacing * 2)
+button_y = (center_y) - (buttonspacing * 1.2)
 button_x = (center_x) - (buttonwidth / 2)
 
 # =============== Select Char,Boon,Map Screen ===============
@@ -173,7 +171,7 @@ MAX_ALPHA = 255  # full black
 
 # =============== Rematch Screen ===============
 
-WINDOW_WIDTH = int(SCREEN_WIDTH * 0.36)
+WINDOW_WIDTH = int(SCREEN_WIDTH * 0.48)
 WINDOW_HEIGHT = int(SCREEN_HEIGHT * 0.52)
 WINDOW_X = (SCREEN_WIDTH - WINDOW_WIDTH) // 2
 WINDOW_Y = (SCREEN_HEIGHT - WINDOW_HEIGHT) // 2
@@ -187,6 +185,7 @@ WINDOW_BUTTON_Y = WINDOW_Y + WINDOW_HEIGHT - WINDOW_BUTTON_HEIGHT - int(SCREEN_H
 
 WINDOW_YES_X = WINDOW_X + WINDOW_WIDTH // 2 - WINDOW_BUTTON_WIDTH - WINDOW_BUTTON_GAP // 2
 WINDOW_NO_X  = WINDOW_X + WINDOW_WIDTH // 2 + WINDOW_BUTTON_GAP // 2
+WINDOW_NO_BUTTON_WIDTH = WINDOW_X + WINDOW_WIDTH - WINDOW_NO_X - int(SCREEN_HEIGHT * 0.02)
 
 TITLE_GAP = int(SCREEN_HEIGHT * 0.025)
 TITLE_PREVIEW_GAP = int(SCREEN_HEIGHT * 0.015)
@@ -287,6 +286,7 @@ cpu_enabled = False
 cpu_level   = 1
 
 # fonts
+font_XXLarge = pygame.font.SysFont(None, 120)
 font_XLarge = pygame.font.SysFont(None, 64)
 font_Large = pygame.font.SysFont(None, 46)
 font_Big = pygame.font.SysFont(None, 35)
@@ -318,3 +318,9 @@ arlandIntroPath = "assets/stories/ArlandIntro.txt"
 arlandEndingPath = "assets/stories/ArlandEnd.txt"
 
 venatorIntroPath = "assets/stories/VenatorIntro.txt"
+
+firstcompleted=False 
+secondcompleted=False
+thirdcompleted=False
+fourthcompleted=False
+finalcompleted=False
