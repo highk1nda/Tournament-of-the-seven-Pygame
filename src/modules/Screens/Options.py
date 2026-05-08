@@ -59,7 +59,6 @@ class Options():
     def apply_volume(self):
         con.musicVolume = self.musicSlider.value / 100
         con.sfxVolume = self.sfxSlider.value / 100
-        con.forest_sfx.set_volume(con.sfxVolume)
         con.select_sound.set_volume(con.sfxVolume)
         con.ui_error_sound.set_volume(con.sfxVolume)
         con.exit_sound.set_volume(con.sfxVolume)
