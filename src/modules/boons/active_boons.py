@@ -1,5 +1,6 @@
 import pygame
 from src.modules.UI import constants as con
+from src.modules.sfx.sound_loader import load_boon_sounds
 
 BOON_COOLDOWN = 12000  # 12 seconds between activations
 
@@ -11,6 +12,7 @@ BOON_ASSET_KEY = {
     "Area of Warding": "warding_frames",
 }
 
+BOON_SOUNDS = load_boon_sounds()
 
 def load_boon_assets():
     assets = {}
@@ -58,6 +60,7 @@ class FreezeDebuff:
         self.start_time = pygame.time.get_ticks()
         self.active = True
         target.frozen = True
+        self.break_sound_played = False
 
     def update(self):
         if not self.active:
@@ -67,6 +70,9 @@ class FreezeDebuff:
         return self.active
 
     def notify_damage(self):
+        if not self.break_sound_played:
+            BOON_SOUNDS["sub_zero_break"].play()
+            self.break_sound_played = True
         self._end()
 
     def _end(self):
@@ -91,6 +97,7 @@ class BurnDebuff:
         target.burning = True
         self.last_tick = pygame.time.get_ticks()
         self.last_hit = pygame.time.get_ticks()
+        BOON_SOUNDS["burn"].play()
 
     def update(self):
         if not self.active:
@@ -99,9 +106,15 @@ class BurnDebuff:
         if now - self.start_time > self.duration:
             self._end()
             return False
+        
+        if self.target.death:
+            self._end()
+            return False
+        
         if self.target.running and now - self.last_tick > self.damage_interval:
             self.target.receive_damage(self.burn_damage, attacker=None)
             self.last_tick = now
+
         if now - self.last_hit > self.hit_interval and not self.target.death:
             self.target.stun = True
             self.last_hit = now
@@ -117,6 +130,7 @@ class SubZeroActiveBoon:
     anim_cooldown = 80
     frame_scale = 10        # scales each frame up to fill the effect area
     freeze_frame = 14       # frame index when freeze is applied to target
+    sound_frame = 7
     warning_seq = [24, 23, 22, 21]  # last 4 frames in reverse used as ground warning
 
     def __init__(self, caster, target, frames):
@@ -133,6 +147,8 @@ class SubZeroActiveBoon:
         self.freeze_pending = False
         self.locked_cx = None
         self.locked_bottom = None
+        self.freeze_sound_played = False
+        self.break_sound_played = False
 
     def update(self):
         if self.done:
@@ -155,18 +171,33 @@ class SubZeroActiveBoon:
                 and self.target.freeze_debuff.active
                 and now - self.target.freeze_debuff.start_time >= FreezeDebuff.duration - 1000
             )
+
+            if ending_soon and not self.break_sound_played:
+                BOON_SOUNDS["sub_zero_break"].play()
+                self.break_sound_played = True
+                # avoid sfx duplicate
+                if self.target.freeze_debuff:
+                    self.target.freeze_debuff.break_sound_played = True
+
             frozen_hold = self.frame_index >= self.freeze_frame and (self.target.frozen or self.freeze_pending) and not ending_soon
             if not frozen_hold and now - self.last_time > self.anim_cooldown:
                 self.frame_index += 1
                 self.last_time = now
+                
             if self.frame_index >= self.freeze_frame and not self.freeze_applied and not self.target.death:
                 self.freeze_pending = True
+
+            if self.frame_index >= self.sound_frame and not self.freeze_sound_played:
+                BOON_SOUNDS["sub_zero_freeze"].play()
+                self.freeze_sound_played = True
+            
             if self.freeze_pending and not self.freeze_applied and not self.target.jumping and not self.target.death:
                 self.target.freeze_debuff = FreezeDebuff(self.target)
                 self.freeze_applied = True
                 self.freeze_pending = False
                 self.locked_cx     = self.target.rect.centerx
                 self.locked_bottom = self.target.rect.bottom
+            
             if self.frame_index >= len(self.frames):
                 self.done = True
 
@@ -219,6 +250,8 @@ class ScorchingRayActiveBoon:
         self.done = False
         self.hit  = False
 
+        BOON_SOUNDS["scorching_ray"].play()
+
     def update(self):
         if self.done:
             return
@@ -262,8 +295,8 @@ class ScorchingRayActiveBoon:
 
 
 class AreaOfWardingActiveBoon:
-    duration        = 8000
-    anim_cooldown   = 35
+    duration        = 6000
+    anim_cooldown   = 51
     zone_radius     = 160
     damage_interval = 600
     zone_damage     = 3
@@ -278,14 +311,19 @@ class AreaOfWardingActiveBoon:
         self.last_time   = pygame.time.get_ticks()
         self.last_damage = pygame.time.get_ticks()
         self.done = False
+        BOON_SOUNDS["warding_loop"].play(-1)
 
     def update(self):
         if self.done:
             return
         now = pygame.time.get_ticks()
 
+        if self.caster.death or self.target.death:
+            self.cleanup()
+            return
+
         if now - self.start_time > self.duration:
-            self.done = True
+            self.cleanup()
             return
 
         if now - self.last_time > self.anim_cooldown:
@@ -304,6 +342,10 @@ class AreaOfWardingActiveBoon:
                 self.target.stun = True
                 self.target.sounds["hit"].play()
                 self.last_damage = now
+    
+    def cleanup(self):
+        BOON_SOUNDS["warding_loop"].stop()
+        self.done = True
 
     def draw(self, surface):
         if self.done:

@@ -37,7 +37,7 @@ boons = [
             "Creates a magical zone around you.",
             "Any opponent who enters",
             "continuously takes damage.",
-            "Duration: 8 seconds.",
+            "Duration: 6 seconds.",
         ],
     },
     {

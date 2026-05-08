@@ -7,37 +7,45 @@ def load_fighter_sounds():
         "walk": pygame.mixer.Sound(
             "assets/sfx/knight-right-footstep-on-gravel-4-with-chainmail-101937.mp3"
         ),
-        "attack1": pygame.mixer.Sound(
-            "assets/sfx/sword_sfx/sword-slice-393847.mp3"
-        ),
-        "attack2": pygame.mixer.Sound(
-            "assets/sfx/sword_sfx/sword-slashing-game-sound-effect-1-379228.mp3"
-        ),
-        "attack3": pygame.mixer.Sound(
-            "assets/sfx/sword_sfx/short-fire-whoosh_1-317280.mp3"
-        ),
-        "attack4": pygame.mixer.Sound(
-            "assets/sfx/sword_sfx/fire-breath-6922.mp3"
-        ),
-        "orc_attack": pygame.mixer.Sound(
-            "assets/sfx/sword_sfx/character-falling-on-ground-250069.mp3"
-        ),
-        "jump": pygame.mixer.Sound("assets/sfx/jump.mp3"),
-        "dash": pygame.mixer.Sound("assets/sfx/woosh.mp3"),
-        "death": pygame.mixer.Sound("assets/sfx/death.mp3"),
+        "dash":     pygame.mixer.Sound("assets/sfx/woosh.mp3"),
+        "death":    pygame.mixer.Sound("assets/sfx/death.mp3"),
         "hit":      pygame.mixer.Sound("assets/sfx/hit.mp3"),
         "cheering": pygame.mixer.Sound("assets/sfx/cheering.mp3") #TODO: use it randomly every 10to20 seconds
     }
 
     sounds["walk"].set_volume(con.sfxVolume)
-    sounds["attack1"].set_volume(con.sfxVolume)
-    sounds["attack2"].set_volume(con.sfxVolume)
-    sounds["attack3"].set_volume(con.sfxVolume)
-    sounds["jump"].set_volume(con.sfxVolume)
     sounds["dash"].set_volume(con.sfxVolume) 
     sounds["death"].set_volume(con.sfxVolume)
     sounds["hit"].set_volume(con.sfxVolume)   
     return sounds
+
+def load_attack_sounds(char_data):
+    sounds = {}
+    for action, path in char_data["attack_sounds"].items():
+        s = pygame.mixer.Sound(path)
+        s.set_volume(con.sfxVolume)
+        sounds[action] = s
+    return sounds
+
+def load_boon_sounds():
+    paths = {
+        "devils_die_rolling":  "assets/sfx/boons/dice_rolling.mp3",
+        "devils_die_curse":    "assets/sfx/boons/dice_curse.mp3",
+        "devils_die_revive":   "assets/sfx/boons/dice_revive.mp3",
+        "sub_zero_freeze":     "assets/sfx/boons/sub_zero_freeze.mp3",
+        "sub_zero_break":      "assets/sfx/boons/sub_zero_break.mp3",
+        "scorching_ray":       "assets/sfx/boons/scorching_ray_fireball.mp3",
+        "burn":                "assets/sfx/boons/burn.mp3",
+        "warding_loop":        "assets/sfx/boons/warding_loop.mp3",
+        "last_stand_activate": "assets/sfx/boons/last_stand_activate.mp3"
+    }
+    sounds = {}
+    for key, path in paths.items():
+        s = pygame.mixer.Sound(path)
+        s.set_volume(con.sfxVolume)
+        sounds[key] = s
+    return sounds
+
 """
                                              ,--,  ,.-.
                ,                   \,       '-,-`,'-.' | ._

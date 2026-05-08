@@ -63,6 +63,8 @@ class FightScreen():
         self.revive_update_time = 0
         self.revive_frame_index = 0
 
+        self.fight_sound_played = False
+
     def loadfighters(self):
         p1_data = getattr(con, "p1_selected", chardict.KNIGHT_DATA) # default to knight if not set
         p2_data = getattr(con, "p2_selected", chardict.WEREBEAR_DATA) # default to werebear if not set
@@ -77,10 +79,17 @@ class FightScreen():
         self.cpu = CPUController(level=self.cpu_level, char_data=p2_data)
 
         self.background = con.fight_backgrounds[con.selected_map]
+        self.cleanup_boon_effects()
         self.boon_effects = []
         burn_frames = self.boon_assets.get("burn_effect_frames")
         self.player1.burn_effect_frames = burn_frames
         self.player2.burn_effect_frames = burn_frames
+    
+    def cleanup_boon_effects(self):
+        for effect in self.boon_effects:
+            if hasattr(effect, "cleanup"):
+                effect.cleanup()
+        self.boon_effects = []
         
     def revive_fighter(self, fighter):
         fighter.death = False
@@ -97,7 +106,12 @@ class FightScreen():
         current_time = pygame.time.get_ticks()
 
         if self.state == "countdown":
-            if current_time - self.state_timer >= con.ROUND_TEXT_DURATION:
+            passed_time = current_time - self.state_timer
+            if passed_time >= con.ROUND_TEXT_DURATION // 2 and not self.fight_sound_played:
+                con.fight_text_sound.play()
+                self.fight_sound_played = True
+                
+            if passed_time >= con.ROUND_TEXT_DURATION:
                 self.state = "fight"
                 self.round_death = None
                 self.round_start_time = current_time
@@ -183,11 +197,13 @@ class FightScreen():
                     self.round_death = self.player2
                     self.p1_wins += 1
 
+                self.cleanup_boon_effects()
                 self.state = "death_animation"
                 self.state_timer = current_time
             return None
         
         if self.state == "time_over":
+            self.cleanup_boon_effects()
             if current_time - self.state_timer > con.ROUND_TEXT_DURATION:
                 self.round_text = self.round_second_text
                 self.state = "round_end"
@@ -281,6 +297,7 @@ class FightScreen():
                 self.dice_player = None
                 self.current_round += 1
                 self.state = "countdown"
+                self.fight_sound_played = False
                 self.state_timer = current_time
             
             return None
@@ -313,6 +330,7 @@ class FightScreen():
                 self.fade_alpha = 0
                 self.current_round += 1
                 self.state = "countdown"
+                self.fight_sound_played = False
                 self.state_timer = current_time
             return None
        
@@ -351,10 +369,14 @@ class FightScreen():
             display_seconds = max(0, (con.ROUND_DURATION - round_time) // 1000)
             draw_timer(self.screen, display_seconds)
 
-        draw_boon_icons(self.screen, self.player1, con.p1_active_boon, con.p1_passive_boon, 
-                        self.boon_icons, False, self.state, self.dice_player, self.dice_result, self.dice_saved)
-        draw_boon_icons(self.screen, self.player2, con.p2_active_boon, con.p2_passive_boon, 
-                        self.boon_icons, True, self.state, self.dice_player, self.dice_result, self.dice_saved)
+        if self.dice:
+            live_result = getattr(self.dice, 'text', None)
+        else:
+            live_result = None
+        draw_boon_icons(self.screen, self.player1, con.p1_active_boon, con.p1_passive_boon, self.boon_icons, 
+                        False, self.state, self.dice_player, self.dice_result, self.dice_saved, live_result)
+        draw_boon_icons(self.screen, self.player2, con.p2_active_boon, con.p2_passive_boon, self.boon_icons, 
+                        True, self.state, self.dice_player, self.dice_result, self.dice_saved, live_result)
 
         if self.fade_alpha > 0:
             self.fade_surface.set_alpha(self.fade_alpha)
@@ -388,6 +410,7 @@ class FightScreen():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.player1.clean_up()
                     self.player2.clean_up()
+                    self.cleanup_boon_effects()
                     con.forest_sfx.stop()
                     con.fight_music.stop()
                     con.exit_sound.play()
@@ -415,6 +438,7 @@ class FightScreen():
                     self.current_round = 1
                     self.state = "countdown"
                     self.loadfighters()
+                    self.fight_sound_played = False
                     self.state_timer = pygame.time.get_ticks()
                 elif rematch_result == "pause":
                     pass

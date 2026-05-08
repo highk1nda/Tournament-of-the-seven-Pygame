@@ -61,18 +61,20 @@ def draw_cooldown(surface, cd, x, y):
     surface.blit(text_surface, (x + ICON_SIZE // 2 - text_surface.get_width() // 2,
                                 y + ICON_SIZE // 2 - text_surface.get_height() // 2))
 
-def devils_die_icon(surface, icons, x, y, fighter, fight_state, dice_player, dice_result, dice_saved):
+def devils_die_icon(surface, icons, x, y, fighter, fight_state, dice_player, dice_result, dice_saved, live_result=None):
     rolling = (fight_state == "dice_roll" and dice_player is fighter)
+    live_revive = (rolling and live_result is not None and live_result == "REVIVE")
+    live_curse = (rolling and live_result is not None and live_result == "CURSE")
     reviving = (fight_state == "revive_animation" and dice_player is fighter)
     revived = (dice_result == "revive" and dice_saved is fighter and fight_state not in ["dice_roll", "revive_animation"])
     cursed = (dice_result == "curse" and dice_saved is fighter)
 
-    if rolling:
-        draw_single_icon(surface, icons["Devil's Die"], x, y, ON_COLOR, PASSIVE_BORDER_COLOR)
-    elif reviving or revived:
-        draw_single_icon(surface, icons["Devil's Die revive"], x, y, REVIVE_COLOR, PASSIVE_BORDER_COLOR)
-    elif cursed:
+    if live_curse or cursed:
         draw_single_icon(surface, icons["Devil's Die curse"], x, y, CURSE_COLOR, PASSIVE_BORDER_COLOR)
+    elif live_revive or reviving or revived:
+        draw_single_icon(surface, icons["Devil's Die revive"], x, y, REVIVE_COLOR, PASSIVE_BORDER_COLOR)
+    elif rolling:
+        draw_single_icon(surface, icons["Devil's Die"], x, y, ON_COLOR, PASSIVE_BORDER_COLOR)
     else:
         draw_single_icon(surface, icons["Devil's Die"], x, y, OFF_COLOR, PASSIVE_BORDER_COLOR)
 
@@ -99,7 +101,7 @@ def adrenaline_icon(surface, icon, x, y, count):
     surface.blit(icon, (x, y), special_flags=pygame.BLEND_MULT)
 
 def draw_boon_icons(surface, fighter, active_boon, passive_boon, icons, right_side, 
-                    fight_state, dice_player, dice_result, dice_saved):
+                    fight_state, dice_player, dice_result, dice_saved, live_result):
     current_time = pygame.time.get_ticks()
 
     if right_side:
@@ -122,7 +124,8 @@ def draw_boon_icons(surface, fighter, active_boon, passive_boon, icons, right_si
     icon_y = ICON_Y + ICON_SIZE + ICON_GAP
     passive_boon_name = passive_boon["key"]
     if passive_boon_name == "devils_die":
-        devils_die_icon(surface, icons, icon_x, icon_y, fighter, fight_state, dice_player, dice_result, dice_saved)
+        devils_die_icon(surface, icons, icon_x, icon_y, fighter, fight_state, 
+                        dice_player, dice_result, dice_saved, live_result)
     
     elif passive_boon_name == "last_stand":
         icon = icons["Last Stand"]

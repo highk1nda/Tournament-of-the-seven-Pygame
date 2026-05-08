@@ -68,6 +68,11 @@ KNIGHT_DATA = {
             "ATTACK2": 200,
             "ATTACK3": 600
     },
+    "attack_sounds": {
+            "ATTACK1": "assets/sfx/chars/knight/attack1.mp3",
+            "ATTACK2": "assets/sfx/chars/knight/attack2.mp3",
+            "ATTACK3": "assets/sfx/chars/knight/attack3.mp3"
+    },
     "cpu": {
             "attack_range":    None,    # None = use level default
             "min_attack_dist": 0,       # melee: no minimum distance
@@ -136,6 +141,11 @@ WEREBEAR_DATA = {
             "ATTACK1": 300,  # ms
             "ATTACK2": 200,
             "ATTACK3": 600
+    },
+    "attack_sounds": {
+            "ATTACK1": "assets/sfx/chars/werebear/attack1.mp3",
+            "ATTACK2": "assets/sfx/chars/werebear/attack2.mp3",
+            "ATTACK3": "assets/sfx/chars/werebear/attack3.mp3"
     },
     "cpu": {
             "attack_range":    None,    # None = use level default
@@ -219,6 +229,10 @@ WIZARD_DATA = {
             "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 20)]
         }
     },
+    "attack_sounds": {
+            "ATTACK1": "assets/sfx/chars/wizard/attack1.mp3",
+            "ATTACK2": "assets/sfx/chars/wizard/attack2.mp3"
+    },
     "cpu": {
             "attack_range":    con.SCREEN_WIDTH, # ranged: always in range, never close the gap
             "min_attack_dist": 300,              # ranged: back off if enemy gets too close
@@ -280,6 +294,11 @@ MINOTAUR_DATA = {
             "ATTACK1": 300,  # ms
             "ATTACK2": 400,
             "ATTACK3": 500
+    },
+    "attack_sounds": {
+            "ATTACK1": "assets/sfx/blank.mp3",          # punch no need for sfx
+            "ATTACK2": "assets/sfx/chars/minotaur/attack2.mp3",
+            "ATTACK3": "assets/sfx/chars/minotaur/attack3.mp3"
     },
     "cpu": {
             "attack_range":    None,    # None = use level default
@@ -361,6 +380,10 @@ ARCHER_DATA = {
             "offset": [int(con.SCREEN_WIDTH / 40), int(con.SCREEN_HEIGHT / 21.3)]
         }
     },
+    "attack_sounds": {
+            "ATTACK1": "assets/sfx/chars/archer/attack1.mp3",
+            "ATTACK2": "assets/sfx/chars/archer/attack2.mp3"
+    },
     "cpu": {
             "attack_range":    con.SCREEN_WIDTH, # ranged: always in range, never close the gap
             "min_attack_dist": 300,              # ranged: back off if enemy gets too close
@@ -429,6 +452,11 @@ KNIGHT_TEMPLAR_DATA = {
             "ATTACK1": 500,  # ms
             "ATTACK2": 500,
             "ATTACK3": 200
+    },
+    "attack_sounds": {
+            "ATTACK1": "assets/sfx/chars/knight templar/attack1.mp3",
+            "ATTACK2": "assets/sfx/chars/knight templar/attack2.mp3",
+            "ATTACK3": "assets/sfx/chars/knight templar/attack3.mp3"
     },
     "cpu": {
             "attack_range":    None,    # None = use level default

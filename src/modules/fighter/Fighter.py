@@ -1,7 +1,7 @@
 import pygame
 
 from src.modules.fighter.render import load_animation_frames, update_fighter_animation, update_wind_animation
-from src.modules.sfx.sound_loader import load_fighter_sounds
+from src.modules.sfx.sound_loader import load_fighter_sounds, load_attack_sounds, load_boon_sounds
 from src.modules.UI import constants as con
 from src.modules.UI import CharDictionary as chardict
 from src.modules.fighter.Projectile import Projectile
@@ -81,12 +81,8 @@ class Fighter():
         self.boon_was_pressed = False
 
         self.sounds = load_fighter_sounds()
-        self.walk_sound = self.sounds["walk"]
-        self.sword_attack1_sound = self.sounds["attack1"]
-        self.sword_attack2_sound = self.sounds["attack2"]
-        self.sword_attack3_sound = self.sounds["attack3"]
-        self.sword_attack4_sound = self.sounds["attack4"]
-        self.orc_attack_sound = self.sounds["orc_attack"]
+        self.attack_sounds = load_attack_sounds(char_data)
+        self.boon_sounds = load_boon_sounds()
 
         self.walk_sound_playing = False
         self.attack_sound_played = False
@@ -169,6 +165,7 @@ class Fighter():
         if self.passive_boon == "last_stand" and not self.last_stand_active:
             if LastStand.check_activation(self):
                 self.last_stand_active = True
+                self.boon_sounds["last_stand_activate"].play()
 
         # check dashing cooldown
         if self.dashing_in_cooldown:
@@ -271,22 +268,18 @@ class Fighter():
         # walking sound
         if self.running:
             if not self.walk_sound_playing:
-                self.walk_sound.play(-1)  # loop
+                self.sounds["walk"].play(-1)  # loop
                 self.walk_sound_playing = True
         else:
             if self.walk_sound_playing:
-                self.walk_sound.stop()
+                self.sounds["walk"].stop()
                 self.walk_sound_playing = False
         # sword sound
         if self.attacking and not self.attack_sound_played:
-            if self.attack_type == 1:
-                self.sword_attack1_sound.play()
-            elif self.attack_type == 2:
-                self.sword_attack2_sound.play()
-            elif self.attack_type == 3:
-                self.sword_attack3_sound.play()
-            elif self.attack_type == 4:
-                self.orc_attack_sound.play()
+            attack_key = f"ATTACK{self.attack_type}"
+            sound = self.attack_sounds.get(attack_key)
+            if sound:
+                sound.play()
             self.attack_sound_played = True
 
         # apply gravity
@@ -442,5 +435,5 @@ class Fighter():
                                      self.rect.bottom - flame_h))
 
     def clean_up(self):
-        self.walk_sound.stop()
+        self.sounds["walk"].stop()
         self.walk_sound_playing = False

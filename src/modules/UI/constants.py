@@ -254,6 +254,8 @@ ui_error_sound   = pygame.mixer.Sound("assets/sfx/floraphonic-arcade-ui-4.mp3")
 exit_sound       = pygame.mixer.Sound("assets/sfx/musicholder-woosh-260275.mp3")
 
 forest_sfx = pygame.mixer.Sound(forestsound)
+fight_text_sound = pygame.mixer.Sound("assets/sfx/impact.mp3")
+fight_text_sound.set_volume(sfxVolume)
 
 # backgrounds
 background = pygame.transform.scale(pygame.image.load(fightscreenimage).convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
