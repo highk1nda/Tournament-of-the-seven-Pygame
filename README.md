@@ -148,10 +148,16 @@ python main.py
 	Active boon 3
 	Graksyn
 	https://coloritmic.itch.io/icecool-pack
-	
+
 	Dice icon
 	SkullReaper
 	https://skullreaper.itch.io/dice-icons
+
+	Passive boon 2
+	AI generated
+
+	Passive boon 3 
+	AI generated
 
 	Menu Music
 	Music: Planning by Alexander Nakarada (https://www.creatorchords.com)
@@ -163,6 +169,32 @@ python main.py
 	Licensed under Creative Commons BY Attribution 4.0 License
 	https://creativecommons.org/licenses/by/4.0/
 
+	Roar sound
+	AI generated
+	https://pixabay.com/sound-effects/nature-bear-roar-cinematic-growling-hd-375396/
+
+	Fireball sound
+	Royalty Free Audio - www.floraphonic.com
+	https://pixabay.com/sound-effects/film-special-effects-fireball-whoosh-2-179126/
+
+	Ice magic sound
+	AI generated
+	https://pixabay.com/sound-effects/film-special-effects-iced-magic-5-378605/
+
+	Explosion sound
+	https://pixabay.com/sound-effects/film-special-effects-explosion-pas-61639/
+
+	Arrow sound
+	https://pixabay.com/sound-effects/film-special-effects-arrow-swish-03-306040/
+
+	Sword blade slicing
+	https://pixabay.com/sound-effects/film-special-effects-sword-blade-slicing-flesh-352708/
+
+	Alternative sword slice
+	https://pixabay.com/de/sound-effects/film-spezialeffekte-violent-sword-slice-393839/
+
+	Energy hum sound
+	https://pixabay.com/sound-effects/film-special-effects-energy-hum-29083/
 ---
 
 <p align="center">

@@ -122,7 +122,7 @@ def draw_boon_icons(surface, fighter, active_boon, passive_boon, icons, right_si
 
     # draw passive boon icon
     icon_y = ICON_Y + ICON_SIZE + ICON_GAP
-    passive_boon_name = passive_boon["key"]
+    passive_boon_name = passive_boon
     if passive_boon_name == "devils_die":
         devils_die_icon(surface, icons, icon_x, icon_y, fighter, fight_state, 
                         dice_player, dice_result, dice_saved, live_result)

@@ -131,8 +131,8 @@ class FightScreen():
 
             # spawn boon effects when a fighter requests one
             for fighter, target, boon_con in (
-                (self.player1, self.player2, con.p1_active_boon),
-                (self.player2, self.player1, con.p2_active_boon),
+                (self.player1, self.player2, con.p1_boon),
+                (self.player2, self.player1, con.p2_boon),
             ):
                 if fighter.wants_boon:
                     fighter.wants_boon = False
@@ -375,9 +375,9 @@ class FightScreen():
             live_result = getattr(self.dice, 'text', None)
         else:
             live_result = None
-        draw_boon_icons(self.screen, self.player1, con.p1_active_boon, con.p1_passive_boon, self.boon_icons, 
+        draw_boon_icons(self.screen, self.player1, con.p1_boon, con.p1_passive_boon, self.boon_icons,
                         False, self.state, self.dice_player, self.dice_result, self.dice_saved, live_result)
-        draw_boon_icons(self.screen, self.player2, con.p2_active_boon, con.p2_passive_boon, self.boon_icons, 
+        draw_boon_icons(self.screen, self.player2, con.p2_boon, con.p2_passive_boon, self.boon_icons,
                         True, self.state, self.dice_player, self.dice_result, self.dice_saved, live_result)
 
         if self.fade_alpha > 0:

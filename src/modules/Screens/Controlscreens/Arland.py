@@ -20,7 +20,7 @@ class Arland():
         if con.storyArlandComplete:
             self.Ending = Button(1600, 900, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Ending', con.font_Large, con.DARK_RED)
         else:
-            self.Ending = Button(1600, 900, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Ending', con.font_Large, con.BLACK, Nonselect=True)
+            self.Ending = Button(1600, 900, int(con.SCREEN_WIDTH/8), con.buttonheight, 'Ending', con.font_Large, con.BLACK, nonselect=True)
 
         self.click = False
         self.preview = CharPreview(charDict.CHARACTER_DATA[4])

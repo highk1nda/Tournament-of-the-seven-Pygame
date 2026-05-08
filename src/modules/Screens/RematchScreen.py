@@ -73,7 +73,7 @@ class RematchScreen:
         self.screen.blit(text_surface, text_surface.get_rect(centerx=self.window_rect.centerx, y=rematch_y))
 
         if self.story:
-            title = con.font_Large.render("Press ESC to return to main menu. Note: going back to main menu or character select will reset progreess", 
+            title = con.font_Large.render("Press ESC to return to main menu. Note: going back to main menu or character select will reset progress", 
                                           True, con.YELLOW)
         else:
             title = con.font_Large.render("Press ESC to return to main menu", True, con.YELLOW)
